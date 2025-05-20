@@ -45,7 +45,7 @@ const CategoryShow = ({ category }) => {
           <div className="md:col-span-1 bg-white dark:bg-cinematic-800 p-4 rounded-lg shadow dark:shadow-soft border border-cinematic-200 dark:border-cinematic-700"> {/* Dark bg, shadow, border */}
             <div className="aspect-w-1 aspect-h-1 w-full overflow-hidden rounded-lg bg-gray-200 dark:bg-cinematic-700"> {/* Dark image bg */}
               <img
-                src={category.image}
+                src={`/storage/${category.image}?v=${new Date().getTime()}`}
                 alt={category.name}
                 className="h-full w-full object-cover object-center"
               />
@@ -226,7 +226,13 @@ const CategoryShow = ({ category }) => {
                         <div className="flex-shrink-0 h-10 w-10">
                           <img
                             className="h-10 w-10 rounded-md object-cover bg-gray-200 dark:bg-cinematic-700" // Dark image bg
-                            src={product.image || `https://via.placeholder.com/40/cccccc/969696?text=No+Image`} // Placeholder with dark bg
+                            src={
+                              product.image
+                                ? `/storage/${product.image}?v=${new Date().getTime()}`
+                                : product.images && product.images.length > 0
+                                  ? `/storage/${product.images[0].url}?v=${new Date().getTime()}`
+                                  : `/assets/default-product.png?v=${new Date().getTime()}`
+                            }
                             alt={product.name}
                           />
                         </div>
