@@ -305,7 +305,13 @@ const CartIndex = ({ cart }) => {
                       <div className="flex flex-col sm:flex-row sm:items-center">
                         <div className="flex-shrink-0 w-full sm:w-20 md:w-24 h-20 sm:h-20 md:h-24 rounded-md overflow-hidden mb-3 sm:mb-0">
                           <img
-                            src={cartItem.product.image || `https://images.unsplash.com/photo-1596462502278-27bfdc403348?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=580&q=80`}
+                            src={
+                              cartItem.product.image
+                                ? `/storage/${cartItem.product.image}?v=${new Date().getTime()}`
+                                : cartItem.product.images && cartItem.product.images[0]?.url
+                                  ? `/storage/${cartItem.product.images[0].url}?v=${new Date().getTime()}`
+                                  : `/assets/default-product.png?v=${new Date().getTime()}`
+                            }
                             alt={cartItem.product.name}
                             className="w-full h-full object-cover object-center"
                           />
