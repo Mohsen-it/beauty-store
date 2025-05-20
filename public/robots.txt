@@ -1,0 +1,17 @@
+User-agent: *
+Allow: /
+Disallow: /admin/
+Disallow: /checkout/
+Disallow: /cart/
+Disallow: /profile/
+Disallow: /login
+Disallow: /register
+Disallow: /password/
+Disallow: /email/
+Disallow: /api/
+Disallow: /storage/
+Disallow: /telescope/
+Disallow: /horizon/
+
+# Sitemap
+Sitemap: https://your-domain.com/sitemap.xml

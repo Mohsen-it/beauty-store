@@ -1,0 +1,186 @@
+/* Enhanced transitions for Cinematic Store theme */
+
+/* Page transitions */
+.page-enter {
+  opacity: 0;
+  transform: translateY(10px);
+}
+
+.page-enter-active {
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 400ms, transform 400ms;
+}
+
+.page-exit {
+  opacity: 1;
+}
+
+.page-exit-active {
+  opacity: 0;
+  transition: opacity 300ms;
+}
+
+/* Cinematic fade effects */
+.cinematic-fade-in {
+  animation: cinematicFadeIn 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.cinematic-fade-up {
+  animation: cinematicFadeUp 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.cinematic-fade-down {
+  animation: cinematicFadeDown 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.cinematic-fade-left {
+  animation: cinematicFadeLeft 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.cinematic-fade-right {
+  animation: cinematicFadeRight 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Staggered animations for lists */
+.stagger-item {
+  opacity: 0;
+}
+
+.stagger-item-visible {
+  animation: cinematicFadeUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Spotlight hover effect */
+.spotlight-hover {
+  position: relative;
+  overflow: hidden;
+}
+
+.spotlight-hover::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(
+    circle,
+    rgba(255, 255, 255, 0.1) 0%,
+    rgba(255, 255, 255, 0) 70%
+  );
+  opacity: 0;
+  transform: scale(0.8);
+  transition: opacity 0.5s, transform 0.5s;
+  pointer-events: none;
+}
+
+.spotlight-hover:hover::before {
+  opacity: 1;
+  transform: scale(1);
+}
+
+/* Dark mode spotlight effect */
+.dark .spotlight-hover::before {
+  background: radial-gradient(
+    circle,
+    rgba(139, 92, 246, 0.15) 0%,
+    rgba(139, 92, 246, 0) 70%
+  );
+}
+
+/* Keyframes */
+@keyframes cinematicFadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes cinematicFadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes cinematicFadeDown {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes cinematicFadeLeft {
+  from {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes cinematicFadeRight {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Smooth transition for all interactive elements */
+button, a, input, select, textarea {
+  transition: all 0.3s ease;
+}
+
+/* Cinematic reveal effect for images */
+.cinematic-reveal {
+  position: relative;
+  overflow: hidden;
+}
+
+.cinematic-reveal img {
+  transition: transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.cinematic-reveal:hover img {
+  transform: scale(1.05);
+}
+
+.cinematic-reveal::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    to bottom,
+    transparent 70%,
+    rgba(0, 0, 0, 0.2) 100%
+  );
+  pointer-events: none;
+}
+
+.dark .cinematic-reveal::after {
+  background: linear-gradient(
+    to bottom,
+    transparent 70%,
+    rgba(0, 0, 0, 0.4) 100%
+  );
+}
