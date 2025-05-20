@@ -8,11 +8,11 @@ const ProductShow = ({ product }) => {
   const formatPrice = (price) => {
     return parseFloat(price).toFixed(2);
   };
-  
+
   return (
     <AdminLayout title={`Product: ${product.name}`}>
       <Head title={`Product: ${product.name}`} />
-  
+
       {/* Product Header */}
       <div className="mb-6 flex flex-col sm:flex-row justify-between items-start gap-4"> {/* Adjusted layout for responsiveness */}
         <div>
@@ -34,19 +34,25 @@ const ProductShow = ({ product }) => {
           </Link>
         </div>
       </div>
-  
+
       {/* Product Details */}
       <div className="mb-6 grid grid-cols-1 md:grid-cols-3 gap-6">
         {/* Main Image & Gallery */}
         <div className="md:col-span-1 bg-white dark:bg-cinematic-800 p-4 rounded-lg shadow dark:shadow-soft border border-cinematic-200 dark:border-cinematic-700"> {/* Added dark mode classes and border */}
           <div className="aspect-w-1 aspect-h-1 w-full overflow-hidden rounded-lg bg-cinematic-200 dark:bg-cinematic-700"> {/* Adjusted bg color */}
             <img
-              src={product.image || `https://images.unsplash.com/photo-1596462502278-27bfdc403348?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=580&q=80`}
+              src={
+                product.image
+                  ? `/storage/${product.image}?v=${new Date().getTime()}`
+                  : product.images && product.images[0]?.url
+                    ? `/storage/${product.images[0].url}?v=${new Date().getTime()}`
+                    : `/assets/default-product.png?v=${new Date().getTime()}`
+              }
               alt={product.name}
               className="h-full w-full object-cover object-center"
             />
           </div>
-  
+
           {/* Gallery */}
           {product.images && product.images.length > 0 && (
             <div className="mt-4">
@@ -65,7 +71,7 @@ const ProductShow = ({ product }) => {
             </div>
           )}
         </div>
-  
+
         {/* Product Info */}
         <div className="md:col-span-2 bg-white dark:bg-cinematic-800 p-4 rounded-lg shadow dark:shadow-soft border border-cinematic-200 dark:border-cinematic-700"> {/* Added dark mode classes and border */}
           <div className="space-y-4">
@@ -185,7 +191,13 @@ const ProductShow = ({ product }) => {
               >
                 <div className="aspect-w-1 aspect-h-1 w-full overflow-hidden bg-cinematic-200 dark:bg-cinematic-700"> {/* Adjusted bg color */}
                   <img
-                    src={relatedProduct.image || `https://images.unsplash.com/photo-1596462502278-27bfdc403348?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=580&q=80`}
+                    src={
+                      relatedProduct.image
+                        ? `/storage/${relatedProduct.image}?v=${new Date().getTime()}`
+                        : relatedProduct.images && relatedProduct.images[0]?.url
+                          ? `/storage/${relatedProduct.images[0].url}?v=${new Date().getTime()}`
+                          : `/assets/default-product.png?v=${new Date().getTime()}`
+                    }
                     alt={relatedProduct.name}
                     className="h-full w-full object-cover object-center"
                   />

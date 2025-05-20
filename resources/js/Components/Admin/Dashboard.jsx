@@ -344,7 +344,13 @@ const Dashboard = ({ stats, recentOrders, topProducts }) => {
                   <div className="flex items-center">
                     <div className="flex-shrink-0 h-10 w-10 rounded-md overflow-hidden">
                       <img
-                        src={product.image || `https://images.unsplash.com/photo-1596462502278-27bfdc403348?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=580&q=80`}
+                        src={
+                          product.image
+                            ? `/storage/${product.image}?v=${new Date().getTime()}`
+                            : product.images && product.images[0]?.url
+                              ? `/storage/${product.images[0].url}?v=${new Date().getTime()}`
+                              : `/assets/default-product.png?v=${new Date().getTime()}`
+                        }
                         alt={product.name}
                         className="h-full w-full object-cover"
                       />
