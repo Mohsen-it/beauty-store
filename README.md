@@ -57,8 +57,8 @@ npm run dev
 
 ## 📸 Screenshots
 
-![Home](https://via.placeholder.com/800x400/FFC0CB/000000?text=Beauty+Store+Home)
-![Product Page](https://via.placeholder.com/800x400/FFD700/000000?text=Product+Details)
+![{25BE377D-486C-48CC-91A1-01DB9EB82D52}](https://github.com/user-attachments/assets/c193e357-ca9c-40cb-ae54-285544aacabc)
+
 
 ## 🛡️ Admin Features
 
