@@ -4,12 +4,13 @@ import { motion, AnimatePresence } from 'framer-motion';
 import axios from 'axios';
 import { toast } from 'react-hot-toast';
 import { t } from '@/utils/translate';
+import { getCsrfHeaders } from '@/utils/csrf';
 
 import CinematicLayout from '@/Layouts/CinematicLayout';
 
 const ProductShow = ({ product, relatedProducts }) => {
   const [quantity, setQuantity] = useState(1);
-  const [activeImage, setActiveImage] = useState(product.image);
+  const [activeImage, setActiveImage] = useState(product.image_url);
   const [isLiked, setIsLiked] = useState(product.is_liked || false);
   const [productImages, setProductImages] = useState([]);
   // State to track when a product is being added to cart (for animation)
@@ -38,15 +39,27 @@ const ProductShow = ({ product, relatedProducts }) => {
   useEffect(() => {
     // Start with main product image
     const images = [];
-    if (product.image) {
-      images.push(product.image);
+    if (product.image_url) {
+      images.push(product.image_url);
     }
 
     // Add images from the relationship
     if (product.images && product.images.length > 0) {
       product.images.forEach(img => {
-        if (img.url) {
-          images.push(img.url);
+        // Try to get image_url first
+        if (img.image_url) {
+          images.push(img.image_url);
+        }
+        // If image_url is not available, try to construct URL from url property
+        else if (img.url) {
+          // Check if url already starts with http:// or https://
+          if (img.url.startsWith('http://') || img.url.startsWith('https://')) {
+            images.push(img.url);
+          } else {
+            // If url doesn't have storage/ prefix, add it
+            const path = img.url.startsWith('storage/') ? img.url : `storage/${img.url.replace(/^\//, '')}`;
+            images.push(`/${path}?v=${new Date().getTime()}`);
+          }
         }
       });
     }
@@ -68,6 +81,9 @@ const ProductShow = ({ product, relatedProducts }) => {
         console.error("Error processing gallery:", error);
       }
     }
+
+    // Log the images for debugging
+    console.log("Product images:", images);
 
     // Set images and default active image to the first one
     setProductImages(images);
@@ -97,17 +113,12 @@ const ProductShow = ({ product, relatedProducts }) => {
     setAddingToCart(true);
 
     try {
-      // Use Fetch API instead of Inertia
-      const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+      // Use the utility function to get CSRF headers
+      const headers = getCsrfHeaders();
 
       const response = await fetch(route('cart.add'), {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json',
-          'X-CSRF-TOKEN': csrfToken,
-          'X-Requested-With': 'XMLHttpRequest'
-        },
+        headers,
         body: JSON.stringify({
           product_id: product.id,
           quantity: quantity
@@ -189,17 +200,12 @@ const ProductShow = ({ product, relatedProducts }) => {
     setAddingRelatedToCart(productId);
 
     try {
-      // Use Fetch API instead of Inertia
-      const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+      // Use the utility function to get CSRF headers
+      const headers = getCsrfHeaders();
 
       const response = await fetch(route('cart.add'), {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json',
-          'X-CSRF-TOKEN': csrfToken,
-          'X-Requested-With': 'XMLHttpRequest'
-        },
+        headers,
         body: JSON.stringify({
           product_id: productId,
           quantity: relatedProductQuantities[productId] || 1
@@ -487,7 +493,23 @@ const ProductShow = ({ product, relatedProducts }) => {
             <div className="group bg-white dark:bg-cinematic-800 rounded-lg overflow-hidden shadow-md dark:shadow-soft hover:shadow-xl dark:hover:shadow-xl transition-shadow duration-300 border border-gray-200 dark:border-cinematic-700">
               <div className="aspect-w-1 aspect-h-1 w-full overflow-hidden">
                 <img
-                  src={relatedProduct.images[0]?.url || `/assets/default-product_1.png`}
+                  src={
+                    relatedProduct.images && relatedProduct.images.length > 0 ? (
+                      relatedProduct.images[0]?.image_url
+                        ? relatedProduct.images[0].image_url
+                        : relatedProduct.images[0]?.url
+                          ? relatedProduct.images[0].url.startsWith('http://') || relatedProduct.images[0].url.startsWith('https://')
+                            ? relatedProduct.images[0].url
+                            : relatedProduct.images[0].url.startsWith('storage/')
+                              ? `/${relatedProduct.images[0].url}?v=${new Date().getTime()}`
+                              : `/storage/${relatedProduct.images[0].url.replace(/^\//, '')}?v=${new Date().getTime()}`
+                          : `/assets/default-product_1.png`
+                    ) : (
+                      relatedProduct.image_url
+                        ? relatedProduct.image_url
+                        : `/assets/default-product_1.png`
+                    )
+                  }
                   alt={relatedProduct.name}
                   className="h-60 w-full object-cover object-center group-hover:scale-105 transition-transform duration-300"
                 />

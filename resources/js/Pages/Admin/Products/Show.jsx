@@ -42,11 +42,15 @@ const ProductShow = ({ product }) => {
           <div className="aspect-w-1 aspect-h-1 w-full overflow-hidden rounded-lg bg-cinematic-200 dark:bg-cinematic-700"> {/* Adjusted bg color */}
             <img
               src={
-                product.image
-                  ? `/storage/${product.image}?v=${new Date().getTime()}`
-                  : product.images && product.images[0]?.url
-                    ? `/storage/${product.images[0].url}?v=${new Date().getTime()}`
-                    : `/assets/default-product.png?v=${new Date().getTime()}`
+                product.image_url
+                  ? product.image_url
+                  : product.image
+                    ? `/storage/${product.image}?v=${new Date().getTime()}`
+                    : product.images && product.images[0]?.image_url
+                      ? product.images[0].image_url
+                      : product.images && product.images[0]?.url
+                        ? `/storage/${product.images[0].url}?v=${new Date().getTime()}`
+                        : `/assets/default-product.png?v=${new Date().getTime()}`
               }
               alt={product.name}
               className="h-full w-full object-cover object-center"
@@ -61,7 +65,13 @@ const ProductShow = ({ product }) => {
                 {product.images.map((image, index) => (
                   <div key={index} className="aspect-w-1 aspect-h-1 w-full overflow-hidden rounded-lg bg-cinematic-200 dark:bg-cinematic-700"> {/* Adjusted bg color */}
                     <img
-                      src={image.url}
+                      src={
+                        image.image_url
+                          ? image.image_url
+                          : image.url
+                            ? `/storage/${image.url}?v=${new Date().getTime()}`
+                            : `/assets/default-product.png?v=${new Date().getTime()}`
+                      }
                       alt={`${product.name} - Image ${index + 1}`}
                       className="h-full w-full object-cover object-center"
                     />
@@ -192,11 +202,15 @@ const ProductShow = ({ product }) => {
                 <div className="aspect-w-1 aspect-h-1 w-full overflow-hidden bg-cinematic-200 dark:bg-cinematic-700"> {/* Adjusted bg color */}
                   <img
                     src={
-                      relatedProduct.image
-                        ? `/storage/${relatedProduct.image}?v=${new Date().getTime()}`
-                        : relatedProduct.images && relatedProduct.images[0]?.url
-                          ? `/storage/${relatedProduct.images[0].url}?v=${new Date().getTime()}`
-                          : `/assets/default-product.png?v=${new Date().getTime()}`
+                      relatedProduct.image_url
+                        ? relatedProduct.image_url
+                        : relatedProduct.image
+                          ? `/storage/${relatedProduct.image}?v=${new Date().getTime()}`
+                          : relatedProduct.images && relatedProduct.images[0]?.image_url
+                            ? relatedProduct.images[0].image_url
+                            : relatedProduct.images && relatedProduct.images[0]?.url
+                              ? `/storage/${relatedProduct.images[0].url}?v=${new Date().getTime()}`
+                              : `/assets/default-product.png?v=${new Date().getTime()}`
                     }
                     alt={relatedProduct.name}
                     className="h-full w-full object-cover object-center"

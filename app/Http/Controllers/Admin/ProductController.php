@@ -16,19 +16,19 @@ class ProductController extends Controller
     public function index(Request $request)
     {
         $products = Product::query()
-            ->with(['category','images'])   
-            ->when($request->filled('search'), fn($q) => 
-                $q->where(fn($query) => 
+            ->with(['category','images'])
+            ->when($request->filled('search'), fn($q) =>
+                $q->where(fn($query) =>
                     $query->where('name', 'like', "%{$request->search}%")
                           ->orWhere('description', 'like', "%{$request->search}%")
                           ->orWhere('slug', 'like', "%{$request->search}%")
                 )
             )
-            ->when($request->filled('category'), fn($q) => 
+            ->when($request->filled('category'), fn($q) =>
                 $q->where('category_id', $request->category)
             )
             ->orderBy(
-                $request->input('sort_field', 'created_at'), 
+                $request->input('sort_field', 'created_at'),
                 $request->input('sort_direction', 'desc')
             )
             ->paginate(10)
@@ -61,7 +61,7 @@ class ProductController extends Controller
             'featured' => 'sometimes|boolean',
             'active' => 'sometimes|boolean',
         ]);
-        
+
         $validatedData['featured'] = $request->boolean('featured');
         $validatedData['active'] = $request->boolean('active');
 
@@ -89,12 +89,22 @@ class ProductController extends Controller
 
     public function edit(Product $product)
     {
-        // The original structure for 'product' data sent to the form:
-        // It merges the product attributes and overwrites 'images' with an array of URL strings.
-        // This is likely what the existing frontend form expects for FilePond initialization or display.
+        // Load the product with its images
+        $product->load('images');
+
+        // Create an array of image data with both ID and URL for each image
+        $imageData = $product->images->map(function($image) {
+            return [
+                'id' => $image->id,
+                'url' => $image->url,
+                'image_url' => $image->image_url
+            ];
+        })->toArray();
+
         return Inertia::render('Admin/Products/Form', [
-            'product' => array_merge($product->load('images')->toArray(), [
+            'product' => array_merge($product->toArray(), [
                 'images' => $product->images->pluck('url')->toArray(),
+                'image_data' => $imageData, // Add this new property with full image data
             ]),
             'categories' => Category::all(),
         ]);
@@ -112,14 +122,16 @@ class ProductController extends Controller
             'stock' => 'required|integer|min:0',
             'featured' => 'sometimes|boolean',
             'active' => 'sometimes|boolean',
-            'existing_images' => 'nullable|array', 
-            'existing_images.*' => 'string', 
+            'existing_images' => 'nullable|array',
+            'existing_images.*' => 'string',
+            'existing_image_ids' => 'nullable|array',
+            'existing_image_ids.*' => 'integer',
         ]);
-        
-        $productDataToUpdate = collect($validatedData)->except(['existing_images'])->all();
+
+        $productDataToUpdate = collect($validatedData)->except(['existing_images', 'existing_image_ids'])->all();
         $productDataToUpdate['featured'] = $request->boolean('featured');
         $productDataToUpdate['active'] = $request->boolean('active');
-        
+
         $product->update($productDataToUpdate);
 
         $this->updateExistingImages($product, $request, 'products');
@@ -143,7 +155,7 @@ class ProductController extends Controller
         return back()->with('success', 'Product featured status updated.');
     }
 
-   
+
     // This method was likely for FilePond server-side processing, which is to be avoided as per requirements.
     // The new approach handles images directly in store/update methods.
     // public function uploadImage(Request $request)
@@ -161,14 +173,14 @@ class ProductController extends Controller
     //     $request->validate([
     //         'images' => 'required|image|max:2048',
     //     ]);
-        
+
     //     $path = $request->file('images')->store('public/products');
     //     $url = Storage::url($path);
-        
+
     //     return response()->json(['url' => $url]);
     // }
-    
-    public function removeImage($id) 
+
+    public function removeImage($id)
     {
         $image = ProductImage::findOrFail($id);
         $this->deleteSingleImageFile($image->url);
@@ -183,31 +195,38 @@ class ProductController extends Controller
         foreach ($imageFiles as $file) {
             $datePath = now()->format('Y/m/d');
             $randomName = Str::random(40) . '.' . $file->getClientOriginalExtension();
-            
+
             // Define the directory path within the disk
             $directoryToStore = $baseFolder . '/' . $datePath;
-            
+
             // Alternative: Use the storeAs method on the UploadedFile object
             // This method stores the file on the specified disk ('public')
             // in the given directory ($directoryToStore) with the specified name ($randomName).
             // It returns the path of the stored file relative to the disk's root.
             $storedPath = $file->storeAs($directoryToStore, $randomName, 'public');
-            
+
             // The $storedPath is the relative path you want to save in the database.
             $model->images()->create(['url' => $storedPath]);
         }
-        
+
     }
-    
+
     private function updateExistingImages($model, Request $request, string $baseFolder)
     {
         $existingImagePathsToKeep = $request->input('existing_images', []);
+        $existingImageIdsToKeep = $request->input('existing_image_ids', []);
 
         $currentImageModels = $model->images()->get(); // Fetch fresh from DB
+
         foreach ($currentImageModels as $imageModel) {
-            if (!in_array($imageModel->url, $existingImagePathsToKeep)) {
-                $this->deleteSingleImageFile($imageModel->url); 
-                $imageModel->delete(); 
+            // Check if the image should be kept either by ID or by path
+            $keepByPath = in_array($imageModel->url, $existingImagePathsToKeep);
+            $keepById = in_array($imageModel->id, $existingImageIdsToKeep);
+
+            if (!$keepByPath && !$keepById) {
+                // Only delete the image if it's not in either list
+                $this->deleteSingleImageFile($imageModel->url);
+                $imageModel->delete();
             }
         }
 
@@ -224,14 +243,14 @@ class ProductController extends Controller
     private function deleteSingleImageFile($relativePath)
     {
         if (!empty($relativePath)) {
-            Storage::disk('public')->delete($relativePath); 
+            Storage::disk('public')->delete($relativePath);
         }
     }
 
     private function deleteAllAssociatedImages($model)
     {
         // Ensure images relation is loaded before accessing it, or query it.
-        $imagesToDelete = $model->images()->get(); 
+        $imagesToDelete = $model->images()->get();
 
         foreach ($imagesToDelete as $imageModel) {
             $this->deleteSingleImageFile($imageModel->url);

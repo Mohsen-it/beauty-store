@@ -166,11 +166,15 @@ const ProductsIndex = ({ products, categories, filters }) => {
                         <img
                           className="h-10 w-10 rounded-md object-cover"
                           src={
-                            product.image
-                              ? `/storage/${product.image}?v=${new Date().getTime()}`
-                              : product.images && product.images.length > 0
-                                ? `/storage/${product.images[0].url}?v=${new Date().getTime()}`
-                                : `/assets/default-product.png?v=${new Date().getTime()}`
+                            product.image_url
+                              ? product.image_url
+                              : product.image
+                                ? `/storage/${product.image}?v=${new Date().getTime()}`
+                                : product.images && product.images.length > 0 && product.images[0]?.image_url
+                                  ? product.images[0].image_url
+                                  : product.images && product.images.length > 0 && product.images[0]?.url
+                                    ? `/storage/${product.images[0].url}?v=${new Date().getTime()}`
+                                    : `/assets/default-product.png?v=${new Date().getTime()}`
                           }
                           alt={product.name}
                           loading="lazy"

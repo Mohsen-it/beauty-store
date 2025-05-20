@@ -407,7 +407,13 @@ const OrderDetails = ({ order, statuses, paymentStatuses }) => {
                     <div className="flex-shrink-0 h-10 w-10">
                       <img
                         className="h-10 w-10 rounded-md object-cover bg-gray-200 dark:bg-cinematic-700" // Dark image bg
-                        src={item.product.image ? `/storage/${item.product.image.replace(/^\/storage\//, '')}?v=${new Date().getTime()}` : `/assets/default-product.png?v=${new Date().getTime()}`}
+                        src={
+                          item.product.image
+                            ? `/storage/${item.product.image.replace(/^\/storage\//, '')}?v=${new Date().getTime()}`
+                            : item.product.images && item.product.images[0]?.url
+                              ? (item.product.images[0].image_url ? `${item.product.images[0].image_url}?v=${new Date().getTime()}` : `/storage/${item.product.images[0].url}?v=${new Date().getTime()}`)
+                              : `/assets/default-product.png?v=${new Date().getTime()}`
+                        }
                         alt={item.product.name}
                       />
                     </div>

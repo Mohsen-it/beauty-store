@@ -48,14 +48,17 @@ const ProductForm = ({ product = null, categories, errors: pageErrors }) => {
 
   // Load existing images if editing
   useEffect(() => {
-    if (isEditing && product && product.image_urls && Array.isArray(product.image_urls) && product.image_urls.length > 0) {
-      const initialFilePondObjects = product.image_urls.map((relativePath) => {
-        if (typeof relativePath !== 'string' || relativePath.trim() === '') {
-            return null; // Skip invalid paths
+    if (isEditing && product && product.image_data && Array.isArray(product.image_data) && product.image_data.length > 0) {
+      // Use the new image_data array that includes IDs
+      const initialFilePondObjects = product.image_data.map((imageData) => {
+        if (!imageData || !imageData.url) {
+            return null; // Skip invalid data
         }
-        const cleanRelativePath = relativePath.startsWith('/') ? relativePath.substring(1) : relativePath;
-        const posterUrl = `${import.meta.env.BASE_URL}storage/${cleanRelativePath}`;
 
+        const relativePath = imageData.url;
+        const cleanRelativePath = relativePath.startsWith('/') ? relativePath.substring(1) : relativePath;
+        // Use image_url if available, otherwise construct it
+        const posterUrl = imageData.image_url || `${import.meta.env.BASE_URL}storage/${cleanRelativePath}`;
 
         const fileName = relativePath.split('/').pop();
         const fileExtension = fileName.split('.').pop().toLowerCase();
@@ -80,23 +83,64 @@ const ProductForm = ({ product = null, categories, errors: pageErrors }) => {
             },
             metadata: {
               poster: posterUrl, // Full URL for preview
+              relativePath: relativePath, // Store for submission if this image is kept
+              imageId: imageData.id // Store the image ID
+            }
+          }
+        };
+      }).filter(item => item !== null); // Filter out any nulls from invalid data
+
+      if (initialFilePondObjects.length > 0) {
+        setFiles(initialFilePondObjects);
+      } else {
+        setFiles([]); // No valid images
+      }
+    } else if (isEditing && product && product.images && Array.isArray(product.images) && product.images.length > 0) {
+      // Fallback to the old method if image_data is not available
+      const initialFilePondObjects = product.images.map((relativePath) => {
+        if (typeof relativePath !== 'string' || relativePath.trim() === '') {
+            return null; // Skip invalid paths
+        }
+        const cleanRelativePath = relativePath.startsWith('/') ? relativePath.substring(1) : relativePath;
+        const posterUrl = `${import.meta.env.BASE_URL}storage/${cleanRelativePath}`;
+
+        const fileName = relativePath.split('/').pop();
+        const fileExtension = fileName.split('.').pop().toLowerCase();
+        let fileType = 'application/octet-stream'; // Default type
+
+        if (['jpg', 'jpeg'].includes(fileExtension)) {
+          fileType = 'image/jpeg';
+        } else if (fileExtension === 'png') {
+          fileType = 'image/png';
+        } else if (fileExtension === 'gif') {
+          fileType = 'image/gif';
+        }
+
+        return {
+          source: relativePath, // Identifier for FilePond
+          options: {
+            type: 'local', // Indicates it's an existing file/resource
+            file: {
+              name: fileName,
+              type: fileType, // Provide the inferred file type
+            },
+            metadata: {
+              poster: posterUrl, // Full URL for preview
               relativePath: relativePath // Store for submission if this image is kept
             }
           }
         };
-      }).filter(item => item !== null); // Filter out any nulls from invalid paths
+      }).filter(item => item !== null);
 
       if (initialFilePondObjects.length > 0) {
         setFiles(initialFilePondObjects);
-      } else if (product.image_urls.length > 0) {
-        setFiles([]);
       } else {
-        setFiles([]); // Product has no image_urls
+        setFiles([]);
       }
     } else if (!isEditing) {
       setFiles([]); // Clear files when creating a new product
-    } else if (isEditing && product && (!product.image_urls || product.image_urls.length === 0)) {
-      setFiles([]);
+    } else {
+      setFiles([]); // No images available
     }
   }, [isEditing, product]); // Dependency array
 
@@ -154,13 +198,29 @@ const ProductForm = ({ product = null, categories, errors: pageErrors }) => {
     };
 
     if (isEditing) {
-      // Send paths of existing images that should be kept
+      // Send IDs of existing images that should be kept
       const existingImagesToKeep = files
-        .filter(fpItem => !(fpItem.file instanceof File) && fpItem.getMetadata('relativePath'))
-        .map(fpItem => fpItem.getMetadata('relativePath'));
+        .filter(fpItem => !(fpItem.file instanceof File))
+        .map(fpItem => {
+          // First try to get the image ID (new method)
+          const imageId = fpItem.getMetadata('imageId');
+          if (imageId) {
+            return { id: imageId, path: fpItem.getMetadata('relativePath') };
+          }
+          // Fallback to just the path (old method)
+          return { path: fpItem.getMetadata('relativePath') };
+        })
+        .filter(item => item.id || item.path); // Filter out any items without id or path
 
-      existingImagesToKeep.forEach(path => {
-        formData.append('existing_images[]', path);
+      // Add existing image IDs to the form data
+      existingImagesToKeep.forEach(item => {
+        if (item.id) {
+          formData.append('existing_image_ids[]', item.id);
+        }
+        // Also include paths for backward compatibility
+        if (item.path) {
+          formData.append('existing_images[]', item.path);
+        }
       });
 
       formData.append('_method', 'PUT');

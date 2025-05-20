@@ -27,13 +27,45 @@ class ProductImage extends Model
      */
     public function getUrlAttribute($value)
     {
-        if (Str::startsWith($value, ['http://', 'https://'])) {
+        if (!$value) {
+            return null;
+        }
+
+        if (Str::startsWith($value, 'http://') || Str::startsWith($value, 'https://')) {
             return $value;
         }
-    
-        return asset('storage/' . ltrim($value, '/'));
+
+        // Store the original value without modification
+        return $value;
     }
-    
+
+    /**
+     * Get the full URL for the image.
+     *
+     * @return string
+     */
+    public function getImageUrlAttribute()
+    {
+        if (!$this->url) {
+            return null;
+        }
+
+        if (Str::startsWith($this->url, 'http://') || Str::startsWith($this->url, 'https://')) {
+            return $this->url;
+        }
+
+        // Ensure we're using the correct path format for storage URLs
+        // Remove any leading slashes to avoid double slashes in the URL
+        $cleanPath = ltrim($this->url, '/');
+
+        // Make sure we don't add 'storage/' twice if it's already in the path
+        if (Str::startsWith($cleanPath, 'storage/')) {
+            return url($cleanPath);
+        }
+
+        return url('storage/' . $cleanPath);
+    }
+
 
     /**
      * Get the product that owns the image.

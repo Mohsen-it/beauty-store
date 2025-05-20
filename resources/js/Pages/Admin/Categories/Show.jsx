@@ -45,7 +45,7 @@ const CategoryShow = ({ category }) => {
           <div className="md:col-span-1 bg-white dark:bg-cinematic-800 p-4 rounded-lg shadow dark:shadow-soft border border-cinematic-200 dark:border-cinematic-700"> {/* Dark bg, shadow, border */}
             <div className="aspect-w-1 aspect-h-1 w-full overflow-hidden rounded-lg bg-gray-200 dark:bg-cinematic-700"> {/* Dark image bg */}
               <img
-                src={`/storage/${category.image}?v=${new Date().getTime()}`}
+                src={category.image_url || `/assets/default-category.png`}
                 alt={category.name}
                 className="h-full w-full object-cover object-center"
               />

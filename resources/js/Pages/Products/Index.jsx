@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'react-hot-toast';
 import { t } from '@/utils/translate';
 import CinematicLayout from '@/Layouts/CinematicLayout';
+import { getCsrfHeaders } from '@/utils/csrf';
 
 const ProductsIndex = ({ products, categories, filters }) => {
   const [priceRange, setPriceRange] = useState({
@@ -64,17 +65,12 @@ const ProductsIndex = ({ products, categories, filters }) => {
     setAddingToCart(productId);
 
     try {
-      // Use Fetch API instead of Inertia
-      const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+      // Use the utility function to get CSRF headers
+      const headers = getCsrfHeaders();
 
       const response = await fetch(route('cart.add'), {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json',
-          'X-CSRF-TOKEN': csrfToken,
-          'X-Requested-With': 'XMLHttpRequest'
-        },
+        headers,
         body: JSON.stringify({
           product_id: productId,
           quantity: 1
@@ -429,7 +425,13 @@ const ProductsIndex = ({ products, categories, filters }) => {
                         <div className="aspect-w-1 aspect-h-1 w-full overflow-hidden">
                             {product.images.length > 0 ? (
                               <img
-                                src={product.images[0].url}
+                                src={
+                                  product.images[0].image_url
+                                    ? product.images[0].image_url
+                                    : product.images[0].url
+                                      ? `/storage/${product.images[0].url}?v=${new Date().getTime()}`
+                                      : `/assets/default-product.png`
+                                }
                                 alt={product.name}
                                 className="h-60 w-full object-cover object-center group-hover:scale-105 transition-transform duration-300"
                               />

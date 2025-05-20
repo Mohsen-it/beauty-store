@@ -62,7 +62,7 @@ const FavoritesIndex = ({ likedProducts }) => {
                           product.image
                             ? `/storage/${product.image}?v=${new Date().getTime()}`
                             : product.images && product.images[0]?.url
-                              ? `/storage/${product.images[0].url}?v=${new Date().getTime()}`
+                              ? (product.images[0].image_url ? `${product.images[0].image_url}?v=${new Date().getTime()}` : `/storage/${product.images[0].url}?v=${new Date().getTime()}`)
                               : `/assets/default-product.png?v=${new Date().getTime()}`
                         }
                         alt={product.name}

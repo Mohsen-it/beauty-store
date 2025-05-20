@@ -525,7 +525,7 @@ const Checkout = ({ cart, order }) => {
                           item.product.image
                             ? `/storage/${item.product.image}?v=${new Date().getTime()}`
                             : item.product.images && item.product.images[0]?.url
-                              ? `/storage/${item.product.images[0].url}?v=${new Date().getTime()}`
+                              ? (item.product.images[0].image_url ? `${item.product.images[0].image_url}?v=${new Date().getTime()}` : `/storage/${item.product.images[0].url}?v=${new Date().getTime()}`)
                               : `/assets/default-product.png?v=${new Date().getTime()}`
                         }
                         alt={item.product.name}

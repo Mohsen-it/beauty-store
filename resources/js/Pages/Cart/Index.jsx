@@ -5,6 +5,7 @@ import { t } from '@/utils/translate';
 import { toast } from 'react-hot-toast';
 import axios from 'axios';
 import CinematicLayout from '@/Layouts/CinematicLayout';
+import { getCsrfHeaders } from '@/utils/csrf';
 
 const CartIndex = ({ cart }) => {
   // State for tracking quantities
@@ -56,17 +57,12 @@ const CartIndex = ({ cart }) => {
     // Set loading state for this item
     setUpdatingItems(prev => ({ ...prev, [cartItemId]: true }));
 
-    // Get CSRF token from meta tag
-    const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+    // Use the utility function to get CSRF headers
+    const headers = getCsrfHeaders();
 
     // Use axios for AJAX request
     axios.delete(route('cart.remove', cartItemId), {
-      headers: {
-        'Content-Type': 'application/json',
-        'X-CSRF-TOKEN': csrfToken,
-        'X-Requested-With': 'XMLHttpRequest',
-        'Accept': 'application/json'
-      }
+      headers
     })
     .then(response => {
       toast.success(t('cart.remove_success'));
@@ -117,19 +113,14 @@ const CartIndex = ({ cart }) => {
       const newQuantity = currentQuantity + 1;
       setItemQuantities(prev => ({ ...prev, [cartItemId]: newQuantity }));
 
-      // Get CSRF token from meta tag
-      const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+      // Use the utility function to get CSRF headers
+      const headers = getCsrfHeaders();
 
-      // Use direct axios call with explicit headers like in ProductShow
+      // Use direct axios call with the headers
       axios.patch(route('cart.update', cartItemId), {
         quantity: newQuantity
       }, {
-        headers: {
-          'Content-Type': 'application/json',
-          'X-CSRF-TOKEN': csrfToken,
-          'X-Requested-With': 'XMLHttpRequest',
-          'Accept': 'application/json'
-        }
+        headers
       })
       .then(response => {
         toast.success(t('cart.update_success'));
@@ -171,19 +162,14 @@ const CartIndex = ({ cart }) => {
       const newQuantity = currentQuantity - 1;
       setItemQuantities(prev => ({ ...prev, [cartItemId]: newQuantity }));
 
-      // Get CSRF token from meta tag
-      const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+      // Use the utility function to get CSRF headers
+      const headers = getCsrfHeaders();
 
-      // Use direct axios call with explicit headers like in ProductShow
+      // Use direct axios call with the headers
       axios.patch(route('cart.update', cartItemId), {
         quantity: newQuantity
       }, {
-        headers: {
-          'Content-Type': 'application/json',
-          'X-CSRF-TOKEN': csrfToken,
-          'X-Requested-With': 'XMLHttpRequest',
-          'Accept': 'application/json'
-        }
+        headers
       })
       .then(response => {
         // Success handling
@@ -217,17 +203,12 @@ const CartIndex = ({ cart }) => {
     // Set loading state
     setClearingCart(true);
 
-    // Get CSRF token from meta tag
-    const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+    // Use the utility function to get CSRF headers
+    const headers = getCsrfHeaders();
 
     // Use axios for AJAX request
     axios.delete(route('cart.clear'), {
-      headers: {
-        'Content-Type': 'application/json',
-        'X-CSRF-TOKEN': csrfToken,
-        'X-Requested-With': 'XMLHttpRequest',
-        'Accept': 'application/json'
-      }
+      headers
     })
     .then(() => {
       toast.success(t('cart.clear_success'));
@@ -306,11 +287,15 @@ const CartIndex = ({ cart }) => {
                         <div className="flex-shrink-0 w-full sm:w-20 md:w-24 h-20 sm:h-20 md:h-24 rounded-md overflow-hidden mb-3 sm:mb-0">
                           <img
                             src={
-                              cartItem.product.image
-                                ? `/storage/${cartItem.product.image}?v=${new Date().getTime()}`
-                                : cartItem.product.images && cartItem.product.images[0]?.url
-                                  ? `/storage/${cartItem.product.images[0].url}?v=${new Date().getTime()}`
-                                  : `/assets/default-product.png?v=${new Date().getTime()}`
+                              cartItem.product.image_url
+                                ? cartItem.product.image_url
+                                : cartItem.product.image
+                                  ? `/storage/${cartItem.product.image}?v=${new Date().getTime()}`
+                                  : cartItem.product.images && cartItem.product.images[0]?.image_url
+                                    ? cartItem.product.images[0].image_url
+                                    : cartItem.product.images && cartItem.product.images[0]?.url
+                                      ? `/storage/${cartItem.product.images[0].url}?v=${new Date().getTime()}`
+                                      : `/assets/default-product.png?v=${new Date().getTime()}`
                             }
                             alt={cartItem.product.name}
                             className="w-full h-full object-cover object-center"

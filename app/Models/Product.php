@@ -70,15 +70,27 @@ class Product extends Model
 
     /**
      * Accessor to get an array of image URLs.
-     * These URLs are relative paths from the 'public/storage/' directory.
+     * These URLs are full URLs to the images.
      */
     public function getImageUrlsAttribute(): array
     {
-        return $this->images->pluck('url')->map(function ($path) {
-            // The controller already stores the relative path correctly (e.g., products/YYYY/MM/DD/filename.ext)
-            // No need to prepend Storage::url() here if the frontend handles adding the base URL + /storage/
-            return $path;
-        })->toArray();
+        return $this->images->pluck('image_url')->toArray();
+    }
+
+    /**
+     * Accessor to get the full URL of the product image.
+     */
+    public function getImageUrlAttribute(): ?string
+    {
+        if (!$this->image) {
+            return null;
+        }
+
+        if (str_starts_with($this->image, 'http://') || str_starts_with($this->image, 'https://')) {
+            return $this->image;
+        }
+
+        return url('storage/' . $this->image);
     }
 
     public function getIsLikedAttribute(): bool

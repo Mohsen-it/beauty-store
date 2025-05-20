@@ -43,12 +43,12 @@ class Category extends Model
     {
         return $this->hasMany(Product::class);
     }
-    
+
     public function parent(): BelongsTo
     {
         return $this->belongsTo(Category::class, 'parent_id');
     }
-    
+
     public function children(): HasMany
     {
         return $this->hasMany(Category::class, 'parent_id');
@@ -57,13 +57,18 @@ class Category extends Model
     /**
      * Accessor to get the full URL of the category image.
      * Returns null if no image is set.
-     * The frontend will prepend BASE_URL + 'storage/' as per requirements.
      */
     public function getImageUrlAttribute(): ?string
     {
-        // The 'image' attribute already stores the relative path (e.g., categories/YYYY/MM/DD/filename.ext)
-        // as saved by the CategoryController.
-        return $this->image;
+        if (!$this->image) {
+            return null;
+        }
+
+        if (str_starts_with($this->image, 'http://') || str_starts_with($this->image, 'https://')) {
+            return $this->image;
+        }
+
+        return url('storage/' . $this->image);
     }
 }
 
