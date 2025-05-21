@@ -54,6 +54,18 @@ class CartController extends Controller
             return redirect()->route('login');
         }
 
+        // Check if this is a redirect from login with old input
+        $productId = $request->old('product_id') ?? $request->input('product_id');
+        $quantity = $request->old('quantity') ?? $request->input('quantity');
+
+        // Create a new request with the correct data if using old input
+        if ($request->hasOldInput()) {
+            $request->merge([
+                'product_id' => $productId,
+                'quantity' => $quantity
+            ]);
+        }
+
         $validated = $request->validate([
             'product_id' => 'required|exists:products,id',
             'quantity' => 'required|integer|min:1',

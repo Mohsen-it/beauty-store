@@ -14,11 +14,12 @@ import { t, getCurrentLanguage, isRtl } from '@/utils/translate';
 const NavLink = memo(({ href, current, children, className }) => (
   <Link
     href={href}
-    className={`px-3 sm:px-4 py-2 rounded-lg text-xs sm:text-sm font-medium transition-all duration-300 backdrop-blur-sm relative overflow-hidden group ${
+    className={`px-2 sm:px-3 md:px-4 py-1.5 sm:py-2 rounded-lg text-xs sm:text-sm font-medium transition-all duration-300 backdrop-blur-sm relative overflow-hidden group ${
       current
         ? 'text-white dark:text-white bg-gradient-to-r from-pink-500 to-purple-600 shadow-lg shadow-pink-500/20 dark:shadow-pink-700/30'
         : 'text-gray-700 hover:text-pink-600 dark:text-gray-300 dark:hover:text-pink-400 border border-transparent hover:border-pink-300/30 dark:hover:border-pink-700/30'
     } ${className || ''}`}
+    aria-current={current ? 'page' : undefined}
   >
     <span className="relative z-10">{children}</span>
     <span className="absolute inset-0 w-full h-full bg-white/10 dark:bg-white/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></span>
@@ -37,12 +38,15 @@ const NavLink = memo(({ href, current, children, className }) => (
 ));
 
 // Memoized Icon Button component
-const IconButton = memo(({ icon, label, onClick, badge, href }) => {
+const IconButton = memo(({ icon, label, onClick, badge, href, className = '' }) => {
   const content = (
     <motion.div
-      whileHover={{ scale: 1.1 }}
+      whileHover={{ scale: 1.05 }}
       whileTap={{ scale: 0.95 }}
-      className="p-2 sm:p-3 relative transition-all duration-300 rounded-full bg-gradient-to-br from-gray-100/80 to-white/90 dark:from-gray-800/80 dark:to-gray-900/90 backdrop-blur-md shadow-lg hover:shadow-xl border border-gray-200/50 dark:border-gray-700/50 focus:outline-none group"
+      className={`p-2 sm:p-2.5 md:p-3 relative transition-all duration-300 rounded-full bg-gradient-to-br from-gray-100/80 to-white/90 dark:from-gray-800/80 dark:to-gray-900/90 backdrop-blur-md shadow-lg hover:shadow-xl border border-gray-200/50 dark:border-gray-700/50 focus:outline-none group ${className}`}
+      aria-label={label}
+      role={onClick ? 'button' : undefined}
+      tabIndex={0}
     >
       <span className="sr-only">{label}</span>
       <div className="text-gray-700 dark:text-gray-300 group-hover:text-pink-600 dark:group-hover:text-pink-400 transition-colors duration-300">
@@ -59,14 +63,14 @@ const IconButton = memo(({ icon, label, onClick, badge, href }) => {
             stiffness: 400,
             damping: 15
           }}
-          className="absolute -top-2 sm:-top-3 -right-1 pointer-events-none"
+          className="absolute -top-1.5 sm:-top-2 md:-top-3 -right-1 pointer-events-none"
         >
           <div className="relative">
             {/* Glowing background effect */}
             <div className="absolute inset-0 rounded-full bg-pink-500/20 dark:bg-pink-600/30 blur-md"></div>
 
             {/* Badge container with gradient */}
-            <div className="relative flex items-center justify-center h-5 sm:h-7 min-w-5 sm:min-w-7 px-1.5 sm:px-2 bg-gradient-to-br from-pink-500 to-purple-600 text-white text-[10px] sm:text-xs font-bold rounded-full shadow-lg shadow-pink-500/20 dark:shadow-pink-700/30 border border-white/20 dark:border-black/10 backdrop-blur-sm">
+            <div className="relative flex items-center justify-center h-4 sm:h-5 md:h-6 min-w-4 sm:min-w-5 md:min-w-6 px-1 sm:px-1.5 md:px-2 bg-gradient-to-br from-pink-500 to-purple-600 text-white text-[8px] sm:text-[10px] md:text-xs font-bold rounded-full shadow-lg shadow-pink-500/20 dark:shadow-pink-700/30 border border-white/20 dark:border-black/10 backdrop-blur-sm">
               {/* Badge counter with animation */}
               <motion.span
                 key={badge}
@@ -85,7 +89,18 @@ const IconButton = memo(({ icon, label, onClick, badge, href }) => {
     </motion.div>
   );
 
-  return href ? <Link href={href}>{content}</Link> : <button onClick={onClick}>{content}</button>;
+  // Add touch target enhancement for mobile
+  const touchTargetStyles = "relative after:content-[''] after:absolute after:top-[-8px] after:right-[-8px] after:bottom-[-8px] after:left-[-8px]";
+
+  return href ? (
+    <Link href={href} className={touchTargetStyles} aria-label={label}>
+      {content}
+    </Link>
+  ) : (
+    <button onClick={onClick} className={touchTargetStyles} aria-label={label}>
+      {content}
+    </button>
+  );
 });
 
 const CinematicLayout = ({ children }) => {
@@ -623,14 +638,29 @@ const CinematicLayout = ({ children }) => {
           </div>
         </div>
 
+        {/* Mobile menu backdrop */}
+        <AnimatePresence>
+          {mobileMenuOpen && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.2 }}
+              className="fixed inset-0 z-40 md:hidden bg-gray-800/50 dark:bg-black/50 backdrop-blur-sm"
+              onClick={() => setMobileMenuOpen(false)}
+              aria-hidden="true"
+            />
+          )}
+        </AnimatePresence>
+
         {/* Mobile menu, show/hide based on menu state */}
         <AnimatePresence>
           {mobileMenuOpen && (
             <motion.div
               ref={mobileMenuRef}
-              initial={{ x: '-100%', opacity: 0 }}
+              initial={{ x: rtl ? '100%' : '-100%', opacity: 0 }}
               animate={{ x: 0, opacity: 1 }}
-              exit={{ x: '-100%', opacity: 0 }}
+              exit={{ x: rtl ? '100%' : '-100%', opacity: 0 }}
               transition={{
                 type: 'spring',
                 stiffness: 250, // Reduced stiffness for smoother animation
@@ -638,19 +668,33 @@ const CinematicLayout = ({ children }) => {
                 mass: 0.8,      // Reduced mass for lighter feel
                 restDelta: 0.01 // Smaller rest delta for better performance
               }}
-              className="fixed inset-0 z-50 md:hidden"
+              className={`fixed inset-y-0 ${rtl ? 'right-0' : 'left-0'} z-50 md:hidden w-[85%] max-w-sm`}
+              role="dialog"
+              aria-modal="true"
+              aria-label="Mobile navigation menu"
             >
-              <div className="absolute inset-0 bg-gray-800/50 dark:bg-black/50 backdrop-blur-sm"
-                   onClick={() => setMobileMenuOpen(false)} />
-
-              <div className="relative h-full w-[90%] xs:w-[85%] sm:w-4/5 max-w-sm bg-gradient-to-b from-white/95 to-white/90 dark:from-gray-900/95 dark:to-gray-900/90 backdrop-blur-xl shadow-2xl overflow-y-auto custom-scrollbar border-l border-gray-200/50 dark:border-gray-700/50">
-                <div className="p-3 sm:p-4 md:p-6">
-                  {/* Logo */}
-                  <Link href="/" className="flex items-center mb-4 sm:mb-6 md:mb-8" onClick={() => setMobileMenuOpen(false)}>
-                    <span className="text-transparent bg-clip-text bg-gradient-to-r from-pink-500 to-purple-600 font-bold text-lg sm:text-xl md:text-2xl tracking-tight">
+              <div className="relative h-full w-full bg-gradient-to-b from-white/95 to-white/90 dark:from-gray-900/95 dark:to-gray-900/90 backdrop-blur-xl shadow-2xl overflow-y-auto custom-scrollbar border-r border-gray-200/50 dark:border-gray-700/50 flex flex-col">
+                {/* Menu header with close button */}
+                <div className="sticky top-0 z-10 flex items-center justify-between p-4 border-b border-gray-200/50 dark:border-gray-700/50 bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm">
+                  <Link href="/" className="flex items-center" onClick={() => setMobileMenuOpen(false)}>
+                    <span className="text-transparent bg-clip-text bg-gradient-to-r from-pink-500 to-purple-600 font-bold text-xl tracking-tight">
                       {t('app.name')}
                     </span>
                   </Link>
+
+                  <button
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="p-2 rounded-full bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-pink-500 focus:ring-offset-2 dark:focus:ring-offset-gray-900"
+                    aria-label="Close menu"
+                  >
+                    <svg className="w-5 h-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </button>
+                </div>
+
+                {/* Menu content */}
+                <div className="flex-1 overflow-y-auto p-4">
 
                   {/* Navigation Links */}
                   <nav className="space-y-1.5 sm:space-y-2 md:space-y-3 mb-4 sm:mb-6 md:mb-8">

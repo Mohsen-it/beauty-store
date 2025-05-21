@@ -34,9 +34,21 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->regenerate();
 
+        // Check if there's a pending cart product
+        $pendingCartProduct = session('pending_cart_product');
+
         // Check if the authenticated user is an admin
         if (Auth::user()->is_admin) {
             return redirect('/admin/dashboard');
+        }
+
+        // If there's a pending cart product, redirect to add to cart
+        if ($pendingCartProduct) {
+            // Clear the session data
+            session()->forget('pending_cart_product');
+
+            // Redirect to the cart.add route with the pending product
+            return redirect()->route('cart.add')->withInput($pendingCartProduct);
         }
 
         return redirect()->intended(RouteServiceProvider::HOME);

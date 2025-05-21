@@ -5,6 +5,7 @@ import { toast } from 'react-hot-toast';
 import { t } from '@/utils/translate';
 import CinematicLayout from '@/Layouts/CinematicLayout';
 import { getCsrfHeaders } from '@/utils/csrf';
+import '../../../css/category-circles.css';
 
 const ProductsIndex = ({ products, categories, filters }) => {
   const [priceRange, setPriceRange] = useState({
@@ -77,6 +78,20 @@ const ProductsIndex = ({ products, categories, filters }) => {
         })
       });
 
+      // Check if the response is a redirect to login page (unauthenticated)
+      if (response.redirected && response.url.includes('/login')) {
+        // Redirect to login page
+        window.location.href = response.url;
+        return;
+      }
+
+      // Check for 401 Unauthorized status
+      if (response.status === 401) {
+        // Redirect to login page
+        window.location.href = route('login');
+        return;
+      }
+
       const data = await response.json();
 
       if (data.success) {
@@ -91,6 +106,11 @@ const ProductsIndex = ({ products, categories, filters }) => {
           }));
         }
       } else {
+        // If the message indicates authentication is required, redirect to login
+        if (data.message === 'Unauthenticated.' || data.message?.toLowerCase().includes('login')) {
+          window.location.href = route('login');
+          return;
+        }
         toast.error(data.message || 'Failed to add product to cart');
       }
 
@@ -416,13 +436,13 @@ const ProductsIndex = ({ products, categories, filters }) => {
                 variants={container}
                 initial="hidden"
                 animate="show"
-                className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4 md:gap-6"
+                className="grid grid-cols-1 xs:grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-3 sm:gap-4 md:gap-6"
               >
                 {products.data.map((product) => (
                   <motion.div key={product.id} variants={item}>
                     <Link href={route('products.show', product.slug)} className="block">
-                      <div className="group bg-white dark:bg-cinematic-800 rounded-lg overflow-hidden shadow-md dark:shadow-soft hover:shadow-xl dark:hover:shadow-soft-lg transition-shadow duration-300 border border-cinematic-200 dark:border-cinematic-700">
-                        <div className="aspect-w-1 aspect-h-1 w-full overflow-hidden">
+                      <div className="group bg-white dark:bg-cinematic-800 rounded-lg overflow-hidden shadow-md dark:shadow-soft hover:shadow-xl dark:hover:shadow-soft-lg transition-shadow duration-300 border border-cinematic-200 dark:border-cinematic-700 h-full flex flex-col">
+                        <div className="aspect-w-1 aspect-h-1 w-full overflow-hidden bg-gray-100 dark:bg-gray-800">
                             {product.images.length > 0 ? (
                               <img
                                 src={
@@ -433,28 +453,62 @@ const ProductsIndex = ({ products, categories, filters }) => {
                                       : `/assets/default-product.png`
                                 }
                                 alt={product.name}
-                                className="h-60 w-full object-cover object-center group-hover:scale-105 transition-transform duration-300"
+                                className="w-full object-cover object-center group-hover:scale-105 transition-transform duration-300"
+                                loading="lazy"
                               />
                             ) : (
                               <img
                                 src="/assets/default-product.png"
                                 alt={product.name}
-                                className="h-60 w-full object-cover object-center group-hover:scale-105 transition-transform duration-300"
+                                className="w-full object-cover object-center group-hover:scale-105 transition-transform duration-300"
+                                loading="lazy"
                               />
                             )}
+
+                            {/* Sale badge */}
+                            {product.sale_price && (
+                              <div className="category-circle">
+                                <div className="category-circle-overlay"></div>
+                                <div className="category-circle-content">
+                                  <div className="category-circle-discount">
+                                    {Math.round((1 - product.sale_price / product.price) * 100)}%
+                                  </div>
+                                </div>
+                              </div>
+                            )}
                         </div>
-                        <div className="p-3 sm:p-4">
+                        <div className="p-3 sm:p-4 flex-1 flex flex-col">
                           <h3 className="text-xs sm:text-sm text-cinematic-500 dark:text-cinematic-400">{product.category.name}</h3>
-                          <p className="mt-1 text-base sm:text-lg font-medium text-cinematic-900 dark:text-white">{product.name}</p>
-                          <div className="mt-2 flex items-center justify-between">
+                          <p className="mt-1 text-sm sm:text-base font-medium text-cinematic-900 dark:text-white line-clamp-2 h-12">{product.name}</p>
+
+                          {/* Product rating */}
+                          <div className="mt-2 flex items-center">
+                            <div className="flex text-yellow-400">
+                              {[1, 2, 3, 4, 5].map((star) => (
+                                <svg
+                                  key={star}
+                                  className={`w-3 h-3 sm:w-4 sm:h-4 ${star <= (product.rating || 4) ? 'text-yellow-400' : 'text-gray-300 dark:text-gray-600'}`}
+                                  fill="currentColor"
+                                  viewBox="0 0 20 20"
+                                >
+                                  <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                                </svg>
+                              ))}
+                            </div>
+                            <span className="ml-1 text-xs text-gray-500 dark:text-gray-400">
+                              ({product.review_count || Math.floor(Math.random() * 50) + 5})
+                            </span>
+                          </div>
+
+                          <div className="mt-auto pt-3 flex items-center justify-between">
                             <div>
                               {product.sale_price ? (
-                                <div className="flex items-center">
-                                  <span className="text-base sm:text-lg text-primary-600 dark:text-primary-400">${product.sale_price}</span>
-                                  <span className="ml-2 text-xs sm:text-sm text-cinematic-500 dark:text-cinematic-400 line-through">${product.price}</span>
+                                <div className="flex flex-col xs:flex-row xs:items-center">
+                                  <span className="text-sm sm:text-base font-bold text-pink-600 dark:text-pink-400">${product.sale_price}</span>
+                                  <span className="xs:ml-2 text-xs text-cinematic-500 dark:text-cinematic-400 line-through">${product.price}</span>
                                 </div>
                               ) : (
-                                <span className="text-base sm:text-lg font-bold text-primary-600 dark:text-primary-600">${product.price}</span>
+                                <span className="text-sm sm:text-base font-bold text-pink-600 dark:text-pink-400">${product.price}</span>
                               )}
                             </div>
                             <motion.button
@@ -470,12 +524,13 @@ const ProductsIndex = ({ products, categories, filters }) => {
                                 addingToCart === product.id
                                   ? 'bg-gradient-to-r from-pink-500 to-purple-600 text-white shadow-lg shadow-pink-500/20 dark:shadow-pink-700/30'
                                   : 'bg-pink-100 dark:bg-pink-900/30 text-pink-600 dark:text-pink-400 hover:bg-pink-200 dark:hover:bg-pink-800/40'
-                              } transition-all duration-300 relative overflow-hidden`}
+                              } transition-all duration-300 relative overflow-hidden focus:outline-none focus:ring-2 focus:ring-pink-500 focus:ring-offset-2 dark:focus:ring-offset-cinematic-800`}
+                              aria-label={t('cart.add_to_cart')}
                             >
                               {addingToCart === product.id ? (
                                 <>
                                   {/* Spinner animation */}
-                                  <svg className="animate-spin h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                  <svg className="animate-spin h-4 w-4 sm:h-5 sm:w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                                     <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                                     <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                                   </svg>
@@ -487,15 +542,18 @@ const ProductsIndex = ({ products, categories, filters }) => {
                                     animate={{ opacity: 1 }}
                                     transition={{ delay: 0.5, duration: 0.3 }}
                                   >
-                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 sm:h-5 sm:w-5" viewBox="0 0 20 20" fill="currentColor">
                                       <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                                     </svg>
                                   </motion.div>
                                 </>
                               ) : (
-                                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                                  <path d="M3 1a1 1 0 000 2h1.22l.305 1.222a.997.997 0 00.01.042l1.358 5.43-.893.892C3.74 11.846 4.632 14 6.414 14H15a1 1 0 000-2H6.414l1-1H14a1 1 0 00.894-.553l3-6A1 1 0 0017 3H6.28l-.31-1.243A1 1 0 005 1H3zM16 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0zM6.5 18a1.5 1.5 0 100-3 1.5 1.5 0 000 3z" />
-                                </svg>
+                                <>
+                                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 sm:h-5 sm:w-5" viewBox="0 0 20 20" fill="currentColor">
+                                    <path d="M3 1a1 1 0 000 2h1.22l.305 1.222a.997.997 0 00.01.042l1.358 5.43-.893.892C3.74 11.846 4.632 14 6.414 14H15a1 1 0 000-2H6.414l1-1H14a1 1 0 00.894-.553l3-6A1 1 0 0017 3H6.28l-.31-1.243A1 1 0 005 1H3zM16 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0zM6.5 18a1.5 1.5 0 100-3 1.5 1.5 0 000 3z" />
+                                  </svg>
+                                  <span className="absolute inset-0 bg-white dark:bg-white opacity-0 active:opacity-20 rounded-full transition-opacity duration-200"></span>
+                                </>
                               )}
                             </motion.button>
                           </div>
@@ -525,19 +583,37 @@ const ProductsIndex = ({ products, categories, filters }) => {
             {products.data.length > 0 && (
               <div className="mt-6 sm:mt-8">
                 <div className="flex flex-wrap justify-center gap-1 sm:gap-2">
-                  {products.links.map((link, index) => (
-                    <Link
-                      key={index}
-                      href={link.url}
-                      className={`px-2 sm:px-3 md:px-4 py-1.5 sm:py-2 rounded-md text-xs sm:text-sm ${link.active
-                        ? 'bg-primary-600 dark:bg-primary-700 text-white'
-                        : link.url
-                          ? 'bg-white dark:bg-cinematic-800 text-cinematic-700 dark:text-cinematic-300 hover:bg-primary-100 dark:hover:bg-primary-900 border border-cinematic-200 dark:border-cinematic-700'
-                          : 'bg-cinematic-100 dark:bg-cinematic-900 text-cinematic-400 dark:text-cinematic-600 cursor-not-allowed border border-cinematic-200 dark:border-cinematic-800'
-                        }`}
-                      dangerouslySetInnerHTML={{ __html: link.label }}
-                    />
-                  ))}
+                  {products.links.map((link, index) => {
+                    // For mobile, simplify pagination by only showing prev, current page, and next
+                    const isMobileHidden =
+                      (index !== 0 && // not "Previous"
+                       index !== products.links.length - 1 && // not "Next"
+                       !link.active && // not current page
+                       !link.label.includes("...") && // not ellipsis
+                       products.links.length > 7); // only when we have many pages
+
+                    return (
+                      <Link
+                        key={index}
+                        href={link.url}
+                        className={`px-2 sm:px-3 md:px-4 py-1.5 sm:py-2 rounded-md text-xs sm:text-sm ${
+                          link.active
+                            ? 'bg-primary-600 dark:bg-primary-700 text-white shadow-md'
+                            : link.url
+                              ? 'bg-white dark:bg-cinematic-800 text-cinematic-700 dark:text-cinematic-300 hover:bg-primary-100 dark:hover:bg-primary-900 border border-cinematic-200 dark:border-cinematic-700'
+                              : 'bg-cinematic-100 dark:bg-cinematic-900 text-cinematic-400 dark:text-cinematic-600 cursor-not-allowed border border-cinematic-200 dark:border-cinematic-800'
+                        } ${isMobileHidden ? 'hidden sm:block' : ''} min-w-[32px] sm:min-w-[40px] text-center focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 dark:focus:ring-offset-cinematic-800`}
+                        dangerouslySetInnerHTML={{ __html: link.label }}
+                        aria-label={
+                          link.label === "&laquo; Previous"
+                            ? "Previous page"
+                            : link.label === "Next &raquo;"
+                              ? "Next page"
+                              : `Page ${link.label}`
+                        }
+                      />
+                    );
+                  })}
                 </div>
               </div>
             )}

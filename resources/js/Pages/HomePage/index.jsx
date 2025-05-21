@@ -5,6 +5,7 @@ import CinematicLayout from "@/Layouts/CinematicLayout";
 import { t } from "@/utils/translate";
 import { toast } from "react-hot-toast";
 import { getCsrfHeaders } from "@/utils/csrf";
+import "../../../css/category-circles.css";
 
 const HomePage = ({ featuredProducts, categories }) => {
   // State to track which product is being added to cart (for animation)
@@ -27,6 +28,20 @@ const HomePage = ({ featuredProducts, categories }) => {
         })
       });
 
+      // Check if the response is a redirect to login page (unauthenticated)
+      if (response.redirected && response.url.includes('/login')) {
+        // Redirect to login page
+        window.location.href = response.url;
+        return;
+      }
+
+      // Check for 401 Unauthorized status
+      if (response.status === 401) {
+        // Redirect to login page
+        window.location.href = route('login');
+        return;
+      }
+
       const data = await response.json();
 
       if (data.success) {
@@ -41,6 +56,11 @@ const HomePage = ({ featuredProducts, categories }) => {
           }));
         }
       } else {
+        // If the message indicates authentication is required, redirect to login
+        if (data.message === 'Unauthenticated.' || data.message?.toLowerCase().includes('login')) {
+          window.location.href = route('login');
+          return;
+        }
         toast.error(data.message || t('cart.add_failed'));
       }
 
@@ -150,12 +170,12 @@ const HomePage = ({ featuredProducts, categories }) => {
             initial="hidden"
             whileInView="show"
             viewport={{ once: true }}
-            className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 md:gap-6"
+            className="category-grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 md:gap-6"
           >
             {categories.map((category) => (
               <motion.div key={category.id} variants={item}>
                 <Link href={route("products.index", { category: category.id })}>
-                  <div className="group relative overflow-hidden rounded-lg shadow-md dark:shadow-soft hover:shadow-xl transition-shadow duration-300">
+                  <div className="relative overflow-hidden rounded-lg shadow-md dark:shadow-soft hover:shadow-xl transition-shadow duration-300">
                     <div className="aspect-w-1 aspect-h-1 w-full overflow-hidden bg-gray-200 dark:bg-cinematic-700">
                       <img
                         src={
@@ -172,6 +192,17 @@ const HomePage = ({ featuredProducts, categories }) => {
                         {category.name}
                       </h3>
                     </div>
+                    {/* Display discount percentage if available */}
+                    {category.discount && (
+                      <div className="category-circle">
+                        <div className="category-circle-overlay"></div>
+                        <div className="category-circle-content">
+                          <div className="category-circle-discount">
+                            {category.discount}%
+                          </div>
+                        </div>
+                      </div>
+                    )}
                   </div>
                 </Link>
               </motion.div>

@@ -82,7 +82,7 @@ export default function Footer() {
       <div className="bg-gradient-to-b from-white to-gray-50 dark:from-gray-900 dark:to-gray-950 border-t border-gray-200/80 dark:border-gray-800/80 backdrop-blur-sm relative z-10 pb-0">
         <div className="container max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 md:py-16">
           <motion.div
-            className="grid grid-cols-2 xs:grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-x-4 sm:gap-x-6 lg:gap-x-8 gap-y-8 sm:gap-y-10"
+            className="grid grid-cols-1 xs:grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-x-4 sm:gap-x-6 lg:gap-x-8 gap-y-8 sm:gap-y-10"
             variants={containerVariants}
             initial="hidden"
             whileInView="visible"
@@ -182,7 +182,7 @@ export default function Footer() {
             </motion.div>
 
             {/* Newsletter and Social Media Column */}
-            <motion.div variants={itemVariants} className="col-span-2 md:col-span-1">
+            <motion.div variants={itemVariants} className="col-span-1 xs:col-span-2 sm:col-span-2 md:col-span-1">
               <h3 className="text-base sm:text-lg font-semibold bg-gradient-to-r from-pink-600 to-purple-600 dark:from-pink-500 dark:to-purple-500 bg-clip-text text-transparent mb-4 sm:mb-6">{t('common.connect_with_us')}</h3>
 
               {/* Modern social media icons with hover effects - more compact on mobile */}
@@ -244,21 +244,23 @@ export default function Footer() {
                   <h4 className="text-sm sm:text-base font-semibold bg-gradient-to-r from-pink-600 to-purple-600 dark:from-pink-500 dark:to-purple-500 bg-clip-text text-transparent mb-1 sm:mb-2 md:mb-3">{t('common.join_newsletter')}</h4>
                   <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 mb-2 sm:mb-3 md:mb-4">{t('common.newsletter_description')}</p>
 
-                  <form onSubmit={handleNewsletterSubmit}>
-                    <div className="relative">
-                      <div className="flex flex-col sm:flex-row sm:space-x-2">
+                  <form onSubmit={handleNewsletterSubmit} className="w-full">
+                    <div className="relative w-full">
+                      <div className="flex flex-col sm:flex-row sm:space-x-2 w-full">
                         <input
                           type="email"
                           name="email"
                           placeholder={t('common.your_email_address')}
-                          className="w-full px-3 sm:px-4 py-2 sm:py-2.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm focus:outline-none focus:ring-2 focus:ring-pink-500 dark:focus:ring-pink-400 focus:border-transparent dark:text-gray-100 shadow-sm text-xs sm:text-sm"
+                          className="w-full px-3 sm:px-4 py-2.5 sm:py-3 rounded-lg border border-gray-200 dark:border-gray-700 bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm focus:outline-none focus:ring-2 focus:ring-pink-500 dark:focus:ring-pink-400 focus:border-transparent dark:text-gray-100 shadow-sm text-xs sm:text-sm"
                           required
+                          aria-label={t('common.your_email_address')}
                         />
                         <motion.button
                           whileHover={{ scale: 1.03 }}
                           whileTap={{ scale: 0.97 }}
                           type="submit"
-                          className="mt-2 sm:mt-0 sm:flex-shrink-0 bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 text-white font-medium px-3 sm:px-4 py-2 sm:py-2.5 rounded-lg shadow-lg hover:shadow-pink-500/30 dark:hover:shadow-pink-700/30 transition-all duration-300 text-xs sm:text-sm"
+                          className="mt-2 sm:mt-0 w-full sm:w-auto sm:flex-shrink-0 bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 text-white font-medium px-3 sm:px-4 py-2.5 sm:py-3 rounded-lg shadow-lg hover:shadow-pink-500/30 dark:hover:shadow-pink-700/30 transition-all duration-300 text-xs sm:text-sm"
+                          aria-label={t('common.subscribe')}
                         >
                           {t('common.subscribe')}
                         </motion.button>
@@ -283,7 +285,7 @@ export default function Footer() {
                 transition={{ duration: 0.5, delay: 0.7 }}
                 className="mb-4 sm:mb-0 text-center sm:text-left"
               >
-                <p className="text-gray-500 dark:text-gray-400 text-xs">
+                <p className="text-gray-500 dark:text-gray-400 text-xs sm:text-sm">
                   &copy; {currentYear} Cinematic Beauty Store. {t('common.copyright')}
                 </p>
               </motion.div>
@@ -295,16 +297,57 @@ export default function Footer() {
                 transition={{ duration: 0.5, delay: 0.8 }}
                 className="flex flex-wrap justify-center sm:justify-end gap-3 sm:gap-4 md:gap-6"
               >
-                <Link href={route('help.privacy')} className="text-gray-500 hover:text-pink-600 dark:text-gray-400 dark:hover:text-pink-400 text-xs transition-colors duration-300">
-                  {t('common.privacy')}
+                <Link
+                  href={route('help.privacy')}
+                  className="text-gray-500 hover:text-pink-600 dark:text-gray-400 dark:hover:text-pink-400 text-xs sm:text-sm transition-colors duration-300 relative group"
+                  aria-label={t('common.privacy')}
+                >
+                  <span className="relative">
+                    {t('common.privacy')}
+                    <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-pink-500 to-purple-600 group-hover:w-full transition-all duration-300"></span>
+                  </span>
                 </Link>
-                <Link href={route('help.terms')} className="text-gray-500 hover:text-pink-600 dark:text-gray-400 dark:hover:text-pink-400 text-xs transition-colors duration-300">
-                  {t('common.terms')}
+                <Link
+                  href={route('help.terms')}
+                  className="text-gray-500 hover:text-pink-600 dark:text-gray-400 dark:hover:text-pink-400 text-xs sm:text-sm transition-colors duration-300 relative group"
+                  aria-label={t('common.terms')}
+                >
+                  <span className="relative">
+                    {t('common.terms')}
+                    <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-pink-500 to-purple-600 group-hover:w-full transition-all duration-300"></span>
+                  </span>
                 </Link>
-                <Link href={route('help.contact')} className="text-gray-500 hover:text-pink-600 dark:text-gray-400 dark:hover:text-pink-400 text-xs transition-colors duration-300">
-                  {t('common.contact')}
+                <Link
+                  href={route('help.contact')}
+                  className="text-gray-500 hover:text-pink-600 dark:text-gray-400 dark:hover:text-pink-400 text-xs sm:text-sm transition-colors duration-300 relative group"
+                  aria-label={t('common.contact')}
+                >
+                  <span className="relative">
+                    {t('common.contact')}
+                    <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-pink-500 to-purple-600 group-hover:w-full transition-all duration-300"></span>
+                  </span>
                 </Link>
               </motion.div>
+            </div>
+
+            {/* Mobile-friendly payment methods */}
+            <div className="mt-6 sm:mt-8">
+              <p className="text-xs text-gray-500 dark:text-gray-400 text-center mb-3">
+                {t('common.payment_methods')}
+              </p>
+              <div className="flex flex-wrap justify-center gap-2 sm:gap-3">
+                {['visa', 'mastercard', 'amex', 'paypal', 'apple-pay'].map((method) => (
+                  <div
+                    key={method}
+                    className="w-10 h-6 sm:w-12 sm:h-7 bg-white dark:bg-gray-800 rounded-md flex items-center justify-center shadow-sm border border-gray-200 dark:border-gray-700"
+                    aria-label={`${method} payment method`}
+                  >
+                    <div className="text-[10px] sm:text-xs font-medium text-gray-700 dark:text-gray-300">
+                      {method.charAt(0).toUpperCase() + method.slice(1).replace('-', ' ')}
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
         </div>
