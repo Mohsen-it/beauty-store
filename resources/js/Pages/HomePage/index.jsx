@@ -286,7 +286,7 @@ const HomePage = ({ featuredProducts, categories }) => {
                             addingToCart === product.id
                               ? 'bg-gradient-to-r from-pink-500 to-purple-600 text-white shadow-lg shadow-pink-500/20 dark:shadow-pink-700/30'
                               : 'bg-pink-100 dark:bg-pink-900/30 text-pink-600 dark:text-pink-400 hover:bg-pink-200 dark:hover:bg-pink-800/40'
-                          } transition-all duration-300 relative overflow-hidden`}
+                          } ${product.name === 'Beauty' ? 'add-to-cart-btn-sm' : ''} transition-all duration-300 relative overflow-hidden`}
                         >
                           {addingToCart === product.id ? (
                             <>

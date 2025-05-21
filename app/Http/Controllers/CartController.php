@@ -59,7 +59,7 @@ class CartController extends Controller
         $quantity = $request->old('quantity') ?? $request->input('quantity');
 
         // Create a new request with the correct data if using old input
-        if ($request->hasOldInput()) {
+        if ($request->old('product_id') || $request->old('quantity')) {
             $request->merge([
                 'product_id' => $productId,
                 'quantity' => $quantity

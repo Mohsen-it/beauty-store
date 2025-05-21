@@ -145,7 +145,8 @@
     "no_more_items": "No more items to load",
     "show_filters": "Show Filters",
     "hide_filters": "Hide Filters",
-    "close": "Close"
+    "close": "Close",
+    "payment_methods": "Payment Methods"
   },
   "auth": {
     "email": "Email",
@@ -480,6 +481,12 @@
     "availability": "Availability",
     "in_stock": "In Stock ({count} available)",
     "quantity": "Quantity",
-    "related_products": "Related Products"
+    "related_products": "Related Products",
+    "reviews": "Reviews",
+    "features": "Features",
+    "add_to_wishlist": "Add to Wishlist",
+    "remove_from_wishlist": "Remove from Wishlist",
+    "shipping_returns": "Shipping & Returns",
+    "out_of_stock": "Out of Stock"
   }
 }

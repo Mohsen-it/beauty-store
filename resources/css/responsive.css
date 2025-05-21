@@ -618,6 +618,14 @@ tbody tr:hover {
   min-height: 44px; /* Ensure good touch target size */
 }
 
+/* Smaller add to cart button */
+.add-to-cart-btn-sm {
+  width: 36px !important;
+  height: 36px !important;
+  min-height: 36px !important;
+  padding: 0.5rem !important;
+}
+
 /* Compact layout for very small screens */
 @media (max-width: 375px) {
   .product-actions {

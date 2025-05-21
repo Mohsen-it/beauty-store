@@ -14,7 +14,7 @@ import { t, getCurrentLanguage, isRtl } from '@/utils/translate';
 const NavLink = memo(({ href, current, children, className }) => (
   <Link
     href={href}
-    className={`px-2 sm:px-3 md:px-4 py-1.5 sm:py-2 rounded-lg text-xs sm:text-sm font-medium transition-all duration-300 backdrop-blur-sm relative overflow-hidden group ${
+    className={`px-3 sm:px-4 md:px-5 py-2 sm:py-2.5 rounded-lg text-sm sm:text-base font-medium transition-all duration-300 backdrop-blur-sm relative overflow-hidden group ${
       current
         ? 'text-white dark:text-white bg-gradient-to-r from-pink-500 to-purple-600 shadow-lg shadow-pink-500/20 dark:shadow-pink-700/30'
         : 'text-gray-700 hover:text-pink-600 dark:text-gray-300 dark:hover:text-pink-400 border border-transparent hover:border-pink-300/30 dark:hover:border-pink-700/30'
@@ -43,7 +43,7 @@ const IconButton = memo(({ icon, label, onClick, badge, href, className = '' }) 
     <motion.div
       whileHover={{ scale: 1.05 }}
       whileTap={{ scale: 0.95 }}
-      className={`p-2 sm:p-2.5 md:p-3 relative transition-all duration-300 rounded-full bg-gradient-to-br from-gray-100/80 to-white/90 dark:from-gray-800/80 dark:to-gray-900/90 backdrop-blur-md shadow-lg hover:shadow-xl border border-gray-200/50 dark:border-gray-700/50 focus:outline-none group ${className}`}
+      className={`p-2.5 sm:p-3 md:p-3.5 relative transition-all duration-300 rounded-full bg-gradient-to-br from-gray-100/80 to-white/90 dark:from-gray-800/80 dark:to-gray-900/90 backdrop-blur-md shadow-lg hover:shadow-xl border border-gray-200/50 dark:border-gray-700/50 focus:outline-none group ${className}`}
       aria-label={label}
       role={onClick ? 'button' : undefined}
       tabIndex={0}
@@ -63,14 +63,14 @@ const IconButton = memo(({ icon, label, onClick, badge, href, className = '' }) 
             stiffness: 400,
             damping: 15
           }}
-          className="absolute -top-1.5 sm:-top-2 md:-top-3 -right-1 pointer-events-none"
+          className="absolute -top-1.5 sm:-top-2 md:-top-2.5 -right-1 pointer-events-none"
         >
           <div className="relative">
             {/* Glowing background effect */}
             <div className="absolute inset-0 rounded-full bg-pink-500/20 dark:bg-pink-600/30 blur-md"></div>
 
             {/* Badge container with gradient */}
-            <div className="relative flex items-center justify-center h-4 sm:h-5 md:h-6 min-w-4 sm:min-w-5 md:min-w-6 px-1 sm:px-1.5 md:px-2 bg-gradient-to-br from-pink-500 to-purple-600 text-white text-[8px] sm:text-[10px] md:text-xs font-bold rounded-full shadow-lg shadow-pink-500/20 dark:shadow-pink-700/30 border border-white/20 dark:border-black/10 backdrop-blur-sm">
+            <div className="relative flex items-center justify-center h-5 sm:h-5 md:h-6 min-w-5 sm:min-w-5 md:min-w-6 px-1.5 sm:px-1.5 md:px-2 bg-gradient-to-br from-pink-500 to-purple-600 text-white text-[10px] sm:text-[10px] md:text-xs font-bold rounded-full shadow-lg shadow-pink-500/20 dark:shadow-pink-700/30 border border-white/20 dark:border-black/10 backdrop-blur-sm">
               {/* Badge counter with animation */}
               <motion.span
                 key={badge}
@@ -89,8 +89,8 @@ const IconButton = memo(({ icon, label, onClick, badge, href, className = '' }) 
     </motion.div>
   );
 
-  // Add touch target enhancement for mobile
-  const touchTargetStyles = "relative after:content-[''] after:absolute after:top-[-8px] after:right-[-8px] after:bottom-[-8px] after:left-[-8px]";
+  // Enhanced touch target for mobile - increased size
+  const touchTargetStyles = "relative after:content-[''] after:absolute after:top-[-12px] after:right-[-12px] after:bottom-[-12px] after:left-[-12px]";
 
   return href ? (
     <Link href={href} className={touchTargetStyles} aria-label={label}>

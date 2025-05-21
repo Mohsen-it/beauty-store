@@ -1,23 +1,33 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Head, Link, useForm } from '@inertiajs/react';
 import { motion, AnimatePresence } from 'framer-motion';
 import axios from 'axios';
 import { toast } from 'react-hot-toast';
 import { t } from '@/utils/translate';
-import { getCsrfHeaders } from '@/utils/csrf';
+import { getCsrfHeaders, refreshCsrfToken } from '@/utils/csrf';
 import '../../../css/category-circles.css';
+import '../../../css/product-page.css';
+import '../../../css/mobile-first.css';
+import ImageLightbox from '@/Components/ImageLightbox';
 
 import CinematicLayout from '@/Layouts/CinematicLayout';
 
 const ProductShow = ({ product, relatedProducts }) => {
   const [quantity, setQuantity] = useState(1);
   const [activeImage, setActiveImage] = useState(product.image_url);
+  const [activeImageIndex, setActiveImageIndex] = useState(0);
   const [isLiked, setIsLiked] = useState(product.is_liked || false);
   const [productImages, setProductImages] = useState([]);
+  const [lightboxOpen, setLightboxOpen] = useState(false);
   // State to track when a product is being added to cart (for animation)
   const [addingToCart, setAddingToCart] = useState(false);
   // State to track which related product is being added to cart
   const [addingRelatedToCart, setAddingRelatedToCart] = useState(null);
+
+  // Mobile-first states
+  const [activeAccordion, setActiveAccordion] = useState('description');
+  const galleryRef = useRef(null);
+  const [galleryScrolling, setGalleryScrolling] = useState(false);
 
   // State to track quantity for each related product
   const [relatedProductQuantities, setRelatedProductQuantities] = useState({});
@@ -35,6 +45,14 @@ const ProductShow = ({ product, relatedProducts }) => {
       quantity: relatedProductQuantities[relatedProduct.id] || 1
     });
   });
+
+  // Refresh CSRF token on component mount
+  useEffect(() => {
+    // Refresh the CSRF token when the component mounts
+    refreshCsrfToken().catch(error => {
+      console.error('Failed to refresh CSRF token on page load:', error);
+    });
+  }, []);
 
   // Process product images on component mount
   useEffect(() => {
@@ -83,15 +101,24 @@ const ProductShow = ({ product, relatedProducts }) => {
       }
     }
 
-    // Log the images for debugging
-    console.log("Product images:", images);
+    // Remove duplicates
+    const uniqueImages = [...new Set(images)];
 
     // Set images and default active image to the first one
-    setProductImages(images);
-    if (images.length > 0) {
-      setActiveImage(images[0]); // Set the first image as active
+    setProductImages(uniqueImages);
+    if (uniqueImages.length > 0) {
+      setActiveImage(uniqueImages[0]); // Set the first image as active
+      setActiveImageIndex(0);
     }
   }, [product]);
+
+  // Update active image index when active image changes
+  useEffect(() => {
+    const index = productImages.findIndex(img => img === activeImage);
+    if (index !== -1) {
+      setActiveImageIndex(index);
+    }
+  }, [activeImage, productImages]);
 
   // We'll use the setData function to keep track of quantity changes,
   // but we won't use the post method since we're using fetch API directly
@@ -114,12 +141,16 @@ const ProductShow = ({ product, relatedProducts }) => {
     setAddingToCart(true);
 
     try {
+      // Refresh CSRF token first to ensure we have the latest token
+      await refreshCsrfToken();
+
       // Use the utility function to get CSRF headers
       const headers = getCsrfHeaders();
 
       const response = await fetch(route('cart.add'), {
         method: 'POST',
         headers,
+        credentials: 'same-origin', // Important for cookies
         body: JSON.stringify({
           product_id: product.id,
           quantity: quantity
@@ -137,6 +168,54 @@ const ProductShow = ({ product, relatedProducts }) => {
       if (response.status === 401) {
         // Redirect to login page
         window.location.href = route('login');
+        return;
+      }
+
+      // Check for CSRF token mismatch (419 status)
+      if (response.status === 419) {
+        // Try to refresh the token and retry the request once
+        await refreshCsrfToken();
+
+        // Get fresh headers after token refresh
+        const freshHeaders = getCsrfHeaders();
+
+        // Retry the request with fresh token
+        const retryResponse = await fetch(route('cart.add'), {
+          method: 'POST',
+          headers: freshHeaders,
+          credentials: 'same-origin',
+          body: JSON.stringify({
+            product_id: product.id,
+            quantity: quantity
+          })
+        });
+
+        if (retryResponse.ok) {
+          const retryData = await retryResponse.json();
+
+          if (retryData.success) {
+            // Display success message
+            toast.success(retryData.message || 'Product added to cart successfully');
+
+            // Update cart count immediately
+            if (retryData.count) {
+              window.dispatchEvent(new CustomEvent('cart-updated', {
+                detail: { count: parseInt(retryData.count) }
+              }));
+            }
+
+            // Remove adding state after a short delay
+            setTimeout(() => {
+              setAddingToCart(false);
+            }, 1000);
+
+            return;
+          }
+        }
+
+        // If retry failed, show error
+        toast.error('Session expired. Please refresh the page and try again.');
+        setAddingToCart(false);
         return;
       }
 
@@ -220,12 +299,16 @@ const ProductShow = ({ product, relatedProducts }) => {
     setAddingRelatedToCart(productId);
 
     try {
+      // Refresh CSRF token first to ensure we have the latest token
+      await refreshCsrfToken();
+
       // Use the utility function to get CSRF headers
       const headers = getCsrfHeaders();
 
       const response = await fetch(route('cart.add'), {
         method: 'POST',
         headers,
+        credentials: 'same-origin', // Important for cookies
         body: JSON.stringify({
           product_id: productId,
           quantity: relatedProductQuantities[productId] || 1
@@ -243,6 +326,54 @@ const ProductShow = ({ product, relatedProducts }) => {
       if (response.status === 401) {
         // Redirect to login page
         window.location.href = route('login');
+        return;
+      }
+
+      // Check for CSRF token mismatch (419 status)
+      if (response.status === 419) {
+        // Try to refresh the token and retry the request once
+        await refreshCsrfToken();
+
+        // Get fresh headers after token refresh
+        const freshHeaders = getCsrfHeaders();
+
+        // Retry the request with fresh token
+        const retryResponse = await fetch(route('cart.add'), {
+          method: 'POST',
+          headers: freshHeaders,
+          credentials: 'same-origin',
+          body: JSON.stringify({
+            product_id: productId,
+            quantity: relatedProductQuantities[productId] || 1
+          })
+        });
+
+        if (retryResponse.ok) {
+          const retryData = await retryResponse.json();
+
+          if (retryData.success) {
+            // Display success message
+            toast.success(retryData.message || 'Product added to cart successfully');
+
+            // Update cart count immediately
+            if (retryData.count) {
+              window.dispatchEvent(new CustomEvent('cart-updated', {
+                detail: { count: parseInt(retryData.count) }
+              }));
+            }
+
+            // Remove adding state after a short delay
+            setTimeout(() => {
+              setAddingRelatedToCart(null);
+            }, 1000);
+
+            return;
+          }
+        }
+
+        // If retry failed, show error
+        toast.error('Session expired. Please refresh the page and try again.');
+        setAddingRelatedToCart(null);
         return;
       }
 
@@ -296,138 +427,96 @@ const ProductShow = ({ product, relatedProducts }) => {
     show: { opacity: 1, y: 0 }
   };
 
+  // Function to handle mobile gallery scrolling
+  const handleGalleryScroll = (index) => {
+    if (galleryRef.current) {
+      setGalleryScrolling(true);
+      setActiveImageIndex(index);
+
+      const slideWidth = galleryRef.current.offsetWidth;
+      galleryRef.current.scrollTo({
+        left: slideWidth * index,
+        behavior: 'smooth'
+      });
+
+      setTimeout(() => {
+        setGalleryScrolling(false);
+      }, 500);
+    }
+  };
+
+  // Function to toggle accordion sections
+  const toggleAccordion = (section) => {
+    setActiveAccordion(activeAccordion === section ? null : section);
+  };
+
   return (
     <CinematicLayout>
       <Head title={`${product.name} - ${t('app.title')}`} />
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <nav className="flex mb-8" aria-label="Breadcrumb">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 lg:py-8">
+        {/* Breadcrumb navigation - Hidden on mobile, visible on tablet and up */}
+        <nav className="hidden sm:flex mb-4 sm:mb-6 lg:mb-8 overflow-x-auto whitespace-nowrap pb-2 scrollbar-hide" aria-label="Breadcrumb">
           <ol className="inline-flex items-center space-x-1 md:space-x-3">
             <li className="inline-flex items-center">
-              <Link href={route('home')} className="text-gray-500 dark:text-gray-300 hover:text-pink-600 dark:hover:text-pink-400">
+              <Link href={route('home')} className="text-gray-500 dark:text-gray-300 hover:text-pink-600 dark:hover:text-pink-400 transition-colors">
                 {t('common.home')}
               </Link>
             </li>
             <li>
               <div className="flex items-center">
-                <svg className="w-6 h-6 text-gray-400 dark:text-gray-500" fill="currentColor" viewBox="0 0 20 20">
+                <svg className="w-5 h-5 text-gray-400 dark:text-gray-500 mx-1" fill="currentColor" viewBox="0 0 20 20">
                   <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd"></path>
                 </svg>
-                <Link href={route('products.index')} className="ml-1 text-gray-500 dark:text-gray-300 hover:text-pink-600 dark:hover:text-pink-400 md:ml-2">
+                <Link href={route('products.index')} className="text-gray-500 dark:text-gray-300 hover:text-pink-600 dark:hover:text-pink-400 transition-colors">
                   {t('products.title')}
                 </Link>
               </div>
             </li>
             <li aria-current="page">
               <div className="flex items-center">
-                <svg className="w-6 h-6 text-gray-400 dark:text-gray-500" fill="currentColor" viewBox="0 0 20 20">
+                <svg className="w-5 h-5 text-gray-400 dark:text-gray-500 mx-1" fill="currentColor" viewBox="0 0 20 20">
                   <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd"></path>
                 </svg>
-                <span className="ml-1 text-gray-500 dark:text-gray-300 md:ml-2">{product.name}</span>
+                <span className="text-gray-500 dark:text-gray-300 max-w-[200px] sm:max-w-xs truncate">{product.name}</span>
               </div>
             </li>
           </ol>
         </nav>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
-          {/* Product Images */}
-          <motion.div
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.5 }}
-            className="order-2 lg:order-1"
+        {/* Mobile Back Button - Only visible on mobile */}
+        <div className="sm:hidden mb-4">
+          <Link
+            href={route('products.index')}
+            className="inline-flex items-center text-gray-600 dark:text-gray-300 hover:text-pink-600 dark:hover:text-pink-400"
           >
-            <div className="mb-6">
-              <div className="aspect-w-1 aspect-h-1 w-full overflow-hidden rounded-lg bg-white dark:bg-cinematic-800 border border-gray-200 dark:border-cinematic-700 shadow-md">
-                <div className="relative">
-                  <motion.img
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    key={activeImage}
-                    src={activeImage || `/assets/default-product.png`}
-                    alt={product.name}
-                    className="h-full w-full object-cover object-center"
-                    loading="eager"
-                  />
-                  {product.sale_price && (
-                    <div className="category-circle">
-                      <div className="category-circle-overlay"></div>
-                      <div className="category-circle-content">
-                        <div className="category-circle-discount">
-                          {Math.round((1 - product.sale_price / product.price) * 100)}%
-                        </div>
-                      </div>
-                    </div>
-                  )}
-                </div>
-              </div>
-            </div>
+            <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+            </svg>
+            {t('common.back_to_products')}
+          </Link>
+        </div>
 
-            {/* Gallery - Responsive grid */}
-            {productImages.length > 0 && (
-              <div className="grid grid-cols-4 xs:grid-cols-5 sm:grid-cols-6 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-2">
-                {productImages.map((image, index) => (
-                  <div
-                    key={index}
-                    onClick={() => setActiveImage(image)}
-                    className={`cursor-pointer rounded-md overflow-hidden bg-white dark:bg-cinematic-800 border border-gray-200 dark:border-cinematic-700 shadow-sm transition-all duration-200 hover:shadow-md ${activeImage === image ? 'ring-2 ring-pink-500 shadow-md' : ''}`}
-                    role="button"
-                    aria-label={`View image ${index + 1} of ${product.name}`}
-                    tabIndex={0}
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter' || e.key === ' ') {
-                        setActiveImage(image);
-                      }
-                    }}
-                  >
-                    <div className="aspect-w-1 aspect-h-1">
-                      <img
-                        src={image}
-                        alt={`${product.name} ${index + 1}`}
-                        className="h-full w-full object-cover object-center"
-                        loading="lazy"
-                      />
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </motion.div>
-
-          {/* Product Details */}
+        {/* Mobile-First Product Layout */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-12">
+          {/* Product Header Section - First on mobile */}
           <motion.div
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
             className="order-1 lg:order-2"
           >
-            <div className="sticky top-24 space-y-6">
-              <div>
-                <Link
-                  href={route('products.index', { category: product.category_id })}
-                  className="text-xs sm:text-sm font-medium text-pink-600 dark:text-pink-400 hover:text-pink-800 dark:hover:text-pink-300 inline-block mb-2"
-                >
-                  {product.category.name}
-                </Link>
-                <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white mb-4">{product.name}</h1>
-              </div>
-
-              <div>
-                {product.sale_price ? (
-                  <div className="flex flex-wrap items-center gap-2">
-                    <span className="text-xl sm:text-2xl font-bold text-pink-600 dark:text-pink-400">${product.sale_price}</span>
-                    <span className="text-base sm:text-lg text-gray-500 dark:text-gray-400 line-through">${product.price}</span>
-                    <span className="px-2 py-1 bg-pink-100 dark:bg-pink-900/30 text-pink-800 dark:text-pink-300 text-xs font-medium rounded">
-                      {Math.round((1 - product.sale_price / product.price) * 100)}% OFF
-                    </span>
-                  </div>
-                ) : (
-                  <span className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">${product.price}</span>
-                )}
-              </div>
+            <div className="product-info-section">
+              <Link
+                href={route('products.index', { category: product.category_id })}
+                className="product-category"
+              >
+                {product.category.name}
+              </Link>
+              <h1 className="product-title">{product.name}</h1>
 
               {/* Product Rating */}
-              <div className="flex items-center">
+              <div className="flex items-center mt-2">
                 <div className="flex text-yellow-400">
                   {[1, 2, 3, 4, 5].map((star) => (
                     <svg
@@ -435,6 +524,7 @@ const ProductShow = ({ product, relatedProducts }) => {
                       className={`w-4 h-4 sm:w-5 sm:h-5 ${star <= (product.rating || 4) ? 'text-yellow-400' : 'text-gray-300 dark:text-gray-600'}`}
                       fill="currentColor"
                       viewBox="0 0 20 20"
+                      aria-hidden="true"
                     >
                       <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
                     </svg>
@@ -445,47 +535,249 @@ const ProductShow = ({ product, relatedProducts }) => {
                 </span>
               </div>
 
-              <div>
-                <h2 className="text-sm font-medium text-gray-900 dark:text-white mb-2">{t('products.description')}</h2>
-                <div className="prose prose-sm text-gray-600 dark:text-gray-300 max-w-none">
-                  <p>{product.description}</p>
+              {/* Price section */}
+              <div className="price-section">
+                {product.sale_price ? (
+                  <>
+                    <span className="current-price">${product.sale_price}</span>
+                    <span className="original-price">${product.price}</span>
+                    <span className="discount-badge">
+                      {Math.round((1 - product.sale_price / product.price) * 100)}% OFF
+                    </span>
+                  </>
+                ) : (
+                  <span className="current-price">${product.price}</span>
+                )}
+              </div>
+
+              {/* Product availability - Mobile only */}
+              <div className="sm:hidden mt-2">
+                {product.stock > 0 ? (
+                  <div className="flex items-center">
+                    <div className="w-2.5 h-2.5 bg-green-500 rounded-full mr-2"></div>
+                    <p className="text-sm text-green-600 dark:text-green-400 font-medium">
+                      {t('products.in_stock', { count: product.stock })}
+                    </p>
+                  </div>
+                ) : (
+                  <div className="flex items-center">
+                    <div className="w-2.5 h-2.5 bg-red-500 rounded-full mr-2"></div>
+                    <p className="text-sm text-red-600 dark:text-red-400 font-medium">
+                      {t('products.out_of_stock')}
+                    </p>
+                  </div>
+                )}
+              </div>
+            </div>
+          </motion.div>
+
+          {/* Product Images - Second on mobile */}
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.1 }}
+            className="order-2 lg:order-1"
+          >
+            {/* Mobile Gallery */}
+            <div className="relative mb-4">
+              <div className="mobile-gallery-container">
+                <div
+                  ref={galleryRef}
+                  className="mobile-gallery"
+                  onScroll={() => {
+                    if (!galleryScrolling && galleryRef.current) {
+                      const index = Math.round(galleryRef.current.scrollLeft / galleryRef.current.offsetWidth);
+                      if (index !== activeImageIndex) {
+                        setActiveImageIndex(index);
+                        setActiveImage(productImages[index]);
+                      }
+                    }
+                  }}
+                >
+                  {productImages.length > 0 ? (
+                    productImages.map((image, index) => (
+                      <div key={index} className="mobile-gallery-slide">
+                        <img
+                          src={image || `/assets/default-product.png`}
+                          alt={`${product.name} ${index + 1}`}
+                          loading={index === 0 ? "eager" : "lazy"}
+                          onError={(e) => {
+                            e.target.src = `/assets/default-product.png`;
+                          }}
+                        />
+
+                        {/* Sale discount tag - Only show on first slide */}
+                        {index === 0 && product.sale_price && (
+                          <div className="category-circle">
+                            <div className="category-circle-overlay"></div>
+                            <div className="category-circle-content">
+                              <div className="category-circle-discount">
+                                {Math.round((1 - product.sale_price / product.price) * 100)}%
+                              </div>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    ))
+                  ) : (
+                    <div className="mobile-gallery-slide">
+                      <img
+                        src={`/assets/default-product.png`}
+                        alt={product.name}
+                        loading="eager"
+                      />
+                    </div>
+                  )}
+                </div>
+
+                {/* Lightbox trigger button */}
+                <div
+                  className="lightbox-trigger"
+                  onClick={() => setLightboxOpen(true)}
+                  role="button"
+                  aria-label="Open image gallery"
+                  tabIndex={0}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      setLightboxOpen(true);
+                    }
+                  }}
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7" />
+                  </svg>
+                </div>
+              </div>
+
+              {/* Gallery Dots */}
+              {productImages.length > 1 && (
+                <div className="mobile-gallery-dots">
+                  {productImages.map((_, index) => (
+                    <div
+                      key={index}
+                      className={`mobile-gallery-dot ${index === activeImageIndex ? 'active' : ''}`}
+                      onClick={() => handleGalleryScroll(index)}
+                    />
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* Thumbnail gallery - Hidden on mobile, visible on desktop */}
+            {productImages.length > 1 && (
+              <div className="thumbnail-gallery">
+                {productImages.map((image, index) => (
+                  <div
+                    key={index}
+                    onClick={() => {
+                      setActiveImage(image);
+                      setActiveImageIndex(index);
+                    }}
+                    className={`thumbnail-item ${activeImageIndex === index ? 'active' : ''}`}
+                    role="button"
+                    aria-label={`View image ${index + 1} of ${product.name}`}
+                    tabIndex={0}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' || e.key === ' ') {
+                        setActiveImage(image);
+                        setActiveImageIndex(index);
+                      }
+                    }}
+                  >
+                    <img
+                      src={image}
+                      alt={`${product.name} ${index + 1}`}
+                      className="h-full w-full object-cover object-center"
+                      loading="lazy"
+                      onError={(e) => {
+                        e.target.src = `/assets/default-product.png`;
+                      }}
+                    />
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {/* Lightbox component */}
+            {lightboxOpen && (
+              <ImageLightbox
+                images={productImages.length > 0 ? productImages : [`/assets/default-product.png`]}
+                initialIndex={activeImageIndex}
+                onClose={() => setLightboxOpen(false)}
+              />
+            )}
+          </motion.div>
+
+          {/* Product Details - Third on mobile */}
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.2 }}
+            className="order-3 lg:order-3 lg:col-span-2"
+          >
+
+              {/* Product description */}
+              <div className="product-info-section">
+                <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">{t('products.description')}</h2>
+                <div className="product-description">
+                  {product.description ? (
+                    <p>{product.description}</p>
+                  ) : (
+                    <p>This premium product is designed to enhance your beauty routine with high-quality ingredients and exceptional results. Experience the difference with our carefully formulated solution.</p>
+                  )}
                 </div>
               </div>
 
               {/* Product Features */}
-              <div className="bg-gray-50 dark:bg-gray-800/50 rounded-lg p-4">
-                <h2 className="text-sm font-medium text-gray-900 dark:text-white mb-3">{t('products.features')}</h2>
-                <ul className="space-y-2">
+              <div className="product-info-section">
+                <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">{t('products.features')}</h2>
+                <ul className="space-y-3 product-description">
                   {(product.features || ['Dermatologically tested', 'Cruelty-free', 'Paraben-free', 'Suitable for all skin types']).map((feature, index) => (
                     <li key={index} className="flex items-start">
-                      <svg className="h-5 w-5 text-green-500 mr-2 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <svg className="h-5 w-5 text-pink-500 dark:text-pink-400 mr-3 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                       </svg>
-                      <span className="text-sm text-gray-600 dark:text-gray-300">{feature}</span>
+                      <span>{feature}</span>
                     </li>
                   ))}
                 </ul>
               </div>
 
-              <div>
-                <h2 className="text-sm font-medium text-gray-900 dark:text-white mb-2">{t('products.availability')}</h2>
-                <p className={`text-sm ${product.stock > 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
-                  {product.stock > 0 ? t('products.in_stock', { count: product.stock }) : t('products.out_of_stock')}
-                </p>
+              {/* Product availability */}
+              <div className="product-info-section">
+                <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">{t('products.availability')}</h2>
+                <div className="flex items-center">
+                  {product.stock > 0 ? (
+                    <>
+                      <div className="w-3 h-3 bg-green-500 rounded-full mr-2"></div>
+                      <p className="text-green-600 dark:text-green-400 font-medium">
+                        {t('products.in_stock', { count: product.stock })}
+                      </p>
+                    </>
+                  ) : (
+                    <>
+                      <div className="w-3 h-3 bg-red-500 rounded-full mr-2"></div>
+                      <p className="text-red-600 dark:text-red-400 font-medium">
+                        {t('products.out_of_stock')}
+                      </p>
+                    </>
+                  )}
+                </div>
               </div>
 
-            <form onSubmit={handleAddToCart} className="space-y-6">
+            <form onSubmit={handleAddToCart} className="product-info-section">
+              {/* Quantity selector */}
               <div>
-                <h2 className="text-sm font-medium text-gray-900 dark:text-white mb-2">{t('products.quantity')}</h2>
-                <div className="flex items-center">
+                <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">{t('products.quantity')}</h2>
+                <div className="quantity-selector">
                   <button
                     type="button"
                     onClick={decrementQuantity}
-                    disabled={quantity <= 1}
-                    className="p-2 sm:p-3 border border-gray-300 dark:border-cinematic-600 rounded-l-md bg-gray-100 dark:bg-cinematic-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-cinematic-600 disabled:opacity-50 disabled:cursor-not-allowed"
+                    disabled={quantity <= 1 || product.stock === 0}
+                    className="quantity-btn"
                     aria-label="Decrease quantity"
                   >
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 12H4" />
                     </svg>
                   </button>
@@ -494,50 +786,67 @@ const ProductShow = ({ product, relatedProducts }) => {
                     min="1"
                     max={product.stock}
                     value={quantity}
-                    onChange={(e) => setQuantity(parseInt(e.target.value))}
-                    className="p-2 sm:p-3 w-16 text-center border-t border-b border-gray-300 dark:border-cinematic-600 bg-white dark:bg-cinematic-700 text-gray-900 dark:text-white"
+                    onChange={(e) => {
+                      const val = parseInt(e.target.value);
+                      if (!isNaN(val) && val >= 1 && val <= product.stock) {
+                        setQuantity(val);
+                      }
+                    }}
+                    className="quantity-input"
                     readOnly
                     aria-label="Product quantity"
                   />
                   <button
                     type="button"
                     onClick={incrementQuantity}
-                    disabled={quantity >= product.stock}
-                    className="p-2 sm:p-3 border border-gray-300 dark:border-cinematic-600 rounded-r-md bg-gray-100 dark:bg-cinematic-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-cinematic-600 disabled:opacity-50 disabled:cursor-not-allowed"
+                    disabled={quantity >= product.stock || product.stock === 0}
+                    className="quantity-btn"
                     aria-label="Increase quantity"
                   >
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
                     </svg>
                   </button>
                 </div>
+                {product.stock > 0 && product.stock <= 5 && (
+                  <p className="text-sm text-amber-600 dark:text-amber-400 mt-2">
+                    Only {product.stock} {product.stock === 1 ? 'item' : 'items'} left in stock!
+                  </p>
+                )}
               </div>
 
-              <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
+              {/* Action buttons */}
+              <div className="action-buttons">
                 <motion.button
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
                   type="submit"
                   disabled={addingToCart || product.stock === 0}
-                  className={`flex-1 py-3 px-6 rounded-md text-white font-medium ${
+                  className={`add-to-cart-btn ${
                     product.stock === 0
-                      ? 'bg-gray-400 dark:bg-gray-600 cursor-not-allowed'
-                      : addingToCart
-                        ? 'bg-gradient-to-r from-pink-500 to-purple-600 shadow-lg shadow-pink-500/20 dark:shadow-pink-700/30'
-                        : 'bg-pink-600 dark:bg-pink-700 hover:bg-pink-700 dark:hover:bg-pink-600'
+                      ? 'opacity-50 cursor-not-allowed'
+                      : ''
                   }`}
                   aria-label={t('cart.add_to_cart')}
                 >
                   {addingToCart ? (
                     <span className="flex items-center justify-center">
-                      <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                      <svg className="animate-spin -ml-1 mr-2 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" aria-hidden="true">
                         <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                         <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                       </svg>
                       {t('common.adding')}
                     </span>
-                  ) : t('cart.add_to_cart')}
+                  ) : (
+                    <>
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+                      </svg>
+                      {t('cart.add_to_cart')}
+                    </>
+                  )}
                 </motion.button>
+
                 <motion.button
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
@@ -563,18 +872,15 @@ const ProductShow = ({ product, relatedProducts }) => {
                         }
                       });
                   }}
-                  className={`p-3 rounded-md border ${
-                    isLiked
-                      ? 'border-pink-500 bg-pink-50 dark:bg-pink-900/20 text-pink-600 dark:text-pink-400'
-                      : 'border-gray-300 dark:border-cinematic-600 bg-white dark:bg-cinematic-700 text-gray-600 dark:text-gray-300'
-                  }`}
+                  className={`favorite-btn ${isLiked ? 'active' : ''}`}
                   aria-label={isLiked ? t('products.remove_from_wishlist') : t('products.add_to_wishlist')}
                   aria-pressed={isLiked}
                 >
                   <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6"
                     fill={isLiked ? "currentColor" : "none"}
                     viewBox="0 0 24 24"
-                    stroke="currentColor">
+                    stroke="currentColor"
+                    aria-hidden="true">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
                   </svg>
                 </motion.button>
@@ -582,41 +888,48 @@ const ProductShow = ({ product, relatedProducts }) => {
             </form>
 
               {/* Shipping and Returns */}
-              <div className="border-t border-gray-200 dark:border-gray-700 pt-4">
-                <div className="flex items-center mb-3">
-                  <svg className="h-5 w-5 text-gray-500 dark:text-gray-400 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" />
-                  </svg>
-                  <span className="text-xs sm:text-sm text-gray-600 dark:text-gray-300">Free shipping on orders over $50</span>
-                </div>
-                <div className="flex items-center">
-                  <svg className="h-5 w-5 text-gray-500 dark:text-gray-400 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 15v-1a4 4 0 00-4-4H8m0 0l3 3m-3-3l3-3m9 14V5a2 2 0 00-2-2H6a2 2 0 00-2 2v16l4-2 4 2 4-2 4 2z" />
-                  </svg>
-                  <span className="text-xs sm:text-sm text-gray-600 dark:text-gray-300">30-day easy returns</span>
-                </div>
+              <div className="product-info-section">
+                <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">{t('products.shipping_returns')}</h2>
+                <ul className="space-y-3 product-description">
+                  <li className="flex items-start">
+                    <svg className="h-5 w-5 text-pink-500 dark:text-pink-400 mr-3 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" />
+                    </svg>
+                    <span className="text-sm text-gray-600 dark:text-gray-300">Free shipping on orders over $50. Standard delivery 3-5 business days.</span>
+                  </li>
+                  <li className="flex items-start">
+                    <svg className="h-5 w-5 text-pink-500 dark:text-pink-400 mr-3 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 15v-1a4 4 0 00-4-4H8m0 0l3 3m-3-3l3-3m9 14V5a2 2 0 00-2-2H6a2 2 0 00-2 2v16l4-2 4 2 4-2 4 2z" />
+                    </svg>
+                    <span className="text-sm text-gray-600 dark:text-gray-300">30-day easy returns. Return for any reason within 30 days for a full refund.</span>
+                  </li>
+                  <li className="flex items-start">
+                    <svg className="h-5 w-5 text-pink-500 dark:text-pink-400 mr-3 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                    </svg>
+                    <span className="text-sm text-gray-600 dark:text-gray-300">Secure payment processing with encryption and fraud protection for your peace of mind.</span>
+                  </li>
+                </ul>
               </div>
-            </div>
           </motion.div>
         </div>
 
    {/* Related Products */}
 {relatedProducts.length > 0 && (
-  <section className="mt-16">
-    <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-8">{t('products.related_products')}</h2>
+  <section className="mt-16 sm:mt-20">
+    <h2 className="related-products-title">{t('products.related_products')}</h2>
     <motion.div
       variants={container}
       initial="hidden"
       whileInView="show"
       viewport={{ once: true }}
-      className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6"
+      className="related-products-grid"
     >
-
       {relatedProducts.map((relatedProduct) => (
-        <motion.div key={relatedProduct.id} variants={item}>
-          <Link href={route('products.show', relatedProduct.slug)}>
-            <div className="group bg-white dark:bg-cinematic-800 rounded-lg overflow-hidden shadow-md dark:shadow-soft hover:shadow-xl dark:hover:shadow-xl transition-shadow duration-300 border border-gray-200 dark:border-cinematic-700">
-              <div className="aspect-w-1 aspect-h-1 w-full overflow-hidden relative">
+        <motion.div key={relatedProduct.id} variants={item} className="h-full">
+          <Link href={route('products.show', relatedProduct.slug)} className="h-full">
+            <div className="group bg-white dark:bg-cinematic-800 rounded-lg overflow-hidden shadow-md dark:shadow-soft hover:shadow-xl dark:hover:shadow-xl transition-all duration-300 border border-gray-200 dark:border-cinematic-700 h-full flex flex-col transform hover:-translate-y-1">
+              <div className="relative aspect-square overflow-hidden bg-gray-100 dark:bg-gray-800">
                 <img
                   src={
                     relatedProduct.images && relatedProduct.images.length > 0 ? (
@@ -636,7 +949,10 @@ const ProductShow = ({ product, relatedProducts }) => {
                     )
                   }
                   alt={relatedProduct.name}
-                  className="h-60 w-full object-cover object-center group-hover:scale-105 transition-transform duration-300"
+                  className="h-full w-full object-cover object-center transition-transform duration-300 group-hover:scale-105"
+                  onError={(e) => {
+                    e.target.src = `/assets/default-product_1.png`;
+                  }}
                 />
                 {relatedProduct.sale_price && (
                   <div className="category-circle">
@@ -649,62 +965,58 @@ const ProductShow = ({ product, relatedProducts }) => {
                   </div>
                 )}
               </div>
-              <div className="p-4">
-                <h3 className="text-sm text-gray-500 dark:text-gray-400">{relatedProduct.category.name}</h3>
-                <p className="mt-1 text-lg font-medium text-gray-900 dark:text-white">{relatedProduct.name}</p>
-                <div className="mt-2 flex items-center justify-between">
-                  <div>
-                    {relatedProduct.sale_price ? (
-                      <div className="flex items-center">
-                        <span className="text-lg font-bold text-pink-600 dark:text-pink-400">${relatedProduct.sale_price}</span>
-                        <span className="ml-2 text-sm text-gray-500 dark:text-gray-400 line-through">${relatedProduct.price}</span>
-                      </div>
-                    ) : (
-                      <span className="text-lg font-bold text-gray-900 dark:text-white">${relatedProduct.price}</span>
-                    )}
-                  </div>
-                  <motion.button
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                    onClick={(e) => {
-                      e.preventDefault();
-                      e.stopPropagation();
-                      handleRelatedAddToCart(relatedProduct.id);
-                    }}
-                    disabled={addingRelatedToCart === relatedProduct.id}
-                    className={`p-2 rounded-full ${
-                      addingRelatedToCart === relatedProduct.id
-                        ? 'bg-gradient-to-r from-pink-500 to-purple-600 text-white shadow-lg shadow-pink-500/20 dark:shadow-pink-700/30'
-                        : 'bg-pink-100 dark:bg-pink-900/30 text-pink-600 dark:text-pink-400 hover:bg-pink-200 dark:hover:bg-pink-800/40'
-                    } transition-all duration-300 relative overflow-hidden`}
-                  >
-                    {addingRelatedToCart === relatedProduct.id ? (
-                      <>
-                        {/* Spinner animation */}
-                        <svg className="animate-spin h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                        </svg>
-
-                        {/* Success animation overlay that appears after a delay */}
-                        <motion.div
-                          className="absolute inset-0 flex items-center justify-center bg-gradient-to-r from-pink-500 to-purple-600"
-                          initial={{ opacity: 0 }}
-                          animate={{ opacity: 1 }}
-                          transition={{ delay: 0.5, duration: 0.3 }}
-                        >
-                          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                            <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                          </svg>
-                        </motion.div>
-                      </>
-                    ) : (
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                        <path d="M3 1a1 1 0 000 2h1.22l.305 1.222a.997.997 0 00.01.042l1.358 5.43-.893.892C3.74 11.846 4.632 14 6.414 14H15a1 1 0 000-2H6.414l1-1H14a1 1 0 00.894-.553l3-6A1 1 0 0017 3H6.28l-.31-1.243A1 1 0 005 1H3zM16 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0zM6.5 18a1.5 1.5 0 100-3 1.5 1.5 0 000 3z" />
-                      </svg>
-                    )}
-                  </motion.button>
+              <div className="p-4 flex-grow flex flex-col">
+                <h3 className="product-category text-xs">{relatedProduct.category.name}</h3>
+                <p className="product-title text-sm sm:text-base line-clamp-2 mb-2">{relatedProduct.name}</p>
+                <div className="price-section mt-auto mb-3 justify-between">
+                  {relatedProduct.sale_price ? (
+                    <>
+                      <span className="current-price text-base">${relatedProduct.sale_price}</span>
+                      <span className="original-price text-sm">${relatedProduct.price}</span>
+                    </>
+                  ) : (
+                    <span className="current-price text-base">${relatedProduct.price}</span>
+                  )}
                 </div>
+                <motion.button
+                  whileHover={{ scale: 1.03 }}
+                  whileTap={{ scale: 0.97 }}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    handleRelatedAddToCart(relatedProduct.id);
+                  }}
+                  disabled={addingRelatedToCart === relatedProduct.id || relatedProduct.stock === 0}
+                  className={`add-to-cart-btn py-2 text-sm w-full ${
+                    addingRelatedToCart === relatedProduct.id
+                      ? 'opacity-90'
+                      : ''
+                  } ${
+                    relatedProduct.stock === 0
+                      ? 'opacity-50 cursor-not-allowed'
+                      : ''
+                  }`}
+                  aria-label={`Add ${relatedProduct.name} to cart`}
+                >
+                  {addingRelatedToCart === relatedProduct.id ? (
+                    <span className="flex items-center justify-center">
+                      <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" aria-hidden="true">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                      </svg>
+                      {t('common.adding')}
+                    </span>
+                  ) : relatedProduct.stock === 0 ? (
+                    <span>{t('products.out_of_stock')}</span>
+                  ) : (
+                    <span className="flex items-center justify-center">
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+                      </svg>
+                      {t('cart.add_to_cart')}
+                    </span>
+                  )}
+                </motion.button>
               </div>
             </div>
           </Link>

@@ -7,6 +7,7 @@ const loadAdditionalStyles = () => {
   import('../css/rtl.css');
   import('../css/animations.css');
   import('../css/category-circles.css');
+  import('../css/product-page.css');
 };
 
 // Load additional styles after initial render
