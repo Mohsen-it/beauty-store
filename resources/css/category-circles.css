@@ -27,10 +27,10 @@
 
 .category-circle {
   position: absolute;
-  width: 40px;
-  height: 40px;
-  top: 8px;
-  right: 8px;
+  width: 24px;
+  height: 24px;
+  top: 2px;
+  right: 2px;
   z-index: 10;
   display: flex;
   align-items: center;
@@ -40,7 +40,7 @@
   border-radius: 0;
   overflow: hidden;
   animation: float 3s ease-in-out infinite;
-  box-shadow: 0 0 10px rgba(236, 72, 153, 0.5);
+  box-shadow: 0 0 6px rgba(236, 72, 153, 0.5);
   /* Tag/file shape using clip-path */
   clip-path: polygon(0 0, 100% 0, 100% 70%, 70% 100%, 0 100%);
 }
@@ -177,13 +177,13 @@
 
 .category-circle-discount {
   font-weight: 700;
-  font-size: 0.75rem;
+  font-size: 0.6rem;
   color: white;
-  letter-spacing: 0.5px;
+  letter-spacing: 0.25px;
   position: relative;
   z-index: 4;
   animation: glitch 2s infinite alternate-reverse;
-  text-shadow: 0 0 10px rgba(236, 72, 153, 0.8);
+  text-shadow: 0 0 8px rgba(236, 72, 153, 0.8);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -212,34 +212,79 @@
   gap: 1rem;
 }
 
-/* Responsive adjustments */
+/* Mobile-optimized responsive adjustments */
 @media (max-width: 640px) {
   .category-circle {
-    width: 35px;
-    height: 35px;
-    top: 6px;
-    right: 6px;
+    width: 20px;
+    height: 20px;
+    top: 2px;
+    right: 2px;
+    /* Reduce animation complexity for better performance */
+    animation: float 4s ease-in-out infinite;
+    box-shadow: 0 0 3px rgba(236, 72, 153, 0.5);
   }
 
   .category-circle-name {
-    font-size: 0.875rem;
+    font-size: 0.65rem;
   }
 
   .category-circle-discount {
-    font-size: 0.75rem;
+    font-size: 0.5rem;
+  }
+
+  /* Simplify animations for better mobile performance */
+  .category-circle::after {
+    animation: scanline 3s linear infinite;
+  }
+
+  .category-circle-overlay::before {
+    animation: rotate 6s linear infinite;
+  }
+
+  .category-circle-discount {
+    animation: glitch 3s infinite alternate-reverse;
   }
 }
 
 @media (max-width: 375px) {
   .category-circle {
-    width: 30px;
-    height: 30px;
-    top: 4px;
-    right: 4px;
+    width: 18px;
+    height: 18px;
+    top: 1px;
+    right: 1px;
+    /* Further reduce animation complexity */
+    box-shadow: 0 0 2px rgba(236, 72, 153, 0.5);
   }
 
   .category-circle-discount {
-    font-size: 0.7rem;
+    font-size: 0.45rem;
+  }
+
+  /* Simplify or disable some animations for smallest screens */
+  .category-circle-overlay::after {
+    opacity: 0.3;
+  }
+
+  .category-circle::before {
+    animation: pulse 4s infinite ease-in-out;
+  }
+}
+
+/* Touch-friendly improvements */
+@media (hover: none) {
+  /* Optimize for touch devices */
+  .category-circle {
+    /* Slightly larger for better visibility */
+    transform: scale(1.05);
+  }
+
+  /* Reduce animation complexity for better performance on touch devices */
+  .category-circle-overlay::before {
+    animation-duration: 8s;
+  }
+
+  .category-circle::after {
+    animation-duration: 4s;
   }
 }
 

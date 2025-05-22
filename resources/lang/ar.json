@@ -66,7 +66,8 @@
     "theme_mode": "وضع العرض",
     "wishlist": "المفضلة",
     "shop": "المتجر",
-    "help": "المساعدة"
+    "help": "المساعدة",
+    "main_menu": "القائمة الرئيسية"
   },
   "common": {
     "about_us": "من نحن",
@@ -92,6 +93,8 @@
     "categories": "الفئات",
     "skincare": "العناية بالبشرة",
     "makeup": "المكياج",
+    "dark_mode": "الوضع الداكن",
+    "language": "اللغة",
     "bath_body": "الاستحمام والجسم",
     "tools_accessories": "الأدوات والإكسسوارات",
     "hair_care": "العناية بالشعر",
@@ -145,7 +148,8 @@
     "no_more_items": "لا توجد المزيد من العناصر للتحميل",
     "show_filters": "عرض الفلاتر",
     "hide_filters": "إخفاء الفلاتر",
-    "close": "إغلاق"
+    "close": "إغلاق",
+    "all": "الكل"
   },
   "auth": {
     "email": "البريد الإلكتروني",
@@ -170,6 +174,7 @@
     "enter_password": "أدخل كلمة المرور",
     "enter_full_name": "أدخل اسمك الكامل",
     "create_new_password": "إنشاء كلمة مرور جديدة",
+    "account": "الحساب",
     "my_account": "حسابي",
     "verify_email": "تحقق من بريدك الإلكتروني",
     "resend_verification": "إعادة إرسال رسالة التحقق",

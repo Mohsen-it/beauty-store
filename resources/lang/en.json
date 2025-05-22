@@ -66,7 +66,8 @@
     "theme_mode": "Theme Mode",
     "wishlist": "Wishlist",
     "shop": "Shop",
-    "help": "Help"
+    "help": "Help",
+    "main_menu": "Main Menu"
   },
   "common": {
     "about_us": "About Us",
@@ -92,6 +93,8 @@
     "categories": "Categories",
     "skincare": "Skincare",
     "makeup": "Makeup",
+    "dark_mode": "Dark Mode",
+    "language": "Language",
     "bath_body": "Bath & Body",
     "tools_accessories": "Tools & Accessories",
     "hair_care": "Hair Care",
@@ -146,7 +149,8 @@
     "show_filters": "Show Filters",
     "hide_filters": "Hide Filters",
     "close": "Close",
-    "payment_methods": "Payment Methods"
+    "payment_methods": "Payment Methods",
+    "all": "All"
   },
   "auth": {
     "email": "Email",
@@ -171,6 +175,7 @@
     "enter_password": "Enter your password",
     "enter_full_name": "Enter your full name",
     "create_new_password": "Create New Password",
+    "account": "Account",
     "my_account": "My Account",
     "verify_email": "Verify Your Email",
     "resend_verification": "Resend Verification Email",

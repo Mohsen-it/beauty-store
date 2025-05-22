@@ -1,0 +1,82 @@
+/* Carousel styling for horizontal scrolling */
+
+/* Hide scrollbar for Chrome, Safari and Opera */
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+/* Hide scrollbar for IE, Edge and Firefox */
+.hide-scrollbar {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}
+
+/* Scroll snap for smoother scrolling */
+.snap-x {
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+}
+
+.snap-center {
+  scroll-snap-align: center;
+}
+
+.snap-start {
+  scroll-snap-align: start;
+}
+
+/* Scroll indicators styling */
+.scroll-indicator {
+  opacity: 0.7;
+  transition: opacity 0.2s ease-in-out;
+}
+
+.scroll-indicator:hover {
+  opacity: 1;
+}
+
+/* Carousel item styling */
+.carousel-item {
+  transition: transform 0.3s ease-in-out;
+}
+
+.carousel-item:hover {
+  transform: translateY(-2px);
+}
+
+/* Active item indicator */
+.carousel-item-active {
+  border-color: #ec4899;
+}
+
+/* Pagination dots */
+.carousel-dots {
+  display: flex;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.carousel-dot {
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 50%;
+  background-color: #e5e7eb;
+  transition: all 0.2s ease-in-out;
+}
+
+.carousel-dot-active {
+  background-color: #ec4899;
+  transform: scale(1.2);
+}
+
+/* Touch-friendly scroll behavior */
+@media (hover: none) {
+  .carousel-container {
+    cursor: grab;
+  }
+  
+  .carousel-container:active {
+    cursor: grabbing;
+  }
+}
