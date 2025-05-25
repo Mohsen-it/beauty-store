@@ -309,18 +309,26 @@ const CinematicLayout = ({ children }) => {
     };
   }, [mobileMenuOpen]);
 
-  // Setup swipe handlers for mobile menu with improved settings
-  const swipeHandlers = useSwipeable({
-    onSwipedLeft: () => setMobileMenuOpen(false),
-    onSwipedRight: () => !mobileMenuOpen && setMobileMenuOpen(true),
+  // Setup swipe handlers for mobile menu - only for closing
+  const menuSwipeHandlers = useSwipeable({
+    onSwipedLeft: () => {
+      if (mobileMenuOpen) {
+        setMobileMenuOpen(false);
+      }
+    },
+    onSwipedRight: () => {
+      if (mobileMenuOpen && rtl) {
+        setMobileMenuOpen(false);
+      }
+    },
     trackMouse: false,
-    preventScrollOnSwipe: false, // Allow scrolling while swiping
-    delta: 50, // Increase the swipe distance required to trigger
-    swipeDuration: 500, // Increase duration to make it less sensitive
+    preventScrollOnSwipe: true,
+    delta: 50, // Require more deliberate swipe
+    swipeDuration: 250,
   });
 
   return (
-    <div className={`flex flex-col min-h-screen bg-gradient-to-b from-gray-50 to-white dark:from-gray-950 dark:to-gray-900 transition-colors duration-300 ${rtl ? 'rtl' : 'ltr'}`} {...swipeHandlers}>
+    <div className={`flex flex-col min-h-screen bg-gradient-to-b from-gray-50 to-white dark:from-gray-950 dark:to-gray-900 transition-colors duration-300 ${rtl ? 'rtl' : 'ltr'}`}>
       {/* Animated background elements */}
       <div className="fixed inset-0 z-0 overflow-hidden pointer-events-none">
         <div className="absolute top-0 left-0 w-full h-full opacity-30 dark:opacity-20">
@@ -589,14 +597,13 @@ const CinematicLayout = ({ children }) => {
               {/* Mobile menu button */}
               <div className="md:hidden">
                 <motion.button
-                  whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                   onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                  className="p-2 sm:p-3 relative transition-all duration-300 rounded-full bg-gradient-to-br from-gray-100/80 to-white/90 dark:from-gray-800/80 dark:to-gray-900/90 backdrop-blur-md shadow-lg hover:shadow-xl border border-gray-200/50 dark:border-gray-700/50 focus:outline-none group"
-                  aria-expanded="false"
+                  className="p-2 sm:p-3 relative transition-all duration-150 rounded-full bg-white dark:bg-gray-800 shadow-lg hover:shadow-xl border border-gray-200/50 dark:border-gray-700/50 focus:outline-none group active:scale-95"
+                  aria-expanded={mobileMenuOpen}
                 >
                   <span className="sr-only">Open main menu</span>
-                  <div className="text-gray-700 dark:text-gray-300 group-hover:text-pink-600 dark:group-hover:text-pink-400 transition-colors duration-300">
+                  <div className="text-gray-700 dark:text-gray-300 group-hover:text-pink-600 dark:group-hover:text-pink-400 transition-colors duration-150">
                     {mobileMenuOpen ? (
                       <svg
                         className="block h-5 w-5"
@@ -631,7 +638,7 @@ const CinematicLayout = ({ children }) => {
                       </svg>
                     )}
                   </div>
-                  <span className="absolute inset-0 rounded-full bg-gradient-to-r from-pink-400/0 to-purple-500/0 group-hover:from-pink-400/10 group-hover:to-purple-500/10 transition-colors duration-300"></span>
+
                 </motion.button>
               </div>
             </div>
@@ -645,8 +652,8 @@ const CinematicLayout = ({ children }) => {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              transition={{ duration: 0.2 }}
-              className="fixed inset-0 z-40 md:hidden bg-gray-800/50 dark:bg-black/50 backdrop-blur-sm"
+              transition={{ duration: 0.15, ease: "easeOut" }}
+              className="fixed inset-0 z-40 md:hidden bg-gray-800/50 dark:bg-black/50"
               onClick={() => setMobileMenuOpen(false)}
               aria-hidden="true"
             />
@@ -658,24 +665,23 @@ const CinematicLayout = ({ children }) => {
           {mobileMenuOpen && (
             <motion.div
               ref={mobileMenuRef}
-              initial={{ x: rtl ? '100%' : '-100%', opacity: 0 }}
-              animate={{ x: 0, opacity: 1 }}
-              exit={{ x: rtl ? '100%' : '-100%', opacity: 0 }}
+              initial={{ x: rtl ? '100%' : '-100%' }}
+              animate={{ x: 0 }}
+              exit={{ x: rtl ? '100%' : '-100%' }}
               transition={{
-                type: 'spring',
-                stiffness: 250, // Reduced stiffness for smoother animation
-                damping: 25,    // Reduced damping
-                mass: 0.8,      // Reduced mass for lighter feel
-                restDelta: 0.01 // Smaller rest delta for better performance
+                type: 'tween',
+                duration: 0.25,
+                ease: [0.25, 0.46, 0.45, 0.94] // Custom easing for smooth feel
               }}
               className={`fixed inset-y-0 ${rtl ? 'right-0' : 'left-0'} z-50 md:hidden w-[85%] max-w-sm`}
               role="dialog"
               aria-modal="true"
               aria-label="Mobile navigation menu"
+              {...menuSwipeHandlers}
             >
-              <div className="relative h-full w-full bg-gradient-to-b from-white/95 to-white/90 dark:from-gray-900/95 dark:to-gray-900/90 backdrop-blur-xl shadow-2xl overflow-y-auto custom-scrollbar border-r border-gray-200/50 dark:border-gray-700/50 flex flex-col">
+              <div className="relative h-full w-full bg-white dark:bg-gray-900 shadow-2xl overflow-y-auto custom-scrollbar border-r border-gray-200/50 dark:border-gray-700/50 flex flex-col">
                 {/* Menu header with close button */}
-                <div className="sticky top-0 z-10 flex items-center justify-between p-4 border-b border-gray-200/50 dark:border-gray-700/50 bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm">
+                <div className="sticky top-0 z-10 flex items-center justify-between p-4 border-b border-gray-200/50 dark:border-gray-700/50 bg-white dark:bg-gray-900">
                   <Link href="/" className="flex items-center" onClick={() => setMobileMenuOpen(false)}>
                     <span className="text-transparent bg-clip-text bg-gradient-to-r from-pink-500 to-purple-600 font-bold text-xl tracking-tight">
                       {t('app.name')}

@@ -343,12 +343,12 @@ const ProductsIndex = ({ products, categories, filters }) => {
               className="h-full w-[85%] max-w-xs sm:max-w-sm lg:w-full lg:max-w-none overflow-y-auto bg-white dark:bg-cinematic-800 p-4 sm:p-5 md:p-6 lg:rounded-xl shadow-lg dark:shadow-soft lg:mb-6 border-r lg:border-2 border-pink-100 dark:border-pink-900/30"
             >
               {/* Header with close button for mobile */}
-              <div className="flex justify-between items-center mb-5 sm:mb-6">
+              <div className="flex justify-between items-center mb-4">
                 <div className="flex items-center">
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 sm:h-6 sm:w-6 mr-2 text-pink-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 sm:h-5 sm:w-5 mr-1.5 text-pink-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
                   </svg>
-                  <h2 className="text-lg sm:text-xl font-bold text-gray-800 dark:text-white bg-gradient-to-r from-pink-500 to-purple-600 bg-clip-text text-transparent">{t('products.filters')}</h2>
+                  <h2 className="text-base font-bold text-gray-800 dark:text-white bg-gradient-to-r from-pink-500 to-purple-600 bg-clip-text text-transparent">{t('products.filters')}</h2>
                 </div>
                 <button
                   type="button"
@@ -370,13 +370,13 @@ const ProductsIndex = ({ products, categories, filters }) => {
               <form onSubmit={handleFilterSubmit}>
                 {/* Categories - Always visible */}
                 <div className="mb-6 sm:mb-7">
-                  <h3 className="text-sm sm:text-base font-semibold text-gray-800 dark:text-gray-200 mb-3 sm:mb-4 flex items-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 sm:h-5 sm:w-5 mr-2 text-pink-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <h3 className="text-sm font-semibold text-gray-800 dark:text-gray-200 mb-2.5 flex items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1.5 text-pink-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
                     </svg>
                     {t('products.categories')}
                   </h3>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                  <div className="flex flex-wrap gap-1.5">
                     {categories.map((category) => {
                       const isSelected = parseInt(filters.category) === category.id;
                       return (
@@ -391,31 +391,26 @@ const ProductsIndex = ({ products, categories, filters }) => {
                               only: ['products', 'filters']
                             });
                           }}
-                          className={`flex items-center p-2.5 rounded-lg transition-all duration-200 ${
+                          className={`flex items-center p-1.5 rounded-md transition-all duration-200 ${
                             isSelected
-                              ? 'bg-gradient-to-r from-pink-500/20 to-purple-600/20 border-2 border-pink-500 dark:border-pink-400 shadow-sm'
+                              ? 'bg-pink-100 dark:bg-pink-900/30 border border-pink-300 dark:border-pink-700'
                               : 'bg-white dark:bg-cinematic-800/50 border border-gray-200 dark:border-gray-700 hover:border-pink-300 dark:hover:border-pink-800'
                           }`}
                         >
-                          <div className={`w-6 h-6 flex items-center justify-center rounded-full mr-2 ${
+                          <div className={`w-4 h-4 flex items-center justify-center rounded-full mr-1 ${
                             isSelected
-                              ? 'bg-gradient-to-r from-pink-500 to-purple-600 text-white'
+                              ? 'bg-pink-500 text-white'
                               : 'bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400'
                           }`}>
                             {getCategoryIcon(category.name)}
                           </div>
-                          <span className={`text-sm font-medium ${
+                          <span className={`text-[10px] font-medium ${
                             isSelected
                               ? 'text-pink-700 dark:text-pink-400'
                               : 'text-gray-700 dark:text-gray-300'
                           }`}>
                             {category.name}
                           </span>
-                          {isSelected && (
-                            <svg className="ml-auto h-4 w-4 text-pink-600 dark:text-pink-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                              <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                            </svg>
-                          )}
                         </button>
                       );
                     })}
@@ -454,17 +449,17 @@ const ProductsIndex = ({ products, categories, filters }) => {
                     >
                       {/* Price Range */}
                       <div className="mb-6 sm:mb-7">
-                        <h3 className="text-sm sm:text-base font-semibold text-gray-800 dark:text-gray-200 mb-3 sm:mb-4 flex items-center">
-                          <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 sm:h-5 sm:w-5 mr-2 text-pink-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <h3 className="text-sm font-semibold text-gray-800 dark:text-gray-200 mb-2.5 flex items-center">
+                          <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1.5 text-pink-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                           </svg>
                           {t('products.price_range')}
                         </h3>
 
-                        <div className="bg-gray-50 dark:bg-gray-800/30 p-4 rounded-lg border border-gray-200 dark:border-gray-700">
-                          <div className="flex items-center justify-between mb-4">
-                            <div className="bg-white dark:bg-cinematic-800 rounded-md border border-gray-200 dark:border-gray-700 px-3 py-2 w-[45%] flex items-center">
-                              <span className="text-pink-600 dark:text-pink-400 font-medium mr-1">$</span>
+                        <div className="bg-white dark:bg-cinematic-800/50 p-3 rounded-lg border border-gray-200 dark:border-gray-700">
+                          <div className="flex items-center justify-between mb-3">
+                            <div className="bg-white dark:bg-cinematic-800 rounded-md border border-gray-200 dark:border-gray-700 px-2 py-1.5 w-[45%] flex items-center">
+                              <span className="text-pink-600 dark:text-pink-400 font-medium mr-1 text-sm">$</span>
                               <input
                                 type="number"
                                 id="min-price"
@@ -473,14 +468,14 @@ const ProductsIndex = ({ products, categories, filters }) => {
                                 step="1"
                                 value={priceRange.min}
                                 onChange={(e) => setPriceRange({ ...priceRange, min: e.target.value })}
-                                className="w-full py-1 border-0 focus:ring-0 focus:outline-none bg-transparent text-gray-800 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 text-sm"
+                                className="w-full py-0.5 border-0 focus:ring-0 focus:outline-none bg-transparent text-gray-800 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 text-xs"
                               />
                             </div>
 
-                            <div className="w-4 h-0.5 bg-gray-300 dark:bg-gray-600 rounded"></div>
+                            <div className="w-3 h-0.5 bg-gray-300 dark:bg-gray-600 rounded"></div>
 
-                            <div className="bg-white dark:bg-cinematic-800 rounded-md border border-gray-200 dark:border-gray-700 px-3 py-2 w-[45%] flex items-center">
-                              <span className="text-pink-600 dark:text-pink-400 font-medium mr-1">$</span>
+                            <div className="bg-white dark:bg-cinematic-800 rounded-md border border-gray-200 dark:border-gray-700 px-2 py-1.5 w-[45%] flex items-center">
+                              <span className="text-pink-600 dark:text-pink-400 font-medium mr-1 text-sm">$</span>
                               <input
                                 type="number"
                                 id="max-price"
@@ -489,13 +484,13 @@ const ProductsIndex = ({ products, categories, filters }) => {
                                 step="1"
                                 value={priceRange.max}
                                 onChange={(e) => setPriceRange({ ...priceRange, max: e.target.value })}
-                                className="w-full py-1 border-0 focus:ring-0 focus:outline-none bg-transparent text-gray-800 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 text-sm"
+                                className="w-full py-0.5 border-0 focus:ring-0 focus:outline-none bg-transparent text-gray-800 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 text-xs"
                               />
                             </div>
                           </div>
 
                           {/* Price range labels */}
-                          <div className="flex justify-between text-xs text-gray-500 dark:text-gray-400 px-1">
+                          <div className="flex justify-between text-[10px] text-gray-500 dark:text-gray-400 px-1">
                             <span>$0</span>
                             <span>$50</span>
                             <span>$100</span>
@@ -504,10 +499,10 @@ const ProductsIndex = ({ products, categories, filters }) => {
 
                           {/* Price range visual indicator */}
                           <div className="relative mt-1 mb-2">
-                            <div className="h-1.5 bg-gray-200 dark:bg-gray-700 rounded-full"></div>
-                            <div className="absolute top-0 left-0 right-0 h-1.5">
+                            <div className="h-1 bg-gray-200 dark:bg-gray-700 rounded-full"></div>
+                            <div className="absolute top-0 left-0 right-0 h-1">
                               <div
-                                className="absolute h-1.5 bg-gradient-to-r from-pink-500 to-purple-600 rounded-full"
+                                className="absolute h-1 bg-gradient-to-r from-pink-500 to-purple-600 rounded-full"
                                 style={{
                                   left: `${Math.min(100, (priceRange.min ? parseInt(priceRange.min) / 2 : 0))}%`,
                                   right: `${100 - Math.min(100, (priceRange.max ? parseInt(priceRange.max) / 2 : 100))}%`
@@ -515,13 +510,13 @@ const ProductsIndex = ({ products, categories, filters }) => {
                               ></div>
                               {priceRange.min && (
                                 <div
-                                  className="absolute w-3 h-3 bg-white dark:bg-gray-200 border-2 border-pink-500 rounded-full -mt-0.5 transform -translate-x-1/2"
+                                  className="absolute w-2.5 h-2.5 bg-white dark:bg-gray-200 border border-pink-500 rounded-full -mt-0.5 transform -translate-x-1/2"
                                   style={{ left: `${Math.min(100, parseInt(priceRange.min) / 2)}%` }}
                                 ></div>
                               )}
                               {priceRange.max && (
                                 <div
-                                  className="absolute w-3 h-3 bg-white dark:bg-gray-200 border-2 border-purple-600 rounded-full -mt-0.5 transform -translate-x-1/2"
+                                  className="absolute w-2.5 h-2.5 bg-white dark:bg-gray-200 border border-purple-600 rounded-full -mt-0.5 transform -translate-x-1/2"
                                   style={{ left: `${Math.min(100, parseInt(priceRange.max) / 2)}%` }}
                                 ></div>
                               )}
@@ -529,32 +524,48 @@ const ProductsIndex = ({ products, categories, filters }) => {
                           </div>
 
                           {/* Quick price buttons */}
-                          <div className="flex flex-wrap gap-2 mt-3">
+                          <div className="grid grid-cols-2 gap-1 mt-2">
                             <button
                               type="button"
                               onClick={() => setPriceRange({ min: '0', max: '25' })}
-                              className="px-2 py-1 text-xs bg-white dark:bg-cinematic-800 border border-gray-200 dark:border-gray-700 rounded hover:border-pink-300 dark:hover:border-pink-800 transition-colors"
+                              className={`px-1 py-0.5 text-[10px] ${
+                                priceRange.min === '0' && priceRange.max === '25'
+                                  ? 'bg-pink-100 dark:bg-pink-900/30 border border-pink-300 dark:border-pink-700 text-pink-700 dark:text-pink-400'
+                                  : 'bg-white dark:bg-cinematic-800 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300'
+                              } rounded hover:border-pink-300 dark:hover:border-pink-800 transition-colors`}
                             >
                               Under $25
                             </button>
                             <button
                               type="button"
                               onClick={() => setPriceRange({ min: '25', max: '50' })}
-                              className="px-2 py-1 text-xs bg-white dark:bg-cinematic-800 border border-gray-200 dark:border-gray-700 rounded hover:border-pink-300 dark:hover:border-pink-800 transition-colors"
+                              className={`px-1 py-0.5 text-[10px] ${
+                                priceRange.min === '25' && priceRange.max === '50'
+                                  ? 'bg-pink-100 dark:bg-pink-900/30 border border-pink-300 dark:border-pink-700 text-pink-700 dark:text-pink-400'
+                                  : 'bg-white dark:bg-cinematic-800 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300'
+                              } rounded hover:border-pink-300 dark:hover:border-pink-800 transition-colors`}
                             >
                               $25 - $50
                             </button>
                             <button
                               type="button"
                               onClick={() => setPriceRange({ min: '50', max: '100' })}
-                              className="px-2 py-1 text-xs bg-white dark:bg-cinematic-800 border border-gray-200 dark:border-gray-700 rounded hover:border-pink-300 dark:hover:border-pink-800 transition-colors"
+                              className={`px-1 py-0.5 text-[10px] ${
+                                priceRange.min === '50' && priceRange.max === '100'
+                                  ? 'bg-pink-100 dark:bg-pink-900/30 border border-pink-300 dark:border-pink-700 text-pink-700 dark:text-pink-400'
+                                  : 'bg-white dark:bg-cinematic-800 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300'
+                              } rounded hover:border-pink-300 dark:hover:border-pink-800 transition-colors`}
                             >
                               $50 - $100
                             </button>
                             <button
                               type="button"
                               onClick={() => setPriceRange({ min: '100', max: '' })}
-                              className="px-2 py-1 text-xs bg-white dark:bg-cinematic-800 border border-gray-200 dark:border-gray-700 rounded hover:border-pink-300 dark:hover:border-pink-800 transition-colors"
+                              className={`px-1 py-0.5 text-[10px] ${
+                                priceRange.min === '100' && priceRange.max === ''
+                                  ? 'bg-pink-100 dark:bg-pink-900/30 border border-pink-300 dark:border-pink-700 text-pink-700 dark:text-pink-400'
+                                  : 'bg-white dark:bg-cinematic-800 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300'
+                              } rounded hover:border-pink-300 dark:hover:border-pink-800 transition-colors`}
                             >
                               $100+
                             </button>
@@ -564,33 +575,33 @@ const ProductsIndex = ({ products, categories, filters }) => {
 
                       {/* Sort Options */}
                       <div className="mb-6 sm:mb-7">
-                        <h3 className="text-sm sm:text-base font-semibold text-gray-800 dark:text-gray-200 mb-3 sm:mb-4 flex items-center">
-                          <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 sm:h-5 sm:w-5 mr-2 text-pink-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <h3 className="text-sm font-semibold text-gray-800 dark:text-gray-200 mb-2.5 flex items-center">
+                          <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1.5 text-pink-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4h13M3 8h9m-9 4h6m4 0l4-4m0 0l4 4m-4-4v12" />
                           </svg>
                           {t('products.sort_by')}
                         </h3>
 
-                        <div className="grid grid-cols-2 gap-2">
+                        <div className="flex flex-wrap gap-1.5">
                           <button
                             type="button"
                             onClick={() => setSortOption({ sort: 'created_at', order: 'desc' })}
-                            className={`flex items-center p-2.5 rounded-lg transition-all duration-200 ${
+                            className={`flex items-center p-1.5 rounded-md transition-all duration-200 ${
                               sortOption.sort === 'created_at' && sortOption.order === 'desc'
-                                ? 'bg-gradient-to-r from-pink-500/20 to-purple-600/20 border-2 border-pink-500 dark:border-pink-400 shadow-sm'
+                                ? 'bg-pink-100 dark:bg-pink-900/30 border border-pink-300 dark:border-pink-700'
                                 : 'bg-white dark:bg-cinematic-800/50 border border-gray-200 dark:border-gray-700 hover:border-pink-300 dark:hover:border-pink-800'
                             }`}
                           >
-                            <div className={`w-6 h-6 flex items-center justify-center rounded-full mr-2 ${
+                            <div className={`w-4 h-4 flex items-center justify-center rounded-full mr-1 ${
                               sortOption.sort === 'created_at' && sortOption.order === 'desc'
-                                ? 'bg-gradient-to-r from-pink-500 to-purple-600 text-white'
+                                ? 'bg-pink-500 text-white'
                                 : 'bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400'
                             }`}>
-                              <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <svg xmlns="http://www.w3.org/2000/svg" className="h-2.5 w-2.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                               </svg>
                             </div>
-                            <span className={`text-xs font-medium ${
+                            <span className={`text-[10px] font-medium ${
                               sortOption.sort === 'created_at' && sortOption.order === 'desc'
                                 ? 'text-pink-700 dark:text-pink-400'
                                 : 'text-gray-700 dark:text-gray-300'
@@ -602,22 +613,22 @@ const ProductsIndex = ({ products, categories, filters }) => {
                           <button
                             type="button"
                             onClick={() => setSortOption({ sort: 'price', order: 'asc' })}
-                            className={`flex items-center p-2.5 rounded-lg transition-all duration-200 ${
+                            className={`flex items-center p-1.5 rounded-md transition-all duration-200 ${
                               sortOption.sort === 'price' && sortOption.order === 'asc'
-                                ? 'bg-gradient-to-r from-pink-500/20 to-purple-600/20 border-2 border-pink-500 dark:border-pink-400 shadow-sm'
+                                ? 'bg-pink-100 dark:bg-pink-900/30 border border-pink-300 dark:border-pink-700'
                                 : 'bg-white dark:bg-cinematic-800/50 border border-gray-200 dark:border-gray-700 hover:border-pink-300 dark:hover:border-pink-800'
                             }`}
                           >
-                            <div className={`w-6 h-6 flex items-center justify-center rounded-full mr-2 ${
+                            <div className={`w-4 h-4 flex items-center justify-center rounded-full mr-1 ${
                               sortOption.sort === 'price' && sortOption.order === 'asc'
-                                ? 'bg-gradient-to-r from-pink-500 to-purple-600 text-white'
+                                ? 'bg-pink-500 text-white'
                                 : 'bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400'
                             }`}>
-                              <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <svg xmlns="http://www.w3.org/2000/svg" className="h-2.5 w-2.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4h13M3 8h9m-9 4h6m4 0l4-4m0 0l4 4m-4-4v12" />
                               </svg>
                             </div>
-                            <span className={`text-xs font-medium ${
+                            <span className={`text-[10px] font-medium ${
                               sortOption.sort === 'price' && sortOption.order === 'asc'
                                 ? 'text-pink-700 dark:text-pink-400'
                                 : 'text-gray-700 dark:text-gray-300'
@@ -629,22 +640,22 @@ const ProductsIndex = ({ products, categories, filters }) => {
                           <button
                             type="button"
                             onClick={() => setSortOption({ sort: 'price', order: 'desc' })}
-                            className={`flex items-center p-2.5 rounded-lg transition-all duration-200 ${
+                            className={`flex items-center p-1.5 rounded-md transition-all duration-200 ${
                               sortOption.sort === 'price' && sortOption.order === 'desc'
-                                ? 'bg-gradient-to-r from-pink-500/20 to-purple-600/20 border-2 border-pink-500 dark:border-pink-400 shadow-sm'
+                                ? 'bg-pink-100 dark:bg-pink-900/30 border border-pink-300 dark:border-pink-700'
                                 : 'bg-white dark:bg-cinematic-800/50 border border-gray-200 dark:border-gray-700 hover:border-pink-300 dark:hover:border-pink-800'
                             }`}
                           >
-                            <div className={`w-6 h-6 flex items-center justify-center rounded-full mr-2 ${
+                            <div className={`w-4 h-4 flex items-center justify-center rounded-full mr-1 ${
                               sortOption.sort === 'price' && sortOption.order === 'desc'
-                                ? 'bg-gradient-to-r from-pink-500 to-purple-600 text-white'
+                                ? 'bg-pink-500 text-white'
                                 : 'bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400'
                             }`}>
-                              <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <svg xmlns="http://www.w3.org/2000/svg" className="h-2.5 w-2.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4h13M3 8h9m-9 4h6m4 0l4-4m0 0l4 4m-4-4v12" transform="rotate(180 12 12)" />
                               </svg>
                             </div>
-                            <span className={`text-xs font-medium ${
+                            <span className={`text-[10px] font-medium ${
                               sortOption.sort === 'price' && sortOption.order === 'desc'
                                 ? 'text-pink-700 dark:text-pink-400'
                                 : 'text-gray-700 dark:text-gray-300'
@@ -656,22 +667,22 @@ const ProductsIndex = ({ products, categories, filters }) => {
                           <button
                             type="button"
                             onClick={() => setSortOption({ sort: 'name', order: 'asc' })}
-                            className={`flex items-center p-2.5 rounded-lg transition-all duration-200 ${
+                            className={`flex items-center p-1.5 rounded-md transition-all duration-200 ${
                               sortOption.sort === 'name' && sortOption.order === 'asc'
-                                ? 'bg-gradient-to-r from-pink-500/20 to-purple-600/20 border-2 border-pink-500 dark:border-pink-400 shadow-sm'
+                                ? 'bg-pink-100 dark:bg-pink-900/30 border border-pink-300 dark:border-pink-700'
                                 : 'bg-white dark:bg-cinematic-800/50 border border-gray-200 dark:border-gray-700 hover:border-pink-300 dark:hover:border-pink-800'
                             }`}
                           >
-                            <div className={`w-6 h-6 flex items-center justify-center rounded-full mr-2 ${
+                            <div className={`w-4 h-4 flex items-center justify-center rounded-full mr-1 ${
                               sortOption.sort === 'name' && sortOption.order === 'asc'
-                                ? 'bg-gradient-to-r from-pink-500 to-purple-600 text-white'
+                                ? 'bg-pink-500 text-white'
                                 : 'bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400'
                             }`}>
-                              <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <svg xmlns="http://www.w3.org/2000/svg" className="h-2.5 w-2.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4h13M3 8h9m-9 4h6m4 0l4-4m0 0l4 4m-4-4v12" />
                               </svg>
                             </div>
-                            <span className={`text-xs font-medium ${
+                            <span className={`text-[10px] font-medium ${
                               sortOption.sort === 'name' && sortOption.order === 'asc'
                                 ? 'text-pink-700 dark:text-pink-400'
                                 : 'text-gray-700 dark:text-gray-300'
@@ -682,12 +693,12 @@ const ProductsIndex = ({ products, categories, filters }) => {
                         </div>
                       </div>
 
-                      <div className="flex flex-col gap-3">
+                      <div className="flex flex-col gap-1.5 mt-2">
                         <button
                           type="submit"
-                          className="w-full bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 text-white font-medium py-3 px-4 rounded-xl shadow-lg shadow-pink-500/20 dark:shadow-pink-700/30 focus:outline-none focus:ring-2 focus:ring-pink-500 focus:ring-offset-2 dark:focus:ring-offset-cinematic-800 transition-all duration-300 transform hover:scale-[1.02] active:scale-[0.98] text-sm flex items-center justify-center"
+                          className="w-full bg-pink-500 hover:bg-pink-600 text-white font-medium py-1.5 px-3 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-pink-500 focus:ring-offset-1 dark:focus:ring-offset-cinematic-800 transition-all duration-200 text-xs flex items-center justify-center"
                         >
-                          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
                           </svg>
                           {t('products.apply_filters')}
@@ -708,9 +719,9 @@ const ProductsIndex = ({ products, categories, filters }) => {
                                 setPriceRange({ min: '', max: '' });
                                 setSortOption({ sort: 'created_at', order: 'desc' });
                               }}
-                              className="w-full text-gray-700 dark:text-gray-300 bg-white dark:bg-cinematic-800 border border-gray-200 dark:border-gray-700 py-3 px-4 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-800/50 focus:outline-none focus:ring-2 focus:ring-pink-500 focus:ring-offset-2 dark:focus:ring-offset-cinematic-800 transition-all duration-300 transform hover:scale-[1.02] active:scale-[0.98] font-medium text-sm flex items-center justify-center"
+                              className="w-full text-gray-700 dark:text-gray-300 bg-white dark:bg-cinematic-800 border border-gray-200 dark:border-gray-700 py-1.5 px-3 rounded-md hover:bg-gray-50 dark:hover:bg-gray-800/50 focus:outline-none focus:ring-1 focus:ring-pink-500 focus:ring-offset-1 dark:focus:ring-offset-cinematic-800 transition-all duration-200 font-medium text-xs flex items-center justify-center"
                             >
-                              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5 mr-1 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                               </svg>
                               {t('products.clear_filters')}

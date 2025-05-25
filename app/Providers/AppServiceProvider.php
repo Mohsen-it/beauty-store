@@ -29,7 +29,7 @@ class AppServiceProvider extends ServiceProvider
         
         // Force HTTPS in production 
         if (App::environment('production')) {
-            URL::forceScheme('https');
+            URL::forceScheme('http');
 
             // Disable query events in production for performance
             Model::preventLazyLoading(!app()->isProduction());
