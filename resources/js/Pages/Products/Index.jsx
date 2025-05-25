@@ -235,19 +235,27 @@ const ProductsIndex = ({ products, categories, filters }) => {
               <div className="flex space-x-2 px-0.5 snap-x snap-mandatory">
                 <div
                   key="all"
-                  className={`snap-start shrink-0 flex flex-col items-center justify-center px-3 py-2 rounded-lg ${
+                  className={`snap-start shrink-0 flex flex-col items-center justify-center px-3 py-2 rounded-lg cursor-pointer transition-all duration-200 ${
                     !filters.category
                       ? 'bg-gradient-to-r from-pink-500 to-purple-600 text-white shadow-md shadow-pink-500/20 dark:shadow-pink-700/30'
-                      : 'bg-white dark:bg-cinematic-800 text-cinematic-700 dark:text-cinematic-300 border border-cinematic-200 dark:border-cinematic-700'
+                      : 'bg-white dark:bg-cinematic-800 text-cinematic-700 dark:text-cinematic-300 border border-cinematic-200 dark:border-cinematic-700 hover:border-pink-300 dark:hover:border-pink-700'
                   }`}
                   onClick={() => {
+                    const params = {
+                      sort: sortOption.sort,
+                      order: sortOption.order
+                    };
+
+                    // Only include price filters if they have values
+                    if (priceRange.min && !isNaN(priceRange.min)) {
+                      params.min_price = priceRange.min;
+                    }
+                    if (priceRange.max && !isNaN(priceRange.max)) {
+                      params.max_price = priceRange.max;
+                    }
+
                     router.visit(route('products.index'), {
-                      data: {
-                        sort: sortOption.sort,
-                        order: sortOption.order,
-                        min_price: priceRange.min,
-                        max_price: priceRange.max
-                      },
+                      data: params,
                       preserveState: true,
                       preserveScroll: true,
                       only: ['products', 'filters']
@@ -260,20 +268,28 @@ const ProductsIndex = ({ products, categories, filters }) => {
                 {categories.map((category) => (
                   <div
                     key={category.id}
-                    className={`snap-start shrink-0 flex flex-col items-center justify-center px-3 py-2 rounded-lg ${
+                    className={`snap-start shrink-0 flex flex-col items-center justify-center px-3 py-2 rounded-lg cursor-pointer transition-all duration-200 ${
                       parseInt(filters.category) === category.id
                         ? 'bg-gradient-to-r from-pink-500 to-purple-600 text-white shadow-md shadow-pink-500/20 dark:shadow-pink-700/30'
-                        : 'bg-white dark:bg-cinematic-800 text-cinematic-700 dark:text-cinematic-300 border border-cinematic-200 dark:border-cinematic-700'
+                        : 'bg-white dark:bg-cinematic-800 text-cinematic-700 dark:text-cinematic-300 border border-cinematic-200 dark:border-cinematic-700 hover:border-pink-300 dark:hover:border-pink-700'
                     }`}
                     onClick={() => {
+                      const params = {
+                        category: category.id,
+                        sort: sortOption.sort,
+                        order: sortOption.order
+                      };
+
+                      // Only include price filters if they have values
+                      if (priceRange.min && !isNaN(priceRange.min)) {
+                        params.min_price = priceRange.min;
+                      }
+                      if (priceRange.max && !isNaN(priceRange.max)) {
+                        params.max_price = priceRange.max;
+                      }
+
                       router.visit(route('products.index'), {
-                        data: {
-                          category: category.id,
-                          sort: sortOption.sort,
-                          order: sortOption.order,
-                          min_price: priceRange.min,
-                          max_price: priceRange.max
-                        },
+                        data: params,
                         preserveState: true,
                         preserveScroll: true,
                         only: ['products', 'filters']
@@ -293,7 +309,7 @@ const ProductsIndex = ({ products, categories, filters }) => {
         )}
 
         {/* Mobile filter toggle button - Fixed at bottom on mobile */}
-        <div className="fixed bottom-4 right-4 z-30 lg:hidden">
+        <div className="fixed bottom-4 right-4 z-20 lg:hidden">
           <button
             type="button"
             onClick={() => setFiltersExpanded(!filtersExpanded)}
@@ -301,7 +317,7 @@ const ProductsIndex = ({ products, categories, filters }) => {
               filtersExpanded
                 ? 'bg-gradient-to-r from-pink-500 to-purple-600 text-white'
                 : 'bg-white dark:bg-cinematic-800 text-pink-600 dark:text-pink-400 border border-pink-200 dark:border-pink-800'
-            } transition-all duration-300 transform hover:scale-[1.05] active:scale-[0.95]`}
+            } transition-all duration-200 transform hover:scale-[1.05] active:scale-[0.95]`}
           >
             <span className="sr-only">{filtersExpanded ? t('common.hide_filters') : t('common.show_filters')}</span>
             {filtersExpanded ? (
@@ -330,10 +346,10 @@ const ProductsIndex = ({ products, categories, filters }) => {
 
         <div className="lg:grid lg:grid-cols-4 lg:gap-4 xl:gap-8">
           {/* Sidebar with filters - Slide in from left on mobile */}
-          <div className={`fixed inset-0 z-40 lg:relative lg:z-0 transform transition-transform duration-300 ease-in-out ${filtersExpanded ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}`}>
+          <div className={`fixed inset-0 z-30 lg:relative lg:z-0 transform transition-transform duration-250 ease-out ${filtersExpanded ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}`}>
             {/* Overlay for mobile */}
             <div
-              className={`fixed inset-0 bg-black bg-opacity-50 lg:hidden transition-opacity duration-300 ${filtersExpanded ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
+              className={`fixed inset-0 bg-black bg-opacity-50 lg:hidden transition-opacity duration-200 ${filtersExpanded ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
               onClick={() => setFiltersExpanded(false)}
             ></div>
 
@@ -384,8 +400,22 @@ const ProductsIndex = ({ products, categories, filters }) => {
                           key={category.id}
                           type="button"
                           onClick={() => {
+                            const params = {
+                              category: category.id,
+                              sort: sortOption.sort,
+                              order: sortOption.order
+                            };
+
+                            // Only include price filters if they have values
+                            if (priceRange.min && !isNaN(priceRange.min)) {
+                              params.min_price = priceRange.min;
+                            }
+                            if (priceRange.max && !isNaN(priceRange.max)) {
+                              params.max_price = priceRange.max;
+                            }
+
                             router.visit(route('products.index'), {
-                              data: { category: category.id },
+                              data: params,
                               preserveState: true,
                               preserveScroll: true,
                               only: ['products', 'filters']
