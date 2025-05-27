@@ -394,9 +394,47 @@ const ProductsIndex = ({ products, categories, filters }) => {
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
                       </svg>
                     </div>
-                    <div>
-                      <h2 className="text-lg font-bold text-gray-800 dark:text-white">{t('products.filters')}</h2>
-                      <p className="text-sm text-gray-500 dark:text-gray-400">{t('products.refine_your_search')}</p>
+                    <div className="flex items-center">
+                      <div>
+                        <h2 className="text-lg font-bold text-gray-800 dark:text-white">{t('products.filters')}</h2>
+                        <p className="text-sm text-gray-500 dark:text-gray-400">{t('products.refine_your_search')}</p>
+                      </div>
+                      {/* Clear filters icon - Mobile only, shows when filters are applied */}
+                      {(filters.category || filters.min_price || filters.max_price ||
+                        sortOption.sort !== 'created_at' || sortOption.order !== 'desc') && (
+                        <motion.button
+                          type="button"
+                          initial={{ scale: 0 }}
+                          animate={{ scale: 1 }}
+                          exit={{ scale: 0 }}
+                          whileHover={{ scale: 1.1 }}
+                          whileTap={{ scale: 0.9 }}
+                          onClick={() => {
+                            router.visit(route('products.index'), {
+                              preserveState: true,
+                              preserveScroll: true,
+                              only: ['products', 'filters']
+                            });
+                            // Reset local state
+                            setPriceRange({ min: '', max: '' });
+                            setSortOption({ sort: 'created_at', order: 'desc' });
+                            // Close filter on mobile after clearing
+                            setFiltersExpanded(false);
+                          }}
+                          className="lg:hidden ml-3 flex items-center justify-center p-2 rounded-full bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 hover:bg-red-200 dark:hover:bg-red-800/40 transition-all duration-200 shadow-md hover:shadow-lg"
+                        >
+                          <span className="sr-only">{t('products.clear_filters')}</span>
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            className="h-4 w-4"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                          >
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                          </svg>
+                        </motion.button>
+                      )}
                     </div>
                   </div>
                   <button
@@ -689,7 +727,7 @@ const ProductsIndex = ({ products, categories, filters }) => {
                           <span className="relative z-10">{t('products.apply_filters')}</span>
                         </motion.button>
 
-                        {/* Clear Filters button - Always visible */}
+                        {/* Clear Filters button - Desktop only */}
                         <motion.button
                           type="button"
                           whileHover={{ scale: 1.02 }}
@@ -703,10 +741,8 @@ const ProductsIndex = ({ products, categories, filters }) => {
                             // Reset local state
                             setPriceRange({ min: '', max: '' });
                             setSortOption({ sort: 'created_at', order: 'desc' });
-                            // Close filter on mobile after clearing
-                            setFiltersExpanded(false);
                           }}
-                          className={`w-full transition-all duration-300 font-semibold text-base flex items-center justify-center shadow-lg hover:shadow-xl py-4 px-6 rounded-2xl focus:outline-none focus:ring-4 focus:ring-offset-2 dark:focus:ring-offset-cinematic-800 ${
+                          className={`hidden lg:flex w-full transition-all duration-300 font-semibold text-base items-center justify-center shadow-lg hover:shadow-xl py-4 px-6 rounded-2xl focus:outline-none focus:ring-4 focus:ring-offset-2 dark:focus:ring-offset-cinematic-800 ${
                             (filters.category || filters.min_price || filters.max_price ||
                              sortOption.sort !== 'created_at' || sortOption.order !== 'desc')
                               ? 'text-red-700 dark:text-red-300 bg-gradient-to-r from-red-50 to-red-100 dark:from-red-900/20 dark:to-red-800/20 border-2 border-red-200 dark:border-red-700 hover:from-red-100 hover:to-red-200 dark:hover:from-red-800/30 dark:hover:to-red-700/30 focus:ring-red-500/50'
