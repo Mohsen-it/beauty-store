@@ -985,6 +985,71 @@ tbody tr:hover {
   color: #9ca3af;
 }
 
+/* Mobile Filter Bottom Sheet */
+.mobile-filter-sheet {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: white;
+  border-top-left-radius: 1rem;
+  border-top-right-radius: 1rem;
+  box-shadow: 0 -10px 25px rgba(0, 0, 0, 0.1);
+  transform: translateY(100%);
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  z-index: 50;
+  max-height: 70vh;
+  overflow: hidden;
+}
+
+.mobile-filter-sheet.open {
+  transform: translateY(0);
+}
+
+.dark .mobile-filter-sheet {
+  background: #1f2937;
+  box-shadow: 0 -10px 25px rgba(0, 0, 0, 0.3);
+}
+
+/* Filter handle */
+.filter-handle {
+  width: 3rem;
+  height: 0.25rem;
+  background: #d1d5db;
+  border-radius: 0.125rem;
+  margin: 0.5rem auto 0.25rem;
+}
+
+.dark .filter-handle {
+  background: #4b5563;
+}
+
+/* Smooth scrolling for filter content */
+.filter-content {
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.filter-content::-webkit-scrollbar {
+  display: none;
+}
+
+/* Touch-friendly filter buttons */
+@media (max-width: 768px) {
+  .filter-button {
+    min-height: 44px;
+    min-width: 44px;
+    touch-action: manipulation;
+  }
+
+  .filter-input {
+    min-height: 44px;
+    font-size: 16px; /* Prevents zoom on iOS */
+  }
+}
+
 .dark .mobile-menu-footer {
   border-top-color: rgba(255, 255, 255, 0.1);
 }
