@@ -1050,6 +1050,65 @@ tbody tr:hover {
   }
 }
 
+/* Premium filter animations */
+.filter-card {
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+.filter-gradient-border {
+  background: linear-gradient(135deg, #ec4899, #8b5cf6, #3b82f6);
+  padding: 2px;
+  border-radius: 1rem;
+}
+
+.filter-gradient-border > div {
+  background: white;
+  border-radius: calc(1rem - 2px);
+}
+
+.dark .filter-gradient-border > div {
+  background: #1f2937;
+}
+
+/* Smooth transitions for all filter elements */
+.filter-element {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.filter-element:hover {
+  transform: translateY(-1px);
+}
+
+/* Enhanced shadows for premium feel */
+.filter-shadow {
+  box-shadow:
+    0 4px 6px -1px rgba(0, 0, 0, 0.1),
+    0 2px 4px -1px rgba(0, 0, 0, 0.06),
+    0 0 0 1px rgba(0, 0, 0, 0.05);
+}
+
+.filter-shadow-lg {
+  box-shadow:
+    0 10px 15px -3px rgba(0, 0, 0, 0.1),
+    0 4px 6px -2px rgba(0, 0, 0, 0.05),
+    0 0 0 1px rgba(0, 0, 0, 0.05);
+}
+
+.dark .filter-shadow {
+  box-shadow:
+    0 4px 6px -1px rgba(0, 0, 0, 0.3),
+    0 2px 4px -1px rgba(0, 0, 0, 0.2),
+    0 0 0 1px rgba(255, 255, 255, 0.05);
+}
+
+.dark .filter-shadow-lg {
+  box-shadow:
+    0 10px 15px -3px rgba(0, 0, 0, 0.3),
+    0 4px 6px -2px rgba(0, 0, 0, 0.2),
+    0 0 0 1px rgba(255, 255, 255, 0.05);
+}
+
 .dark .mobile-menu-footer {
   border-top-color: rgba(255, 255, 255, 0.1);
 }

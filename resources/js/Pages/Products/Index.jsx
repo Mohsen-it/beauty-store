@@ -346,49 +346,63 @@ const ProductsIndex = ({ products, categories, filters }) => {
         </div>
 
         <div className="lg:grid lg:grid-cols-4 lg:gap-4 xl:gap-8">
+          {/* Mobile Overlay */}
+          {filtersExpanded && (
+            <div
+              className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 lg:hidden transition-all duration-300"
+              onClick={() => setFiltersExpanded(false)}
+            />
+          )}
+
           {/* Mobile Bottom Sheet / Desktop Sidebar */}
           <div className={`
-            lg:relative lg:z-0 lg:translate-y-0
+            lg:relative lg:z-0 lg:translate-y-0 lg:block
             ${filtersExpanded
-              ? 'fixed inset-x-0 bottom-0 z-30 translate-y-0'
-              : 'fixed inset-x-0 bottom-0 z-30 translate-y-full lg:translate-y-0'
+              ? 'fixed inset-x-0 bottom-0 z-50 translate-y-0'
+              : 'fixed inset-x-0 bottom-0 z-50 translate-y-full lg:translate-y-0'
             }
-            transition-transform duration-300 ease-out
+            transition-all duration-300 ease-out
           `}>
-            {/* Overlay for mobile */}
-            <div
-              className={`fixed inset-0 bg-black bg-opacity-50 lg:hidden transition-opacity duration-200 ${filtersExpanded ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
-              onClick={() => setFiltersExpanded(false)}
-            ></div>
-
             <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{
+                opacity: filtersExpanded || isLargeScreen ? 1 : 0,
+                y: filtersExpanded || isLargeScreen ? 0 : 20
+              }}
+              transition={{ duration: 0.3, ease: "easeOut" }}
               className={`
-                lg:h-auto lg:w-full lg:max-w-none lg:rounded-xl lg:mb-6 lg:border-2 lg:border-pink-100 lg:dark:border-pink-900/30
-                h-[70vh] w-full rounded-t-2xl overflow-hidden bg-white dark:bg-cinematic-800
-                shadow-lg dark:shadow-soft
+                lg:h-auto lg:w-full lg:max-w-none lg:rounded-xl lg:mb-6 lg:border-2 lg:border-pink-100 lg:dark:border-pink-900/30 lg:shadow-lg lg:dark:shadow-soft
+                h-[75vh] w-full rounded-t-3xl overflow-hidden bg-white dark:bg-cinematic-800
+                shadow-2xl dark:shadow-2xl border-t-4 border-pink-500
               `}
             >
               {/* Mobile Bottom Sheet Handle */}
-              <div className="lg:hidden flex justify-center pt-2 pb-1">
-                <div className="w-12 h-1 bg-gray-300 dark:bg-gray-600 rounded-full"></div>
+              <div className="lg:hidden flex flex-col items-center pt-3 pb-2 bg-gradient-to-b from-pink-50 to-white dark:from-pink-900/20 dark:to-cinematic-800">
+                <div className="w-16 h-1.5 bg-gradient-to-r from-pink-400 to-purple-500 rounded-full shadow-sm"></div>
+                <div className="mt-2 text-xs text-gray-500 dark:text-gray-400 font-medium">
+                  {t('common.swipe_down_to_close')}
+                </div>
               </div>
 
               {/* Scrollable Content */}
-              <div className="h-full overflow-y-auto p-4 sm:p-5 md:p-6">
+              <div className="h-full overflow-y-auto p-4 sm:p-5 md:p-6 bg-gradient-to-b from-white to-gray-50/50 dark:from-cinematic-800 dark:to-cinematic-900/50">
                 {/* Header with close button for mobile */}
-                <div className="flex justify-between items-center mb-4">
+                <div className="flex justify-between items-center mb-6 pb-4 border-b border-gray-200 dark:border-gray-700">
                   <div className="flex items-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 sm:h-5 sm:w-5 mr-1.5 text-pink-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
-                    </svg>
-                    <h2 className="text-base font-bold text-gray-800 dark:text-white bg-gradient-to-r from-pink-500 to-purple-600 bg-clip-text text-transparent">{t('products.filters')}</h2>
+                    <div className="p-2 bg-gradient-to-r from-pink-500 to-purple-600 rounded-lg mr-3">
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
+                      </svg>
+                    </div>
+                    <div>
+                      <h2 className="text-lg font-bold text-gray-800 dark:text-white">{t('products.filters')}</h2>
+                      <p className="text-sm text-gray-500 dark:text-gray-400">{t('products.refine_your_search')}</p>
+                    </div>
                   </div>
                   <button
                     type="button"
                     onClick={() => setFiltersExpanded(false)}
-                    className="lg:hidden flex items-center justify-center p-2 rounded-full bg-pink-100 dark:bg-pink-900/30 text-pink-600 dark:text-pink-400 hover:bg-pink-200 dark:hover:bg-pink-800/40 transition-all duration-200"
+                    className="lg:hidden flex items-center justify-center p-3 rounded-full bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 transition-all duration-200 shadow-md hover:shadow-lg"
                   >
                     <span className="sr-only">{t('common.close')}</span>
                     <svg
@@ -403,21 +417,28 @@ const ProductsIndex = ({ products, categories, filters }) => {
                   </button>
                 </div>
               <form onSubmit={handleFilterSubmit}>
-                {/* Categories - Compact Mobile Design */}
-                <div className="mb-4 sm:mb-6">
-                  <h3 className="text-sm font-semibold text-gray-800 dark:text-gray-200 mb-3 flex items-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1.5 text-pink-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
-                    </svg>
-                    {t('products.categories')}
-                  </h3>
-                  <div className="grid grid-cols-2 gap-2">
+                {/* Categories - Premium Design */}
+                <div className="mb-6 p-4 bg-gradient-to-br from-gray-50 to-white dark:from-gray-800/50 dark:to-gray-900/50 rounded-2xl border border-gray-200 dark:border-gray-700 shadow-sm">
+                  <div className="flex items-center mb-4">
+                    <div className="p-2 bg-gradient-to-r from-pink-500 to-purple-600 rounded-lg mr-3">
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
+                      </svg>
+                    </div>
+                    <div>
+                      <h3 className="text-base font-bold text-gray-800 dark:text-gray-200">{t('products.categories')}</h3>
+                      <p className="text-xs text-gray-500 dark:text-gray-400">{t('products.choose_category')}</p>
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-2 gap-3">
                     {categories.map((category) => {
                       const isSelected = parseInt(filters.category) === category.id;
                       return (
-                        <button
+                        <motion.button
                           key={category.id}
                           type="button"
+                          whileHover={{ scale: 1.02 }}
+                          whileTap={{ scale: 0.98 }}
                           onClick={() => {
                             const params = {
                               category: category.id,
@@ -440,23 +461,32 @@ const ProductsIndex = ({ products, categories, filters }) => {
                               only: ['products', 'filters']
                             });
                           }}
-                          className={`flex items-center justify-center p-3 rounded-lg transition-all duration-200 ${
+                          className={`relative flex flex-col items-center justify-center p-4 rounded-xl transition-all duration-300 min-h-[80px] ${
                             isSelected
-                              ? 'bg-gradient-to-r from-pink-500 to-purple-600 text-white shadow-md'
-                              : 'bg-white dark:bg-cinematic-800/50 border border-gray-200 dark:border-gray-700 hover:border-pink-300 dark:hover:border-pink-800 text-gray-700 dark:text-gray-300'
+                              ? 'bg-gradient-to-br from-pink-500 to-purple-600 text-white shadow-lg shadow-pink-500/25'
+                              : 'bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-600 hover:border-pink-300 dark:hover:border-pink-700 text-gray-700 dark:text-gray-300 hover:shadow-md'
                           }`}
                         >
-                          <div className={`w-5 h-5 flex items-center justify-center rounded-full mr-2 ${
+                          {isSelected && (
+                            <div className="absolute top-2 right-2">
+                              <div className="w-5 h-5 bg-white/20 rounded-full flex items-center justify-center">
+                                <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                  <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                                </svg>
+                              </div>
+                            </div>
+                          )}
+                          <div className={`w-8 h-8 flex items-center justify-center rounded-full mb-2 ${
                             isSelected
                               ? 'bg-white/20 text-white'
-                              : 'bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400'
+                              : 'bg-gradient-to-br from-pink-100 to-purple-100 dark:from-pink-900/30 dark:to-purple-900/30 text-pink-600 dark:text-pink-400'
                           }`}>
                             {getCategoryIcon(category.name)}
                           </div>
-                          <span className="text-xs font-medium truncate">
+                          <span className="text-xs font-semibold text-center leading-tight">
                             {category.name}
                           </span>
-                        </button>
+                        </motion.button>
                       );
                     })}
                   </div>
@@ -492,19 +522,24 @@ const ProductsIndex = ({ products, categories, filters }) => {
                       transition={{ duration: 0.3 }}
                       className="overflow-hidden"
                     >
-                      {/* Price Range - Compact Design */}
-                      <div className="mb-4 sm:mb-6">
-                        <h3 className="text-sm font-semibold text-gray-800 dark:text-gray-200 mb-3 flex items-center">
-                          <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1.5 text-pink-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                          </svg>
-                          {t('products.price_range')}
-                        </h3>
+                      {/* Price Range - Premium Design */}
+                      <div className="mb-6 p-4 bg-gradient-to-br from-gray-50 to-white dark:from-gray-800/50 dark:to-gray-900/50 rounded-2xl border border-gray-200 dark:border-gray-700 shadow-sm">
+                        <div className="flex items-center mb-4">
+                          <div className="p-2 bg-gradient-to-r from-green-500 to-emerald-600 rounded-lg mr-3">
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                          </div>
+                          <div>
+                            <h3 className="text-base font-bold text-gray-800 dark:text-gray-200">{t('products.price_range')}</h3>
+                            <p className="text-xs text-gray-500 dark:text-gray-400">{t('products.set_budget')}</p>
+                          </div>
+                        </div>
 
                         {/* Custom Price Inputs */}
-                        <div className="flex items-center gap-2 mb-3">
-                          <div className="flex-1 bg-white dark:bg-cinematic-800 rounded-lg border border-gray-200 dark:border-gray-700 px-3 py-2 flex items-center">
-                            <span className="text-pink-600 dark:text-pink-400 font-medium mr-1 text-sm">$</span>
+                        <div className="flex items-center gap-3 mb-4">
+                          <div className="flex-1 relative">
+                            <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-green-600 dark:text-green-400 font-bold">$</div>
                             <input
                               type="number"
                               placeholder="Min"
@@ -512,12 +547,16 @@ const ProductsIndex = ({ products, categories, filters }) => {
                               step="1"
                               value={priceRange.min}
                               onChange={(e) => setPriceRange({ ...priceRange, min: e.target.value })}
-                              className="w-full border-0 focus:ring-0 focus:outline-none bg-transparent text-gray-800 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 text-sm"
+                              className="w-full pl-8 pr-4 py-3 bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-600 rounded-xl focus:border-green-500 dark:focus:border-green-400 focus:ring-0 focus:outline-none text-gray-800 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 text-sm font-medium transition-all duration-200"
                             />
                           </div>
-                          <span className="text-gray-400 dark:text-gray-500">-</span>
-                          <div className="flex-1 bg-white dark:bg-cinematic-800 rounded-lg border border-gray-200 dark:border-gray-700 px-3 py-2 flex items-center">
-                            <span className="text-pink-600 dark:text-pink-400 font-medium mr-1 text-sm">$</span>
+                          <div className="flex items-center justify-center w-8 h-8 bg-gradient-to-r from-green-500 to-emerald-600 rounded-full">
+                            <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 12H4" />
+                            </svg>
+                          </div>
+                          <div className="flex-1 relative">
+                            <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-green-600 dark:text-green-400 font-bold">$</div>
                             <input
                               type="number"
                               placeholder="Max"
@@ -525,181 +564,138 @@ const ProductsIndex = ({ products, categories, filters }) => {
                               step="1"
                               value={priceRange.max}
                               onChange={(e) => setPriceRange({ ...priceRange, max: e.target.value })}
-                              className="w-full border-0 focus:ring-0 focus:outline-none bg-transparent text-gray-800 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 text-sm"
+                              className="w-full pl-8 pr-4 py-3 bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-600 rounded-xl focus:border-green-500 dark:focus:border-green-400 focus:ring-0 focus:outline-none text-gray-800 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 text-sm font-medium transition-all duration-200"
                             />
                           </div>
                         </div>
 
                         {/* Quick price buttons */}
-                        <div className="grid grid-cols-2 gap-2">
-                          <button
-                            type="button"
-                            onClick={() => setPriceRange({ min: '0', max: '25' })}
-                            className={`px-3 py-2 text-xs rounded-lg transition-all duration-200 ${
-                              priceRange.min === '0' && priceRange.max === '25'
-                                ? 'bg-gradient-to-r from-pink-500 to-purple-600 text-white shadow-md'
-                                : 'bg-white dark:bg-cinematic-800 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:border-pink-300 dark:hover:border-pink-800'
-                            }`}
-                          >
-                            Under $25
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => setPriceRange({ min: '25', max: '50' })}
-                            className={`px-3 py-2 text-xs rounded-lg transition-all duration-200 ${
-                              priceRange.min === '25' && priceRange.max === '50'
-                                ? 'bg-gradient-to-r from-pink-500 to-purple-600 text-white shadow-md'
-                                : 'bg-white dark:bg-cinematic-800 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:border-pink-300 dark:hover:border-pink-800'
-                            }`}
-                          >
-                            $25 - $50
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => setPriceRange({ min: '50', max: '100' })}
-                            className={`px-3 py-2 text-xs rounded-lg transition-all duration-200 ${
-                              priceRange.min === '50' && priceRange.max === '100'
-                                ? 'bg-gradient-to-r from-pink-500 to-purple-600 text-white shadow-md'
-                                : 'bg-white dark:bg-cinematic-800 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:border-pink-300 dark:hover:border-pink-800'
-                            }`}
-                          >
-                            $50 - $100
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => setPriceRange({ min: '100', max: '' })}
-                            className={`px-3 py-2 text-xs rounded-lg transition-all duration-200 ${
-                              priceRange.min === '100' && priceRange.max === ''
-                                ? 'bg-gradient-to-r from-pink-500 to-purple-600 text-white shadow-md'
-                                : 'bg-white dark:bg-cinematic-800 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:border-pink-300 dark:hover:border-pink-800'
-                            }`}
-                          >
-                            $100+
-                          </button>
+                        <div className="grid grid-cols-2 gap-3">
+                          {[
+                            { min: '0', max: '25', label: 'Under $25' },
+                            { min: '25', max: '50', label: '$25 - $50' },
+                            { min: '50', max: '100', label: '$50 - $100' },
+                            { min: '100', max: '', label: '$100+' }
+                          ].map((range, index) => (
+                            <motion.button
+                              key={index}
+                              type="button"
+                              whileHover={{ scale: 1.02 }}
+                              whileTap={{ scale: 0.98 }}
+                              onClick={() => setPriceRange({ min: range.min, max: range.max })}
+                              className={`px-4 py-3 text-sm font-semibold rounded-xl transition-all duration-300 ${
+                                priceRange.min === range.min && priceRange.max === range.max
+                                  ? 'bg-gradient-to-r from-green-500 to-emerald-600 text-white shadow-lg shadow-green-500/25'
+                                  : 'bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:border-green-300 dark:hover:border-green-700 hover:shadow-md'
+                              }`}
+                            >
+                              {range.label}
+                            </motion.button>
+                          ))}
                         </div>
                       </div>
 
-                      {/* Sort Options - Compact Design */}
-                      <div className="mb-4 sm:mb-6">
-                        <h3 className="text-sm font-semibold text-gray-800 dark:text-gray-200 mb-3 flex items-center">
-                          <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1.5 text-pink-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4h13M3 8h9m-9 4h6m4 0l4-4m0 0l4 4m-4-4v12" />
-                          </svg>
-                          {t('products.sort_by')}
-                        </h3>
+                      {/* Sort Options - Premium Design */}
+                      <div className="mb-6 p-4 bg-gradient-to-br from-gray-50 to-white dark:from-gray-800/50 dark:to-gray-900/50 rounded-2xl border border-gray-200 dark:border-gray-700 shadow-sm">
+                        <div className="flex items-center mb-4">
+                          <div className="p-2 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-lg mr-3">
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4h13M3 8h9m-9 4h6m4 0l4-4m0 0l4 4m-4-4v12" />
+                            </svg>
+                          </div>
+                          <div>
+                            <h3 className="text-base font-bold text-gray-800 dark:text-gray-200">{t('products.sort_by')}</h3>
+                            <p className="text-xs text-gray-500 dark:text-gray-400">{t('products.arrange_results')}</p>
+                          </div>
+                        </div>
 
-                        <div className="grid grid-cols-2 gap-2">
-                          <button
-                            type="button"
-                            onClick={() => setSortOption({ sort: 'created_at', order: 'desc' })}
-                            className={`flex items-center justify-center p-3 rounded-lg transition-all duration-200 ${
-                              sortOption.sort === 'created_at' && sortOption.order === 'desc'
-                                ? 'bg-gradient-to-r from-pink-500 to-purple-600 text-white shadow-md'
-                                : 'bg-white dark:bg-cinematic-800/50 border border-gray-200 dark:border-gray-700 hover:border-pink-300 dark:hover:border-pink-800 text-gray-700 dark:text-gray-300'
-                            }`}
-                          >
-                            <div className={`w-5 h-5 flex items-center justify-center rounded-full mr-2 ${
-                              sortOption.sort === 'created_at' && sortOption.order === 'desc'
-                                ? 'bg-white/20 text-white'
-                                : 'bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400'
-                            }`}>
-                              <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                              </svg>
-                            </div>
-                            <span className="text-xs font-medium truncate">
-                              {t('products.newest')}
-                            </span>
-                          </button>
-
-                          <button
-                            type="button"
-                            onClick={() => setSortOption({ sort: 'price', order: 'asc' })}
-                            className={`flex items-center justify-center p-3 rounded-lg transition-all duration-200 ${
-                              sortOption.sort === 'price' && sortOption.order === 'asc'
-                                ? 'bg-gradient-to-r from-pink-500 to-purple-600 text-white shadow-md'
-                                : 'bg-white dark:bg-cinematic-800/50 border border-gray-200 dark:border-gray-700 hover:border-pink-300 dark:hover:border-pink-800 text-gray-700 dark:text-gray-300'
-                            }`}
-                          >
-                            <div className={`w-5 h-5 flex items-center justify-center rounded-full mr-2 ${
-                              sortOption.sort === 'price' && sortOption.order === 'asc'
-                                ? 'bg-white/20 text-white'
-                                : 'bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400'
-                            }`}>
-                              <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4h13M3 8h9m-9 4h6m4 0l4-4m0 0l4 4m-4-4v12" />
-                              </svg>
-                            </div>
-                            <span className="text-xs font-medium truncate">
-                              Price ↑
-                            </span>
-                          </button>
-
-                          <button
-                            type="button"
-                            onClick={() => setSortOption({ sort: 'price', order: 'desc' })}
-                            className={`flex items-center justify-center p-3 rounded-lg transition-all duration-200 ${
-                              sortOption.sort === 'price' && sortOption.order === 'desc'
-                                ? 'bg-gradient-to-r from-pink-500 to-purple-600 text-white shadow-md'
-                                : 'bg-white dark:bg-cinematic-800/50 border border-gray-200 dark:border-gray-700 hover:border-pink-300 dark:hover:border-pink-800 text-gray-700 dark:text-gray-300'
-                            }`}
-                          >
-                            <div className={`w-5 h-5 flex items-center justify-center rounded-full mr-2 ${
-                              sortOption.sort === 'price' && sortOption.order === 'desc'
-                                ? 'bg-white/20 text-white'
-                                : 'bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400'
-                            }`}>
-                              <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4h13M3 8h9m-9 4h6m4 0l4-4m0 0l4 4m-4-4v12" transform="rotate(180 12 12)" />
-                              </svg>
-                            </div>
-                            <span className="text-xs font-medium truncate">
-                              Price ↓
-                            </span>
-                          </button>
-
-                          <button
-                            type="button"
-                            onClick={() => setSortOption({ sort: 'name', order: 'asc' })}
-                            className={`flex items-center justify-center p-3 rounded-lg transition-all duration-200 ${
-                              sortOption.sort === 'name' && sortOption.order === 'asc'
-                                ? 'bg-gradient-to-r from-pink-500 to-purple-600 text-white shadow-md'
-                                : 'bg-white dark:bg-cinematic-800/50 border border-gray-200 dark:border-gray-700 hover:border-pink-300 dark:hover:border-pink-800 text-gray-700 dark:text-gray-300'
-                            }`}
-                          >
-                            <div className={`w-5 h-5 flex items-center justify-center rounded-full mr-2 ${
-                              sortOption.sort === 'name' && sortOption.order === 'asc'
-                                ? 'bg-white/20 text-white'
-                                : 'bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400'
-                            }`}>
-                              <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4h13M3 8h9m-9 4h6m4 0l4-4m0 0l4 4m-4-4v12" />
-                              </svg>
-                            </div>
-                            <span className="text-xs font-medium truncate">
-                              A-Z
-                            </span>
-                          </button>
+                        <div className="grid grid-cols-2 gap-3">
+                          {[
+                            { sort: 'created_at', order: 'desc', label: 'Newest', icon: 'clock' },
+                            { sort: 'price', order: 'asc', label: 'Price ↑', icon: 'arrow-up' },
+                            { sort: 'price', order: 'desc', label: 'Price ↓', icon: 'arrow-down' },
+                            { sort: 'name', order: 'asc', label: 'A-Z', icon: 'sort-alpha' }
+                          ].map((option, index) => {
+                            const isSelected = sortOption.sort === option.sort && sortOption.order === option.order;
+                            return (
+                              <motion.button
+                                key={index}
+                                type="button"
+                                whileHover={{ scale: 1.02 }}
+                                whileTap={{ scale: 0.98 }}
+                                onClick={() => setSortOption({ sort: option.sort, order: option.order })}
+                                className={`relative flex flex-col items-center justify-center p-4 rounded-xl transition-all duration-300 min-h-[70px] ${
+                                  isSelected
+                                    ? 'bg-gradient-to-br from-blue-500 to-indigo-600 text-white shadow-lg shadow-blue-500/25'
+                                    : 'bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-600 hover:border-blue-300 dark:hover:border-blue-700 text-gray-700 dark:text-gray-300 hover:shadow-md'
+                                }`}
+                              >
+                                {isSelected && (
+                                  <div className="absolute top-2 right-2">
+                                    <div className="w-5 h-5 bg-white/20 rounded-full flex items-center justify-center">
+                                      <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                                      </svg>
+                                    </div>
+                                  </div>
+                                )}
+                                <div className={`w-8 h-8 flex items-center justify-center rounded-full mb-2 ${
+                                  isSelected
+                                    ? 'bg-white/20 text-white'
+                                    : 'bg-gradient-to-br from-blue-100 to-indigo-100 dark:from-blue-900/30 dark:to-indigo-900/30 text-blue-600 dark:text-blue-400'
+                                }`}>
+                                  {option.icon === 'clock' && (
+                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                    </svg>
+                                  )}
+                                  {option.icon === 'arrow-up' && (
+                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 11l5-5m0 0l5 5m-5-5v12" />
+                                    </svg>
+                                  )}
+                                  {option.icon === 'arrow-down' && (
+                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 13l-5 5m0 0l-5-5m5 5V6" />
+                                    </svg>
+                                  )}
+                                  {option.icon === 'sort-alpha' && (
+                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4h13M3 8h9m-9 4h6m4 0l4-4m0 0l4 4m-4-4v12" />
+                                    </svg>
+                                  )}
+                                </div>
+                                <span className="text-xs font-semibold text-center leading-tight">
+                                  {option.label}
+                                </span>
+                              </motion.button>
+                            );
+                          })}
                         </div>
                       </div>
 
-                      {/* Action Buttons */}
-                      <div className="flex flex-col gap-3 mt-6 pt-4 border-t border-gray-200 dark:border-gray-700">
-                        <button
+                      {/* Action Buttons - Premium Design */}
+                      <div className="flex flex-col gap-4 mt-8 pt-6 border-t-2 border-gradient-to-r from-pink-200 to-purple-200 dark:from-pink-800 dark:to-purple-800">
+                        <motion.button
                           type="submit"
-                          className="w-full bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 text-white font-semibold py-3 px-4 rounded-lg shadow-md hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-pink-500 focus:ring-offset-2 dark:focus:ring-offset-cinematic-800 transition-all duration-200 text-sm flex items-center justify-center"
+                          whileHover={{ scale: 1.02 }}
+                          whileTap={{ scale: 0.98 }}
+                          className="w-full bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-600 hover:from-pink-600 hover:via-purple-600 hover:to-indigo-700 text-white font-bold py-4 px-6 rounded-2xl shadow-xl hover:shadow-2xl focus:outline-none focus:ring-4 focus:ring-pink-500/50 focus:ring-offset-2 dark:focus:ring-offset-cinematic-800 transition-all duration-300 text-base flex items-center justify-center relative overflow-hidden"
                         >
-                          <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <div className="absolute inset-0 bg-gradient-to-r from-white/20 to-transparent opacity-0 hover:opacity-100 transition-opacity duration-300"></div>
+                          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
                           </svg>
-                          {t('products.apply_filters')}
-                        </button>
+                          <span className="relative z-10">{t('products.apply_filters')}</span>
+                        </motion.button>
 
                         {/* Only show Clear Filters button if any filter is applied */}
                         {(filters.category || filters.min_price || filters.max_price ||
                           sortOption.sort !== 'created_at' || sortOption.order !== 'desc') && (
-                            <button
+                            <motion.button
                               type="button"
+                              whileHover={{ scale: 1.02 }}
+                              whileTap={{ scale: 0.98 }}
                               onClick={() => {
                                 router.visit(route('products.index'), {
                                   preserveState: true,
@@ -712,13 +708,13 @@ const ProductsIndex = ({ products, categories, filters }) => {
                                 // Close filter on mobile after clearing
                                 setFiltersExpanded(false);
                               }}
-                              className="w-full text-gray-700 dark:text-gray-300 bg-white dark:bg-cinematic-800 border border-gray-200 dark:border-gray-700 py-3 px-4 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800/50 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 dark:focus:ring-offset-cinematic-800 transition-all duration-200 font-medium text-sm flex items-center justify-center"
+                              className="w-full text-gray-700 dark:text-gray-300 bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-700 border-2 border-gray-200 dark:border-gray-600 py-4 px-6 rounded-2xl hover:bg-gradient-to-r hover:from-gray-100 hover:to-gray-200 dark:hover:from-gray-700 dark:hover:to-gray-600 focus:outline-none focus:ring-4 focus:ring-gray-500/50 focus:ring-offset-2 dark:focus:ring-offset-cinematic-800 transition-all duration-300 font-semibold text-base flex items-center justify-center shadow-lg hover:shadow-xl"
                             >
-                              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-2 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-3 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                               </svg>
                               {t('products.clear_filters')}
-                            </button>
+                            </motion.button>
                           )}
                       </div>
                     </motion.div>
