@@ -770,13 +770,13 @@ const ProductsIndex = ({ products, categories, filters }) => {
                 variants={container}
                 initial="hidden"
                 animate="show"
-                className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-3 sm:gap-4 lg:gap-6 p-2 sm:p-4 lg:p-0"
+                className="products-grid grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5 gap-4 p-4"
               >
                 {products.data.map((product) => (
                   <motion.div key={product.id} variants={item}>
                     <Link href={route('products.show', product.slug)} className="block h-full group" aria-label={`View ${product.name} details`}>
-                      <div className="card-product h-full flex flex-col">
-                        <div className="aspect-square w-full overflow-hidden bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-700 relative">
+                      <div className="bg-white dark:bg-cinematic-800 rounded-xl shadow-md hover:shadow-lg transition-all duration-300 overflow-hidden h-full flex flex-col min-h-[280px] border border-gray-200 dark:border-cinematic-700">
+                        <div className="aspect-[4/3] w-full overflow-hidden bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-700 relative">
                             {product.images.length > 0 ? (
                               <img
                                 src={
@@ -832,88 +832,71 @@ const ProductsIndex = ({ products, categories, filters }) => {
                               </div>
                             )}
                         </div>
-                        <div className="p-1 xs:p-1.5 sm:p-2 lg:p-3 xl:p-4 flex-1 flex flex-col">
-                          <div className="flex justify-between items-start mb-1 lg:mb-2">
-                            <h3 className="text-[8px] xs:text-[9px] sm:text-[10px] lg:text-xs xl:text-sm text-cinematic-500 dark:text-cinematic-400 truncate max-w-[70%]">{product.category.name}</h3>
+                        <div className="p-3 flex-1 flex flex-col space-y-2">
+                          <div className="flex justify-between items-start">
+                            <span className="text-xs text-pink-500 dark:text-pink-400 font-medium">{product.category.name}</span>
 
                             {/* Compact rating */}
                             <div className="flex items-center">
                               <svg
-                                className="w-2 h-2 xs:w-2 xs:h-2 sm:w-2.5 sm:h-2.5 lg:w-3 lg:h-3 xl:w-3.5 xl:h-3.5 text-yellow-400"
+                                className="w-3 h-3 text-yellow-400"
                                 fill="currentColor"
                                 viewBox="0 0 20 20"
                               >
                                 <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
                               </svg>
-                              <span className="ml-0.5 text-[7px] xs:text-[8px] lg:text-xs xl:text-sm text-gray-500 dark:text-gray-400">
+                              <span className="ml-1 text-xs text-gray-500 dark:text-gray-400">
                                 {product.rating || 4.0}
                               </span>
                             </div>
                           </div>
 
-                          <p className="mt-0 text-[9px] xs:text-[10px] sm:text-xs lg:text-sm xl:text-base font-medium text-cinematic-900 dark:text-white line-clamp-2 lg:line-clamp-3 min-h-[1rem] xs:min-h-[1.25rem] lg:min-h-[2.5rem] xl:min-h-[3rem]">{product.name}</p>
+                          <h3 className="text-sm font-medium text-cinematic-900 dark:text-white line-clamp-2 flex-grow">{product.name}</h3>
 
-                          <div className="mt-auto pt-1 lg:pt-2 xl:pt-3 flex items-center justify-between">
-                            <div>
-                              {product.sale_price ? (
-                                <div className="flex flex-col lg:flex-row lg:items-center">
-                                  <span className="text-[9px] xs:text-[10px] sm:text-xs lg:text-sm xl:text-base font-bold text-pink-600 dark:text-pink-400">${product.sale_price}</span>
-                                  <span className="ml-0 lg:ml-1 text-[7px] xs:text-[8px] lg:text-xs xl:text-sm text-cinematic-500 dark:text-cinematic-400 line-through">${product.price}</span>
-                                </div>
-                              ) : (
-                                <span className="text-[9px] xs:text-[10px] sm:text-xs lg:text-sm xl:text-base font-bold text-pink-600 dark:text-pink-400">${product.price}</span>
-                              )}
+                          <div className="mt-auto space-y-2">
+                            <div className="flex items-center justify-between">
+                              <div>
+                                {product.sale_price ? (
+                                  <div className="flex items-center space-x-2">
+                                    <span className="text-base font-bold text-pink-600 dark:text-pink-400">${product.sale_price}</span>
+                                    <span className="text-sm text-gray-500 dark:text-gray-400 line-through">${product.price}</span>
+                                  </div>
+                                ) : (
+                                  <span className="text-base font-bold text-pink-600 dark:text-pink-400">${product.price}</span>
+                                )}
+                              </div>
                             </div>
                             <motion.button
-                              whileHover={{ scale: 1.05 }}
-                              whileTap={{ scale: 0.95 }}
+                              whileHover={{ scale: 1.02 }}
+                              whileTap={{ scale: 0.98 }}
                               onClick={(e) => {
                                 e.preventDefault();
                                 e.stopPropagation();
                                 handleAddToCart(product.id);
                               }}
                               disabled={addingToCart === product.id}
-                              className={`p-1 lg:p-2 xl:p-2.5 rounded-full ${
+                              className={`w-full py-2 px-3 rounded-lg text-sm font-medium transition-all duration-300 min-h-[44px] ${
                                 addingToCart === product.id
-                                  ? 'bg-gradient-to-r from-pink-500 to-purple-600 text-white shadow-lg shadow-pink-500/20 dark:shadow-pink-700/30'
-                                  : 'bg-pink-100 dark:bg-pink-900/30 text-pink-600 dark:text-pink-400 hover:bg-pink-200 dark:hover:bg-pink-800/40'
-                              } transition-all duration-300 relative overflow-hidden focus:outline-none focus:ring-1 focus:ring-pink-500 focus:ring-offset-1 dark:focus:ring-offset-cinematic-800`}
+                                  ? 'bg-gradient-to-r from-pink-500 to-purple-600 text-white shadow-lg'
+                                  : 'bg-pink-600 hover:bg-pink-700 text-white'
+                              } focus:outline-none focus:ring-2 focus:ring-pink-500 focus:ring-offset-2 dark:focus:ring-offset-cinematic-800`}
                               aria-label={t('cart.add_to_cart')}
-                              style={{
-                                minWidth: window.innerWidth >= 1024 ? '32px' : '24px',
-                                minHeight: window.innerWidth >= 1024 ? '32px' : '24px',
-                                width: window.innerWidth >= 1024 ? '32px' : '24px',
-                                height: window.innerWidth >= 1024 ? '32px' : '24px',
-                                touchAction: 'manipulation'
-                              }}
                             >
                               {addingToCart === product.id ? (
-                                <>
-                                  {/* Spinner animation */}
-                                  <svg className="animate-spin h-2.5 w-2.5 xs:h-3 xs:w-3 sm:h-3.5 sm:w-3.5 lg:h-4 lg:w-4 xl:h-5 xl:w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                <span className="flex items-center justify-center">
+                                  <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                                     <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                                     <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                                   </svg>
-
-                                  {/* Success animation overlay that appears after a delay */}
-                                  <motion.div
-                                    className="absolute inset-0 flex items-center justify-center bg-gradient-to-r from-pink-500 to-purple-600"
-                                    initial={{ opacity: 0 }}
-                                    animate={{ opacity: 1 }}
-                                    transition={{ delay: 0.5, duration: 0.3 }}
-                                  >
-                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-2.5 w-2.5 xs:h-3 xs:w-3 sm:h-3.5 sm:w-3.5 lg:h-4 lg:w-4 xl:h-5 xl:w-5" viewBox="0 0 20 20" fill="currentColor">
-                                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                                    </svg>
-                                  </motion.div>
-                                </>
+                                  {t('common.adding')}
+                                </span>
                               ) : (
-                                <>
-                                  <svg xmlns="http://www.w3.org/2000/svg" className="h-2.5 w-2.5 xs:h-3 xs:w-3 sm:h-3.5 sm:w-3.5 lg:h-4 lg:w-4 xl:h-5 xl:w-5" viewBox="0 0 20 20" fill="currentColor">
-                                    <path d="M3 1a1 1 0 000 2h1.22l.305 1.222a.997.997 0 00.01.042l1.358 5.43-.893.892C3.74 11.846 4.632 14 6.414 14H15a1 1 0 000-2H6.414l1-1H14a1 1 0 00.894-.553l3-6A1 1 0 0017 3H6.28l-.31-1.243A1 1 0 005 1H3zM16 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0zM6.5 18a1.5 1.5 0 100-3 1.5 1.5 0 000 3z" />
+                                <span className="flex items-center justify-center">
+                                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
                                   </svg>
-                                  <span className="absolute inset-0 bg-white dark:bg-white opacity-0 active:opacity-20 rounded-full transition-opacity duration-200"></span>
-                                </>
+                                  {t('cart.add_to_cart')}
+                                </span>
                               )}
                             </motion.button>
                           </div>

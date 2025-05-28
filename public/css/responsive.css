@@ -33,8 +33,8 @@ h3 {
   font-size: 1.25rem;
 }
 
-/* Responsive grid improvements */
-.grid {
+/* Responsive grid improvements - Use specific classes to avoid conflicts with Tailwind */
+.custom-grid {
   display: grid;
   grid-template-columns: repeat(1, minmax(0, 1fr));
   gap: 1rem;
@@ -45,12 +45,12 @@ h3 {
   .container {
     max-width: 640px;
   }
-  
+
   h1 {
     font-size: 2rem;
   }
-  
-  .grid {
+
+  .custom-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 1.5rem;
   }
@@ -60,12 +60,12 @@ h3 {
   .container {
     max-width: 768px;
   }
-  
+
   h1 {
     font-size: 2.25rem;
   }
-  
-  .grid {
+
+  .custom-grid {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 }
@@ -74,12 +74,12 @@ h3 {
   .container {
     max-width: 1024px;
   }
-  
+
   h1 {
     font-size: 2.5rem;
   }
-  
-  .grid {
+
+  .custom-grid {
     grid-template-columns: repeat(4, minmax(0, 1fr));
   }
 }
@@ -91,7 +91,7 @@ h3 {
 }
 
 /* Touch-friendly improvements */
-button, 
+button,
 .button,
 a.button,
 input[type="button"],

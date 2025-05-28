@@ -147,6 +147,31 @@ html, body {
     .glass-dark {
         @apply bg-gray-900/10 backdrop-blur-md border border-gray-700/30;
     }
+
+    /* Products grid - ensure proper mobile layout */
+    .products-grid {
+        display: grid !important;
+        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+        gap: 1rem !important;
+    }
+
+    @media (min-width: 640px) {
+        .products-grid {
+            grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+        }
+    }
+
+    @media (min-width: 768px) {
+        .products-grid {
+            grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+        }
+    }
+
+    @media (min-width: 1280px) {
+        .products-grid {
+            grid-template-columns: repeat(5, minmax(0, 1fr)) !important;
+        }
+    }
 }
 
 /* Enhanced animations */

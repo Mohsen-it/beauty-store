@@ -12,10 +12,10 @@ const NavigationMenu = ({ auth, className = '' }) => {
         {t('navigation.products')}
       </NavLink>
       <NavLink href={route('categories.skincare')} current={route().current('categories.skincare')}>
-        Skincare
+        {t('navigation.skincare')}
       </NavLink>
       <NavLink href={route('categories.makeup')} current={route().current('categories.makeup')}>
-        Makeup
+        {t('navigation.makeup')}
       </NavLink>
       {auth.user && (
         <NavLink href={route('orders.index')} current={route().current('orders.index')}>

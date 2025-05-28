@@ -27,6 +27,11 @@ Route::get('/', function () {
     return Inertia::render('HomePage/index', $featuredData);
 })->middleware(["prevent.admin.access"])->name("home");
 
+// Mobile Menu Test Page
+Route::get('/mobile-menu-test', function () {
+    return Inertia::render('MobileMenuTest');
+})->name("mobile.menu.test");
+
 
 
 Route::get('/dashboard', function () {

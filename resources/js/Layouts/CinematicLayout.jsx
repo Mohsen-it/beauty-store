@@ -276,49 +276,7 @@ const CinematicLayout = ({ children }) => {
     };
   }, [currentLanguage, rtl]);
 
-  // Prevent body scroll when mobile menu is open - improved implementation
-  useEffect(() => {
-    // Save the current scroll position and body style
-    const scrollY = window.scrollY;
-    const originalStyle = {
-      overflow: document.body.style.overflow,
-      position: document.body.style.position,
-      top: document.body.style.top,
-      width: document.body.style.width,
-    };
-
-    if (mobileMenuOpen) {
-      // Lock the body at current scroll position
-      document.body.style.overflow = 'hidden';
-      document.body.style.position = 'fixed';
-      document.body.style.top = `-${scrollY}px`;
-      document.body.style.width = '100%';
-    } else {
-      // Restore original styles
-      document.body.style.overflow = originalStyle.overflow;
-      document.body.style.position = originalStyle.position;
-      document.body.style.top = originalStyle.top;
-      document.body.style.width = originalStyle.width;
-
-      // Restore scroll position
-      if (document.body.style.top) {
-        window.scrollTo(0, parseInt(document.body.style.top || '0') * -1);
-      }
-    }
-
-    // Cleanup function to ensure body styles are reset
-    return () => {
-      document.body.style.overflow = originalStyle.overflow;
-      document.body.style.position = originalStyle.position;
-      document.body.style.top = originalStyle.top;
-      document.body.style.width = originalStyle.width;
-
-      // Restore scroll position on unmount if needed
-      if (document.body.style.top) {
-        window.scrollTo(0, parseInt(document.body.style.top || '0') * -1);
-      }
-    };
-  }, [mobileMenuOpen]);
+  // Body scroll lock is now handled in MobileMenu component
 
   // Setup swipe handlers for mobile menu - only for closing
   const menuSwipeHandlers = useSwipeable({
@@ -613,6 +571,8 @@ const CinematicLayout = ({ children }) => {
                   </div>
                 )}
               </div>
+
+
 
               {/* Mobile menu button with improved touch target */}
               <div className="lg:hidden">

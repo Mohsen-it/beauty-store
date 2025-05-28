@@ -454,7 +454,7 @@ const ProductShow = ({ product, relatedProducts }) => {
     <CinematicLayout>
       <Head title={`${product.name} - ${t('app.title')}`} />
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 lg:py-8">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 lg:py-8">
         {/* Breadcrumb navigation - Hidden on mobile, visible on tablet and up */}
         <nav className="hidden sm:flex mb-4 sm:mb-6 lg:mb-8 overflow-x-auto whitespace-nowrap pb-2 scrollbar-hide" aria-label="Breadcrumb">
           <ol className="inline-flex items-center space-x-1 md:space-x-3">
@@ -498,7 +498,7 @@ const ProductShow = ({ product, relatedProducts }) => {
         </div>
 
         {/* Mobile-First Product Layout */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-12">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
           {/* Product Header Section - First on mobile */}
           <motion.div
             initial={{ opacity: 0, y: 10 }}
@@ -580,10 +580,10 @@ const ProductShow = ({ product, relatedProducts }) => {
           >
             {/* Mobile Gallery */}
             <div className="relative mb-4">
-              <div className="mobile-gallery-container">
+              <div className="mobile-gallery-container aspect-[4/3] bg-gray-100 dark:bg-gray-800 rounded-xl overflow-hidden">
                 <div
                   ref={galleryRef}
-                  className="mobile-gallery"
+                  className="mobile-gallery h-full"
                   onScroll={() => {
                     if (!galleryScrolling && galleryRef.current) {
                       const index = Math.round(galleryRef.current.scrollLeft / galleryRef.current.offsetWidth);
@@ -596,11 +596,12 @@ const ProductShow = ({ product, relatedProducts }) => {
                 >
                   {productImages.length > 0 ? (
                     productImages.map((image, index) => (
-                      <div key={index} className="mobile-gallery-slide">
+                      <div key={index} className="mobile-gallery-slide h-full">
                         <img
                           src={image || `/assets/default-product.png`}
                           alt={`${product.name} ${index + 1}`}
                           loading={index === 0 ? "eager" : "lazy"}
+                          className="w-full h-full object-contain"
                           onError={(e) => {
                             e.target.src = `/assets/default-product.png`;
                           }}
@@ -620,11 +621,12 @@ const ProductShow = ({ product, relatedProducts }) => {
                       </div>
                     ))
                   ) : (
-                    <div className="mobile-gallery-slide">
+                    <div className="mobile-gallery-slide h-full">
                       <img
                         src={`/assets/default-product.png`}
                         alt={product.name}
                         loading="eager"
+                        className="w-full h-full object-contain"
                       />
                     </div>
                   )}
@@ -916,20 +918,20 @@ const ProductShow = ({ product, relatedProducts }) => {
 
    {/* Related Products */}
 {relatedProducts.length > 0 && (
-  <section className="mt-16 sm:mt-20">
-    <h2 className="related-products-title">{t('products.related_products')}</h2>
+  <section className="mt-16 sm:mt-20 pb-20 md:pb-8">
+    <h2 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white mb-8 text-center">{t('products.related_products')}</h2>
     <motion.div
       variants={container}
       initial="hidden"
       whileInView="show"
       viewport={{ once: true }}
-      className="related-products-grid"
+      className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4"
     >
       {relatedProducts.map((relatedProduct) => (
         <motion.div key={relatedProduct.id} variants={item} className="h-full">
           <Link href={route('products.show', relatedProduct.slug)} className="h-full">
-            <div className="group bg-white dark:bg-cinematic-800 rounded-lg overflow-hidden shadow-md dark:shadow-soft hover:shadow-xl dark:hover:shadow-xl transition-all duration-300 border border-gray-200 dark:border-cinematic-700 h-full flex flex-col transform hover:-translate-y-1">
-              <div className="relative aspect-square overflow-hidden bg-gray-100 dark:bg-gray-800">
+            <div className="bg-white dark:bg-cinematic-800 rounded-xl shadow-md hover:shadow-lg transition-all duration-300 overflow-hidden h-full flex flex-col min-h-[280px] border border-gray-200 dark:border-cinematic-700">
+              <div className="relative aspect-[4/3] overflow-hidden bg-gray-100 dark:bg-gray-800">
                 <img
                   src={
                     relatedProduct.images && relatedProduct.images.length > 0 ? (
@@ -949,7 +951,7 @@ const ProductShow = ({ product, relatedProducts }) => {
                     )
                   }
                   alt={relatedProduct.name}
-                  className="h-full w-full object-cover object-center transition-transform duration-300 group-hover:scale-105"
+                  className="h-full w-full object-cover object-center transition-transform duration-300 hover:scale-105"
                   onError={(e) => {
                     e.target.src = `/assets/default-product_1.png`;
                   }}
@@ -965,58 +967,58 @@ const ProductShow = ({ product, relatedProducts }) => {
                   </div>
                 )}
               </div>
-              <div className="p-4 flex-grow flex flex-col">
-                <h3 className="product-category text-xs">{relatedProduct.category.name}</h3>
-                <p className="product-title text-sm sm:text-base line-clamp-2 mb-2">{relatedProduct.name}</p>
-                <div className="price-section mt-auto mb-3 justify-between">
-                  {relatedProduct.sale_price ? (
-                    <>
-                      <span className="current-price text-base">${relatedProduct.sale_price}</span>
-                      <span className="original-price text-sm">${relatedProduct.price}</span>
-                    </>
-                  ) : (
-                    <span className="current-price text-base">${relatedProduct.price}</span>
-                  )}
-                </div>
-                <motion.button
-                  whileHover={{ scale: 1.03 }}
-                  whileTap={{ scale: 0.97 }}
-                  onClick={(e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    handleRelatedAddToCart(relatedProduct.id);
-                  }}
-                  disabled={addingRelatedToCart === relatedProduct.id || relatedProduct.stock === 0}
-                  className={`add-to-cart-btn py-2 text-sm w-full ${
-                    addingRelatedToCart === relatedProduct.id
-                      ? 'opacity-90'
-                      : ''
-                  } ${
-                    relatedProduct.stock === 0
-                      ? 'opacity-50 cursor-not-allowed'
-                      : ''
-                  }`}
-                  aria-label={`Add ${relatedProduct.name} to cart`}
+              <div className="p-3 flex-grow flex flex-col space-y-2">
+                <span className="text-xs text-pink-500 dark:text-pink-400 font-medium">{relatedProduct.category.name}</span>
+                <h3 className="text-sm font-medium text-gray-900 dark:text-white line-clamp-2 flex-grow">{relatedProduct.name}</h3>
+                <div className="mt-auto space-y-2">
+                  <div className="flex items-center space-x-2">
+                    {relatedProduct.sale_price ? (
+                      <>
+                        <span className="text-base font-bold text-pink-600 dark:text-pink-400">${relatedProduct.sale_price}</span>
+                        <span className="text-sm text-gray-500 dark:text-gray-400 line-through">${relatedProduct.price}</span>
+                      </>
+                    ) : (
+                      <span className="text-base font-bold text-pink-600 dark:text-pink-400">${relatedProduct.price}</span>
+                    )}
+                  </div>
+                  <motion.button
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      handleRelatedAddToCart(relatedProduct.id);
+                    }}
+                    disabled={addingRelatedToCart === relatedProduct.id || relatedProduct.stock === 0}
+                    className={`w-full py-2 px-3 rounded-lg text-sm font-medium transition-all duration-300 min-h-[44px] ${
+                      relatedProduct.stock === 0
+                        ? 'bg-gray-400 text-white cursor-not-allowed'
+                        : addingRelatedToCart === relatedProduct.id
+                          ? 'bg-gradient-to-r from-pink-500 to-purple-600 text-white'
+                          : 'bg-pink-600 hover:bg-pink-700 text-white'
+                    } focus:outline-none focus:ring-2 focus:ring-pink-500 focus:ring-offset-2`}
+                    aria-label={`Add ${relatedProduct.name} to cart`}
                 >
-                  {addingRelatedToCart === relatedProduct.id ? (
-                    <span className="flex items-center justify-center">
-                      <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" aria-hidden="true">
-                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                      </svg>
-                      {t('common.adding')}
-                    </span>
-                  ) : relatedProduct.stock === 0 ? (
-                    <span>{t('products.out_of_stock')}</span>
-                  ) : (
-                    <span className="flex items-center justify-center">
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
-                      </svg>
-                      {t('cart.add_to_cart')}
-                    </span>
-                  )}
-                </motion.button>
+                    {addingRelatedToCart === relatedProduct.id ? (
+                      <span className="flex items-center justify-center">
+                        <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                        {t('common.adding')}
+                      </span>
+                    ) : relatedProduct.stock === 0 ? (
+                      t('products.out_of_stock')
+                    ) : (
+                      <span className="flex items-center justify-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+                        </svg>
+                        {t('cart.add_to_cart')}
+                      </span>
+                    )}
+                  </motion.button>
+                </div>
               </div>
             </div>
           </Link>
@@ -1026,6 +1028,55 @@ const ProductShow = ({ product, relatedProducts }) => {
   </section>
 )}
 
+        {/* Mobile Sticky CTA */}
+        <div className="fixed bottom-0 left-0 right-0 p-4 bg-white dark:bg-cinematic-800 border-t border-gray-200 dark:border-cinematic-700 shadow-lg md:hidden z-50">
+          <div className="flex items-center justify-between gap-4">
+            <div className="flex flex-col">
+              <div className="flex items-center space-x-2">
+                {product.sale_price ? (
+                  <>
+                    <span className="text-lg font-bold text-pink-600 dark:text-pink-400">${product.sale_price}</span>
+                    <span className="text-sm text-gray-500 dark:text-gray-400 line-through">${product.price}</span>
+                  </>
+                ) : (
+                  <span className="text-lg font-bold text-pink-600 dark:text-pink-400">${product.price}</span>
+                )}
+              </div>
+            </div>
+            <motion.button
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              onClick={handleAddToCart}
+              disabled={addingToCart || product.stock === 0}
+              className={`flex-1 max-w-[200px] py-3 px-6 rounded-xl font-medium transition-all duration-300 min-h-[44px] ${
+                product.stock === 0
+                  ? 'bg-gray-400 text-white cursor-not-allowed'
+                  : addingToCart
+                    ? 'bg-gradient-to-r from-pink-500 to-purple-600 text-white'
+                    : 'bg-pink-600 hover:bg-pink-700 text-white'
+              } focus:outline-none focus:ring-2 focus:ring-pink-500 focus:ring-offset-2`}
+            >
+              {addingToCart ? (
+                <span className="flex items-center justify-center">
+                  <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                  {t('common.adding')}
+                </span>
+              ) : product.stock === 0 ? (
+                t('products.out_of_stock')
+              ) : (
+                <span className="flex items-center justify-center">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+                  </svg>
+                  {t('cart.add_to_cart')}
+                </span>
+              )}
+            </motion.button>
+          </div>
+        </div>
 
       </div>
     </CinematicLayout>
