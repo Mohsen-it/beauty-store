@@ -141,14 +141,20 @@ const HomePage = ({ featuredProducts, categories }) => {
     <CinematicLayout>
       <Head title={`${t('navigation.home')} - ${t('app.title')}`} />
 
-      {/* Hero Section - Mobile Optimized with Reduced Motion Support */}
+      {/* Enhanced Hero Section with Glass Morphism */}
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: prefersReducedMotion ? 0.3 : 0.6 }}
-        className="relative bg-pink-50 dark:bg-cinematic-900 transition-colors duration-300"
+        className="relative bg-gradient-to-br from-pink-50 via-purple-50 to-indigo-50 dark:from-gray-950 dark:via-gray-900 dark:to-gray-800 transition-all duration-500 overflow-hidden"
       >
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-10 md:py-16 lg:py-24">
+        {/* Enhanced background elements */}
+        <div className="absolute inset-0 overflow-hidden">
+          <div className="absolute top-10 left-10 w-72 h-72 bg-gradient-to-br from-pink-400/20 to-purple-600/20 rounded-full blur-3xl animate-float"></div>
+          <div className="absolute bottom-10 right-10 w-96 h-96 bg-gradient-to-br from-purple-400/20 to-indigo-600/20 rounded-full blur-3xl animate-float-delayed"></div>
+        </div>
+
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 md:py-20 lg:py-32 relative z-10">
           {/* Mobile-first layout with reversed order on mobile */}
           <div className="flex flex-col-reverse md:flex-row md:items-center md:justify-between gap-6 md:gap-8">
             {/* Hero image shown first on mobile for immediate visual impact */}
@@ -185,7 +191,7 @@ const HomePage = ({ featuredProducts, categories }) => {
                   duration: prefersReducedMotion ? 0.2 : 0.4,
                   ease: "easeOut"
                 }}
-                className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-extrabold text-gray-900 dark:text-white mb-3 sm:mb-4 leading-tight"
+                className="heading-xl mb-6 sm:mb-8"
               >
                 {t('home.hero_title')}
               </motion.h1>
@@ -197,7 +203,7 @@ const HomePage = ({ featuredProducts, categories }) => {
                   duration: prefersReducedMotion ? 0.2 : 0.4,
                   ease: "easeOut"
                 }}
-                className="text-base sm:text-lg text-gray-600 dark:text-cinematic-300 mb-5 sm:mb-6"
+                className="text-lg sm:text-xl md:text-2xl text-gray-700 dark:text-gray-200 mb-8 sm:mb-10 leading-relaxed font-medium"
               >
                 {t('home.hero_description')}
               </motion.p>
@@ -209,14 +215,27 @@ const HomePage = ({ featuredProducts, categories }) => {
                   duration: prefersReducedMotion ? 0.2 : 0.4,
                   ease: "easeOut"
                 }}
-                className="flex justify-center md:justify-start"
+                className="flex flex-col sm:flex-row gap-4 sm:gap-6 justify-center md:justify-start"
               >
                 <Link
                   href={route("products.index")}
-                  className="inline-flex items-center justify-center w-full sm:w-auto bg-pink-600 hover:bg-pink-700 dark:bg-pink-700 dark:hover:bg-pink-600 text-white font-medium py-3 px-6 rounded-lg shadow-md hover:shadow-lg transition duration-300 text-base"
+                  className="btn btn-primary btn-lg hover-lift"
                   aria-label="Shop now"
                 >
-                  {t('common.shop_now')}
+                  <span className="mr-2">{t('common.shop_now')}</span>
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                  </svg>
+                </Link>
+                <Link
+                  href={route("products.index", { category: "skincare" })}
+                  className="btn btn-secondary btn-lg hover-lift"
+                  aria-label="Browse skincare products"
+                >
+                  <span className="mr-2">{t('navigation.skincare')}</span>
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                  </svg>
                 </Link>
               </motion.div>
             </div>
@@ -587,12 +606,12 @@ const HomePage = ({ featuredProducts, categories }) => {
             {/* Premium Quality */}
             <motion.div
               variants={item}
-              className="bg-gray-50 dark:bg-gray-800/50 rounded-xl p-3 sm:p-5 shadow-sm hover:shadow-md transition-shadow duration-300 flex flex-row sm:flex-col items-center sm:items-center sm:text-center flex-shrink-0 sm:flex-shrink w-72 sm:w-auto snap-center"
+              className="card-feature p-4 sm:p-6 hover-lift flex flex-row sm:flex-col items-center sm:items-center sm:text-center flex-shrink-0 sm:flex-shrink w-72 sm:w-auto snap-center"
             >
-              <div className="flex-shrink-0 flex items-center justify-center w-12 h-12 sm:w-16 sm:h-16 rounded-full bg-pink-100 dark:bg-pink-900/30 text-pink-600 dark:text-pink-400 shadow-sm mb-0 sm:mb-4 mr-3 sm:mr-0">
+              <div className="flex-shrink-0 flex items-center justify-center w-14 h-14 sm:w-20 sm:h-20 rounded-full bg-gradient-to-br from-pink-500 to-purple-600 text-white shadow-xl mb-0 sm:mb-6 mr-4 sm:mr-0 animate-glow">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
-                  className="h-6 w-6 sm:h-8 sm:w-8"
+                  className="h-7 w-7 sm:h-10 sm:w-10"
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor"
@@ -607,10 +626,10 @@ const HomePage = ({ featuredProducts, categories }) => {
                 </svg>
               </div>
               <div className="flex-1">
-                <h3 className="text-sm sm:text-lg font-semibold text-gray-900 dark:text-white mb-1 sm:mb-2">
+                <h3 className="text-base sm:text-xl font-bold text-gray-900 dark:text-white mb-2 sm:mb-3">
                   {t('home.premium_quality')}
                 </h3>
-                <p className="text-xs sm:text-sm text-gray-600 dark:text-cinematic-400 line-clamp-2 sm:line-clamp-none">
+                <p className="text-sm sm:text-base text-gray-600 dark:text-gray-300 line-clamp-2 sm:line-clamp-none leading-relaxed">
                   {t('home.premium_quality_desc')}
                 </p>
               </div>
@@ -619,12 +638,12 @@ const HomePage = ({ featuredProducts, categories }) => {
             {/* Cruelty Free */}
             <motion.div
               variants={item}
-              className="bg-gray-50 dark:bg-gray-800/50 rounded-xl p-3 sm:p-5 shadow-sm hover:shadow-md transition-shadow duration-300 flex flex-row sm:flex-col items-center sm:items-center sm:text-center flex-shrink-0 sm:flex-shrink w-72 sm:w-auto snap-center"
+              className="card-feature p-4 sm:p-6 hover-lift flex flex-row sm:flex-col items-center sm:items-center sm:text-center flex-shrink-0 sm:flex-shrink w-72 sm:w-auto snap-center"
             >
-              <div className="flex-shrink-0 flex items-center justify-center w-12 h-12 sm:w-16 sm:h-16 rounded-full bg-pink-100 dark:bg-pink-900/30 text-pink-600 dark:text-pink-400 shadow-sm mb-0 sm:mb-4 mr-3 sm:mr-0">
+              <div className="flex-shrink-0 flex items-center justify-center w-14 h-14 sm:w-20 sm:h-20 rounded-full bg-gradient-to-br from-green-500 to-emerald-600 text-white shadow-xl mb-0 sm:mb-6 mr-4 sm:mr-0 animate-glow">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
-                  className="h-6 w-6 sm:h-8 sm:w-8"
+                  className="h-7 w-7 sm:h-10 sm:w-10"
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor"
@@ -634,15 +653,15 @@ const HomePage = ({ featuredProducts, categories }) => {
                     strokeLinecap="round"
                     strokeLinejoin="round"
                     strokeWidth={2}
-                    d="M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.001 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9a5.002 5.002 0 006.001 0M18 7l3 9m-3-9l-6-2m0-2v2m0 16V5m0 16H9m3 0h3"
+                    d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
                   />
                 </svg>
               </div>
               <div className="flex-1">
-                <h3 className="text-sm sm:text-lg font-semibold text-gray-900 dark:text-white mb-1 sm:mb-2">
+                <h3 className="text-base sm:text-xl font-bold text-gray-900 dark:text-white mb-2 sm:mb-3">
                   {t('home.cruelty_free')}
                 </h3>
-                <p className="text-xs sm:text-sm text-gray-600 dark:text-cinematic-400 line-clamp-2 sm:line-clamp-none">
+                <p className="text-sm sm:text-base text-gray-600 dark:text-gray-300 line-clamp-2 sm:line-clamp-none leading-relaxed">
                   {t('home.cruelty_free_desc')}
                 </p>
               </div>
@@ -651,12 +670,12 @@ const HomePage = ({ featuredProducts, categories }) => {
             {/* Fast Shipping */}
             <motion.div
               variants={item}
-              className="bg-gray-50 dark:bg-gray-800/50 rounded-xl p-3 sm:p-5 shadow-sm hover:shadow-md transition-shadow duration-300 flex flex-row sm:flex-col items-center sm:items-center sm:text-center sm:col-span-2 md:col-span-1 flex-shrink-0 sm:flex-shrink w-72 sm:w-auto sm:mx-auto sm:max-w-md md:max-w-none snap-center"
+              className="card-feature p-4 sm:p-6 hover-lift flex flex-row sm:flex-col items-center sm:items-center sm:text-center sm:col-span-2 md:col-span-1 flex-shrink-0 sm:flex-shrink w-72 sm:w-auto sm:mx-auto sm:max-w-md md:max-w-none snap-center"
             >
-              <div className="flex-shrink-0 flex items-center justify-center w-12 h-12 sm:w-16 sm:h-16 rounded-full bg-pink-100 dark:bg-pink-900/30 text-pink-600 dark:text-pink-400 shadow-sm mb-0 sm:mb-4 mr-3 sm:mr-0">
+              <div className="flex-shrink-0 flex items-center justify-center w-14 h-14 sm:w-20 sm:h-20 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 text-white shadow-xl mb-0 sm:mb-6 mr-4 sm:mr-0 animate-glow">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
-                  className="h-6 w-6 sm:h-8 sm:w-8"
+                  className="h-7 w-7 sm:h-10 sm:w-10"
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor"
@@ -671,10 +690,10 @@ const HomePage = ({ featuredProducts, categories }) => {
                 </svg>
               </div>
               <div className="flex-1">
-                <h3 className="text-sm sm:text-lg font-semibold text-gray-900 dark:text-white mb-1 sm:mb-2">
+                <h3 className="text-base sm:text-xl font-bold text-gray-900 dark:text-white mb-2 sm:mb-3">
                   {t('home.fast_shipping')}
                 </h3>
-                <p className="text-xs sm:text-sm text-gray-600 dark:text-cinematic-400 line-clamp-2 sm:line-clamp-none">
+                <p className="text-sm sm:text-base text-gray-600 dark:text-gray-300 line-clamp-2 sm:line-clamp-none leading-relaxed">
                   {t('home.fast_shipping_desc')}
                 </p>
               </div>

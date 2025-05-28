@@ -146,6 +146,12 @@ module.exports = {
         'glow-lg': '0 0 40px rgba(236, 72, 153, 0.4)',
         'inner-soft': 'inset 0 2px 4px 0 rgba(0, 0, 0, 0.06)',
         'glass': '0 8px 32px 0 rgba(31, 38, 135, 0.37)',
+        '3xl': '0 35px 60px -12px rgba(0, 0, 0, 0.25)',
+        '4xl': '0 45px 80px -15px rgba(0, 0, 0, 0.3)',
+        'glow-pink': '0 0 30px rgba(236, 72, 153, 0.5)',
+        'glow-purple': '0 0 30px rgba(168, 85, 247, 0.5)',
+        'glow-blue': '0 0 30px rgba(59, 130, 246, 0.5)',
+        'glow-green': '0 0 30px rgba(34, 197, 94, 0.5)',
       },
       animation: {
         'fade-in': 'fadeIn 0.5s ease-in-out',

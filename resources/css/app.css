@@ -35,61 +35,98 @@ html, body {
 
 /* Enhanced utility classes */
 @layer components {
-    /* Modern button system */
+    /* Advanced button system with enhanced visual appeal */
     .btn {
-        @apply inline-flex items-center justify-center px-6 py-3 rounded-xl font-semibold text-sm tracking-wide transition-all duration-300 shadow-lg hover:shadow-xl focus:outline-none focus:ring-4 focus:ring-offset-2 transform hover:-translate-y-0.5 active:translate-y-0;
+        @apply relative inline-flex items-center justify-center px-6 py-3.5 rounded-2xl font-semibold text-sm tracking-wide transition-all duration-500 shadow-xl hover:shadow-2xl focus:outline-none focus:ring-4 focus:ring-offset-2 transform hover:-translate-y-1 active:translate-y-0 overflow-hidden backdrop-blur-sm;
+    }
+
+    .btn::before {
+        content: '';
+        @apply absolute inset-0 bg-gradient-to-r from-white/20 to-transparent opacity-0 transition-opacity duration-300;
+    }
+
+    .btn:hover::before {
+        @apply opacity-100;
     }
 
     .btn-primary {
-        @apply bg-gradient-to-r from-pink-500 to-rose-500 text-white hover:from-pink-600 hover:to-rose-600 focus:from-pink-600 focus:to-rose-600 focus:ring-pink-500/50 shadow-pink-500/25
-        dark:from-pink-600 dark:to-rose-600 dark:hover:from-pink-500 dark:hover:to-rose-500 dark:focus:ring-pink-400/50 dark:shadow-pink-600/25;
+        @apply bg-gradient-to-br from-pink-500 via-rose-500 to-purple-600 text-white hover:from-pink-600 hover:via-rose-600 hover:to-purple-700 focus:from-pink-600 focus:via-rose-600 focus:to-purple-700 focus:ring-pink-500/50 shadow-pink-500/30 border border-pink-400/20
+        dark:from-pink-600 dark:via-rose-600 dark:to-purple-700 dark:hover:from-pink-500 dark:hover:via-rose-500 dark:hover:to-purple-600 dark:focus:ring-pink-400/50 dark:shadow-pink-600/30 dark:border-pink-500/20;
     }
 
     .btn-secondary {
-        @apply bg-white/90 backdrop-blur-sm border-2 border-pink-200 text-pink-700 hover:bg-pink-50 hover:border-pink-300 focus:ring-pink-500/30 shadow-pink-100/50
-        dark:bg-gray-800/90 dark:text-pink-300 dark:border-pink-700/50 dark:hover:bg-gray-700/90 dark:hover:border-pink-600/50 dark:focus:ring-pink-400/30 dark:shadow-gray-900/50;
+        @apply bg-white/80 backdrop-blur-md border-2 border-pink-200/60 text-pink-700 hover:bg-pink-50/80 hover:border-pink-300/80 hover:text-pink-800 focus:ring-pink-500/50 shadow-pink-100/60
+        dark:bg-gray-800/80 dark:text-pink-300 dark:border-pink-700/60 dark:hover:bg-gray-700/80 dark:hover:border-pink-600/60 dark:hover:text-pink-200 dark:focus:ring-pink-400/50 dark:shadow-pink-900/30;
     }
 
     .btn-accent {
-        @apply bg-gradient-to-r from-purple-500 to-indigo-500 text-white hover:from-purple-600 hover:to-indigo-600 focus:ring-purple-500/50 shadow-purple-500/25
-        dark:from-purple-600 dark:to-indigo-600 dark:hover:from-purple-500 dark:hover:to-indigo-500 dark:focus:ring-purple-400/50;
+        @apply bg-gradient-to-br from-purple-500 via-indigo-500 to-blue-600 text-white hover:from-purple-600 hover:via-indigo-600 hover:to-blue-700 focus:ring-purple-500/50 shadow-purple-500/30 border border-purple-400/20
+        dark:from-purple-600 dark:via-indigo-600 dark:to-blue-700 dark:hover:from-purple-500 dark:hover:via-indigo-500 dark:hover:to-blue-600 dark:focus:ring-purple-400/50;
     }
 
     .btn-danger {
-        @apply bg-gradient-to-r from-red-500 to-pink-500 text-white hover:from-red-600 hover:to-pink-600 focus:ring-red-500/50 shadow-red-500/25
-        dark:from-red-600 dark:to-pink-600 dark:hover:from-red-500 dark:hover:to-pink-500 dark:focus:ring-red-400/50;
+        @apply bg-gradient-to-br from-red-500 via-pink-500 to-rose-600 text-white hover:from-red-600 hover:via-pink-600 hover:to-rose-700 focus:ring-red-500/50 shadow-red-500/30 border border-red-400/20
+        dark:from-red-600 dark:via-pink-600 dark:to-rose-700 dark:hover:from-red-500 dark:hover:via-pink-500 dark:hover:to-rose-600 dark:focus:ring-red-400/50;
+    }
+
+    .btn-ghost {
+        @apply bg-transparent border-2 border-gray-200/60 text-gray-700 hover:bg-gray-50/80 hover:border-gray-300/80 focus:ring-gray-500/50
+        dark:border-gray-700/60 dark:text-gray-300 dark:hover:bg-gray-800/50 dark:hover:border-gray-600/60 dark:focus:ring-gray-400/50;
     }
 
     .btn-sm {
-        @apply px-4 py-2 text-xs rounded-lg;
+        @apply px-4 py-2.5 text-xs rounded-xl;
     }
 
     .btn-lg {
-        @apply px-8 py-4 text-base rounded-2xl;
+        @apply px-8 py-4 text-base rounded-3xl;
     }
 
     .btn-icon {
-        @apply p-3 rounded-xl;
+        @apply p-3.5 rounded-2xl;
     }
 
-    /* Enhanced card system */
+    /* Advanced card system with glass morphism and enhanced interactions */
     .card {
-        @apply bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-white/20 overflow-hidden transition-all duration-300 hover:shadow-2xl hover:-translate-y-1
-        dark:bg-gray-800/80 dark:border-gray-700/30 dark:shadow-gray-900/50;
+        @apply relative bg-white/85 backdrop-blur-md rounded-3xl shadow-2xl border border-white/30 overflow-hidden transition-all duration-500 hover:shadow-3xl hover:-translate-y-2 hover:scale-[1.01]
+        dark:bg-gray-800/85 dark:border-gray-700/40 dark:shadow-gray-900/60;
+    }
+
+    .card::before {
+        content: '';
+        @apply absolute inset-0 bg-gradient-to-br from-white/10 via-transparent to-transparent opacity-0 transition-opacity duration-300;
+    }
+
+    .card:hover::before {
+        @apply opacity-100;
     }
 
     .card-glass {
-        @apply bg-white/10 backdrop-blur-md rounded-2xl border border-white/20 shadow-2xl
-        dark:bg-gray-900/10 dark:border-gray-700/30;
+        @apply bg-white/15 backdrop-blur-xl rounded-3xl border border-white/25 shadow-3xl
+        dark:bg-gray-900/15 dark:border-gray-700/35;
     }
 
     .card-product {
-        @apply bg-white/95 backdrop-blur-sm rounded-2xl shadow-lg border border-gray-100/50 overflow-hidden transition-all duration-500 hover:shadow-2xl hover:-translate-y-2 hover:scale-[1.02]
-        dark:bg-gray-800/95 dark:border-gray-700/30 dark:shadow-gray-900/50;
+        @apply relative bg-white/90 backdrop-blur-sm rounded-3xl shadow-xl border border-gray-100/60 overflow-hidden transition-all duration-700 hover:shadow-3xl hover:-translate-y-3 hover:scale-[1.03]
+        dark:bg-gray-800/90 dark:border-gray-700/40 dark:shadow-gray-900/60;
+    }
+
+    .card-product::after {
+        content: '';
+        @apply absolute inset-0 bg-gradient-to-br from-pink-500/5 via-purple-500/5 to-transparent opacity-0 transition-opacity duration-500;
+    }
+
+    .card-product:hover::after {
+        @apply opacity-100;
     }
 
     .card-spotlight {
-        @apply card hover:shadow-pink-500/20 hover:border-pink-200/50 dark:hover:shadow-pink-600/20 dark:hover:border-pink-700/50;
+        @apply card hover:shadow-pink-500/25 hover:border-pink-200/60 hover:bg-pink-50/20 dark:hover:shadow-pink-600/25 dark:hover:border-pink-700/60 dark:hover:bg-pink-900/10;
+    }
+
+    .card-feature {
+        @apply bg-gradient-to-br from-white/80 via-white/60 to-white/40 backdrop-blur-lg rounded-2xl border border-white/40 shadow-xl hover:shadow-2xl transition-all duration-500
+        dark:from-gray-800/80 dark:via-gray-800/60 dark:to-gray-800/40 dark:border-gray-700/40;
     }
 
     /* Layout containers */
@@ -101,51 +138,99 @@ html, body {
         @apply py-20 md:py-32;
     }
 
-    /* Enhanced typography */
+    /* Advanced typography with enhanced visual appeal */
     .heading-xl {
-        @apply text-4xl md:text-5xl lg:text-6xl font-bold bg-gradient-to-r from-pink-600 via-purple-600 to-indigo-600 bg-clip-text text-transparent leading-tight;
+        @apply text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold bg-gradient-to-br from-pink-600 via-purple-600 to-indigo-700 bg-clip-text text-transparent leading-tight tracking-tight;
+        text-shadow: 0 0 40px rgba(236, 72, 153, 0.3);
     }
 
     .heading-lg {
-        @apply text-3xl md:text-4xl font-bold text-gray-900 dark:text-white leading-tight;
+        @apply text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 dark:text-white leading-tight tracking-tight;
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     }
 
     .heading-md {
-        @apply text-2xl md:text-3xl font-semibold text-gray-900 dark:text-white;
+        @apply text-2xl md:text-3xl lg:text-4xl font-semibold text-gray-900 dark:text-white leading-tight;
     }
 
     .heading-sm {
-        @apply text-xl md:text-2xl font-semibold text-gray-800 dark:text-gray-200;
+        @apply text-xl md:text-2xl lg:text-3xl font-semibold text-gray-800 dark:text-gray-200 leading-tight;
     }
 
     .text-gradient {
-        @apply bg-gradient-to-r from-pink-500 to-purple-600 bg-clip-text text-transparent;
+        @apply bg-gradient-to-br from-pink-500 via-purple-600 to-indigo-700 bg-clip-text text-transparent;
     }
 
-    /* Animation utilities */
+    .text-gradient-secondary {
+        @apply bg-gradient-to-br from-rose-500 via-pink-600 to-purple-700 bg-clip-text text-transparent;
+    }
+
+    .text-shimmer {
+        @apply bg-gradient-to-r from-pink-400 via-purple-500 to-indigo-600 bg-clip-text text-transparent;
+        background-size: 200% 100%;
+        animation: shimmer-text 3s ease-in-out infinite;
+    }
+
+    /* Enhanced animation utilities */
     .animate-float {
         animation: float 6s ease-in-out infinite;
+    }
+
+    .animate-float-delayed {
+        animation: float 6s ease-in-out infinite 2s;
     }
 
     .animate-glow {
         animation: glow 2s ease-in-out infinite alternate;
     }
 
+    .animate-pulse-slow {
+        animation: pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+    }
+
     .hover-lift {
-        @apply transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl;
+        @apply transition-all duration-500 hover:-translate-y-3 hover:shadow-3xl hover:scale-[1.02];
     }
 
     .hover-scale {
-        @apply transition-transform duration-300 hover:scale-105;
+        @apply transition-transform duration-500 hover:scale-110;
     }
 
-    /* Glass morphism utilities */
+    .hover-rotate {
+        @apply transition-transform duration-500 hover:rotate-3;
+    }
+
+    .hover-tilt {
+        @apply transition-transform duration-500 hover:rotate-1 hover:scale-105;
+    }
+
+    /* Advanced glass morphism utilities */
     .glass {
-        @apply bg-white/10 backdrop-blur-md border border-white/20;
+        @apply bg-white/15 backdrop-blur-xl border border-white/25 shadow-2xl;
     }
 
     .glass-dark {
-        @apply bg-gray-900/10 backdrop-blur-md border border-gray-700/30;
+        @apply bg-gray-900/15 backdrop-blur-xl border border-gray-700/35 shadow-2xl;
+    }
+
+    .glass-strong {
+        @apply bg-white/25 backdrop-blur-2xl border border-white/40 shadow-3xl;
+    }
+
+    /* Enhanced form styling */
+    .form-input {
+        @apply w-full px-4 py-3 rounded-2xl border-2 border-gray-200/60 bg-white/80 backdrop-blur-sm text-gray-900 placeholder-gray-500 transition-all duration-300 focus:border-pink-500 focus:ring-4 focus:ring-pink-500/20 focus:bg-white
+        dark:border-gray-700/60 dark:bg-gray-800/80 dark:text-white dark:placeholder-gray-400 dark:focus:border-pink-400 dark:focus:ring-pink-400/20 dark:focus:bg-gray-800;
+    }
+
+    .form-select {
+        @apply w-full px-4 py-3 rounded-2xl border-2 border-gray-200/60 bg-white/80 backdrop-blur-sm text-gray-900 transition-all duration-300 focus:border-pink-500 focus:ring-4 focus:ring-pink-500/20 focus:bg-white
+        dark:border-gray-700/60 dark:bg-gray-800/80 dark:text-white dark:focus:border-pink-400 dark:focus:ring-pink-400/20 dark:focus:bg-gray-800;
+    }
+
+    .form-textarea {
+        @apply w-full px-4 py-3 rounded-2xl border-2 border-gray-200/60 bg-white/80 backdrop-blur-sm text-gray-900 placeholder-gray-500 transition-all duration-300 focus:border-pink-500 focus:ring-4 focus:ring-pink-500/20 focus:bg-white resize-none
+        dark:border-gray-700/60 dark:bg-gray-800/80 dark:text-white dark:placeholder-gray-400 dark:focus:border-pink-400 dark:focus:ring-pink-400/20 dark:focus:bg-gray-800;
     }
 
     /* Products grid - ensure proper mobile layout */
@@ -174,20 +259,53 @@ html, body {
     }
 }
 
-/* Enhanced animations */
+/* Enhanced animations with sophisticated effects */
 @keyframes float {
-    0%, 100% { transform: translateY(0px); }
-    50% { transform: translateY(-10px); }
+    0%, 100% {
+        transform: translateY(0px) rotate(0deg);
+    }
+    33% {
+        transform: translateY(-8px) rotate(1deg);
+    }
+    66% {
+        transform: translateY(-12px) rotate(-1deg);
+    }
 }
 
 @keyframes glow {
-    0% { box-shadow: 0 0 20px rgba(236, 72, 153, 0.3); }
-    100% { box-shadow: 0 0 30px rgba(236, 72, 153, 0.6); }
+    0% {
+        box-shadow: 0 0 20px rgba(236, 72, 153, 0.3), 0 0 40px rgba(168, 85, 247, 0.2);
+    }
+    100% {
+        box-shadow: 0 0 30px rgba(236, 72, 153, 0.6), 0 0 60px rgba(168, 85, 247, 0.4);
+    }
 }
 
 @keyframes shimmer {
     0% { transform: translateX(-100%); }
     100% { transform: translateX(100%); }
+}
+
+@keyframes shimmer-text {
+    0% { background-position: -200% 0; }
+    100% { background-position: 200% 0; }
+}
+
+@keyframes pulse-glow {
+    0%, 100% {
+        box-shadow: 0 0 20px rgba(236, 72, 153, 0.4);
+        transform: scale(1);
+    }
+    50% {
+        box-shadow: 0 0 40px rgba(236, 72, 153, 0.8);
+        transform: scale(1.05);
+    }
+}
+
+@keyframes gradient-shift {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
 }
 
 /* Loading shimmer effect */
