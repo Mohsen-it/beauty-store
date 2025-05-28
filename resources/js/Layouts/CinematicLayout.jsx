@@ -10,30 +10,40 @@ import { useSwipeable } from 'react-swipeable';
 import debounce from 'lodash/debounce';
 import { t, getCurrentLanguage, isRtl } from '@/utils/translate';
 
-// Memoized Navigation Link component for better performance
+// Enhanced Navigation Link component with modern design
 const NavLink = memo(({ href, current, children, className }) => (
   <Link
     href={href}
-    className={`px-3 sm:px-4 md:px-5 py-2 sm:py-2.5 rounded-lg text-sm sm:text-base font-medium transition-all duration-300 backdrop-blur-sm relative overflow-hidden group ${
+    className={`relative px-4 sm:px-5 md:px-6 py-2.5 sm:py-3 rounded-xl text-sm sm:text-base font-semibold transition-all duration-500 backdrop-blur-md overflow-hidden group ${
       current
-        ? 'text-white dark:text-white bg-gradient-to-r from-pink-500 to-purple-600 shadow-lg shadow-pink-500/20 dark:shadow-pink-700/30'
-        : 'text-gray-700 hover:text-pink-600 dark:text-gray-300 dark:hover:text-pink-400 border border-transparent hover:border-pink-300/30 dark:hover:border-pink-700/30'
+        ? 'text-white bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500 shadow-xl shadow-pink-500/30 dark:shadow-pink-600/40 border border-white/20'
+        : 'text-gray-700 hover:text-white dark:text-gray-300 dark:hover:text-white bg-white/10 hover:bg-gradient-to-r hover:from-pink-500/90 hover:to-purple-600/90 border border-gray-200/30 hover:border-pink-300/50 dark:border-gray-700/30 dark:hover:border-pink-600/50 shadow-lg hover:shadow-xl hover:shadow-pink-500/20'
     } ${className || ''}`}
     aria-current={current ? 'page' : undefined}
   >
-    <span className="relative z-10">{children}</span>
-    <span className="absolute inset-0 w-full h-full bg-white/10 dark:bg-white/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></span>
+    <span className="relative z-20 flex items-center gap-2">{children}</span>
+
+    {/* Animated background gradient */}
+    <span className="absolute inset-0 bg-gradient-to-r from-pink-500/0 via-purple-500/0 to-indigo-500/0 group-hover:from-pink-500/20 group-hover:via-purple-500/20 group-hover:to-indigo-500/20 transition-all duration-500 z-10"></span>
+
+    {/* Glass morphism overlay */}
+    <span className="absolute inset-0 bg-white/5 dark:bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10"></span>
+
+    {/* Active indicator */}
     {current ? (
       <motion.span
-        className="absolute bottom-0 left-0 h-0.5 bg-white"
+        className="absolute bottom-0 left-0 h-1 bg-gradient-to-r from-white via-pink-200 to-white rounded-full"
         layoutId="navIndicator"
         initial={{ width: 0 }}
         animate={{ width: '100%' }}
-        transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+        transition={{ type: 'spring', stiffness: 400, damping: 30 }}
       />
     ) : (
-      <span className="absolute bottom-0 right-0 w-0 h-0.5 bg-gradient-to-r from-pink-500 to-purple-600 group-hover:w-full transition-all duration-300 origin-right group-hover:origin-left"></span>
+      <span className="absolute bottom-0 right-0 w-0 h-1 bg-gradient-to-r from-pink-400 to-purple-500 group-hover:w-full transition-all duration-500 origin-right group-hover:origin-left rounded-full"></span>
     )}
+
+    {/* Shimmer effect on hover */}
+    <span className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-1000 bg-gradient-to-r from-transparent via-white/20 to-transparent skew-x-12"></span>
   </Link>
 ));
 
@@ -328,46 +338,75 @@ const CinematicLayout = ({ children }) => {
   });
 
   return (
-    <div className={`flex flex-col min-h-screen bg-gradient-to-b from-gray-50 to-white dark:from-gray-950 dark:to-gray-900 transition-colors duration-300 ${rtl ? 'rtl' : 'ltr'}`}>
-      {/* Animated background elements */}
+    <div className={`flex flex-col min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 dark:from-gray-950 dark:via-gray-900 dark:to-gray-800 transition-all duration-500 ${rtl ? 'rtl' : 'ltr'}`}>
+      {/* Enhanced animated background elements */}
       <div className="fixed inset-0 z-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-0 left-0 w-full h-full opacity-30 dark:opacity-20">
-          <div className="absolute top-[10%] right-[5%] w-[25rem] h-[25rem] rounded-full bg-gradient-to-r from-pink-300/20 to-purple-400/20 dark:from-pink-700/20 dark:to-purple-800/20 blur-3xl"></div>
-          <div className="absolute top-[40%] left-[10%] w-[30rem] h-[30rem] rounded-full bg-gradient-to-r from-blue-300/20 to-cyan-400/20 dark:from-blue-700/20 dark:to-cyan-800/20 blur-3xl"></div>
-          <div className="absolute bottom-[15%] right-[15%] w-[20rem] h-[20rem] rounded-full bg-gradient-to-r from-purple-300/20 to-indigo-400/20 dark:from-purple-700/20 dark:to-indigo-800/20 blur-3xl"></div>
+        <div className="absolute top-0 left-0 w-full h-full opacity-40 dark:opacity-25">
+          {/* Primary gradient orbs */}
+          <div className="absolute top-[8%] right-[3%] w-[35rem] h-[35rem] rounded-full bg-gradient-to-br from-pink-400/30 via-purple-500/20 to-indigo-400/30 dark:from-pink-600/25 dark:via-purple-700/15 dark:to-indigo-600/25 blur-3xl animate-float"></div>
+          <div className="absolute top-[35%] left-[5%] w-[40rem] h-[40rem] rounded-full bg-gradient-to-br from-blue-400/25 via-cyan-500/20 to-teal-400/25 dark:from-blue-600/20 dark:via-cyan-700/15 dark:to-teal-600/20 blur-3xl animate-float" style={{ animationDelay: '2s' }}></div>
+          <div className="absolute bottom-[10%] right-[10%] w-[28rem] h-[28rem] rounded-full bg-gradient-to-br from-purple-400/30 via-pink-500/20 to-rose-400/30 dark:from-purple-600/25 dark:via-pink-700/15 dark:to-rose-600/25 blur-3xl animate-float" style={{ animationDelay: '4s' }}></div>
+
+          {/* Secondary accent orbs */}
+          <div className="absolute top-[60%] right-[40%] w-[20rem] h-[20rem] rounded-full bg-gradient-to-br from-amber-300/20 to-orange-400/20 dark:from-amber-600/15 dark:to-orange-600/15 blur-2xl animate-float" style={{ animationDelay: '1s' }}></div>
+          <div className="absolute top-[20%] left-[60%] w-[25rem] h-[25rem] rounded-full bg-gradient-to-br from-emerald-300/20 to-green-400/20 dark:from-emerald-600/15 dark:to-green-600/15 blur-2xl animate-float" style={{ animationDelay: '3s' }}></div>
         </div>
+
+        {/* Subtle grid pattern overlay */}
+        <div className="absolute inset-0 opacity-[0.02] dark:opacity-[0.05]" style={{
+          backgroundImage: `radial-gradient(circle at 1px 1px, rgba(0,0,0,0.15) 1px, transparent 0)`,
+          backgroundSize: '20px 20px'
+        }}></div>
       </div>
 
-      {/* Header */}
+      {/* Enhanced Header */}
       <motion.header
         style={{
           opacity: headerOpacity,
           y: headerY,
           backdropFilter: `blur(${headerBlur}px)`
         }}
-        className="fixed w-full z-50 transition-all duration-300 bg-white/70 dark:bg-gray-900/70 shadow-lg"
+        className="fixed w-full z-50 transition-all duration-500 bg-white/80 dark:bg-gray-900/80 shadow-xl shadow-black/5 dark:shadow-black/20 border-b border-white/20 dark:border-gray-700/30"
       >
         <div className="container max-w-screen-xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8">
           <div className="flex justify-between h-14 sm:h-16 md:h-20">
             <div className="flex items-center">
-              <Link href="/" className="flex-shrink-0 flex items-center">
+              <Link href="/" className="flex-shrink-0 flex items-center group">
                 <motion.div
                   style={{ scale: logoScale }}
-                  whileHover={{ scale: 1.05 }}
+                  whileHover={{ scale: 1.08 }}
                   whileTap={{ scale: 0.95 }}
                   transition={{
                     type: "spring",
-                    stiffness: 400,
-                    damping: 17,
+                    stiffness: 500,
+                    damping: 20,
                     duration: prefersReducedMotion ? 0 : undefined
                   }}
-                  className="relative"
+                  className="relative flex items-center gap-3"
                 >
-                  <span className="text-transparent bg-clip-text bg-gradient-to-r from-pink-500 to-purple-600 font-bold text-lg sm:text-xl md:text-2xl tracking-tight">
-                    <span className="hidden sm:inline">{t('app.name')}</span>
-                    <span className="sm:hidden">CS</span>
-                  </span>
-                  <span className="absolute -inset-1 rounded-lg bg-gradient-to-r from-pink-500/20 to-purple-600/20 blur-lg opacity-50 group-hover:opacity-100 transition-opacity"></span>
+                  {/* Logo Icon */}
+                  <div className="relative">
+                    <div className="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 rounded-xl bg-gradient-to-br from-pink-500 via-purple-500 to-indigo-500 flex items-center justify-center shadow-lg shadow-pink-500/30 group-hover:shadow-pink-500/50 transition-all duration-300">
+                      <svg className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 text-white" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                      </svg>
+                    </div>
+                    <div className="absolute -inset-1 rounded-xl bg-gradient-to-br from-pink-500/30 to-purple-600/30 blur-md opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                  </div>
+
+                  {/* Brand Text */}
+                  <div className="flex flex-col">
+                    <span className="text-transparent bg-clip-text bg-gradient-to-r from-pink-600 via-purple-600 to-indigo-600 font-bold text-lg sm:text-xl md:text-2xl tracking-tight leading-none">
+                      <span className="hidden sm:inline">{t('app.name')}</span>
+                      <span className="sm:hidden">CS</span>
+                    </span>
+                    <span className="hidden md:block text-xs text-gray-500 dark:text-gray-400 font-medium tracking-wider uppercase">
+                      Beauty & Cosmetics
+                    </span>
+                  </div>
+
+                  {/* Animated glow effect */}
+                  <span className="absolute -inset-2 rounded-2xl bg-gradient-to-r from-pink-500/0 via-purple-500/0 to-indigo-500/0 group-hover:from-pink-500/10 group-hover:via-purple-500/10 group-hover:to-indigo-500/10 blur-xl transition-all duration-500"></span>
                 </motion.div>
               </Link>
 

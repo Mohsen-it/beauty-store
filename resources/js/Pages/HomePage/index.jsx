@@ -335,18 +335,29 @@ const HomePage = ({ featuredProducts, categories }) => {
         </div>
       </section>
 
-      {/* Featured Products Section - Mobile Optimized */}
-      <section className="py-6 sm:py-8 md:py-12 bg-gray-50 dark:bg-cinematic-900 transition-colors duration-300">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <motion.h2
-            initial={{ opacity: 0, y: 10 }}
+      {/* Enhanced Featured Products Section */}
+      <section className="py-12 sm:py-16 md:py-24 bg-gradient-to-br from-gray-50 via-white to-gray-100 dark:from-gray-950 dark:via-gray-900 dark:to-gray-800 transition-all duration-500 relative overflow-hidden">
+        {/* Background decoration */}
+        <div className="absolute inset-0 opacity-30 dark:opacity-20">
+          <div className="absolute top-10 left-10 w-32 h-32 bg-gradient-to-br from-pink-400/20 to-purple-500/20 rounded-full blur-2xl"></div>
+          <div className="absolute bottom-10 right-10 w-40 h-40 bg-gradient-to-br from-blue-400/20 to-cyan-500/20 rounded-full blur-2xl"></div>
+        </div>
+
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            transition={{ duration: 0.4 }}
-            className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-900 dark:text-white text-center mb-5 sm:mb-6 md:mb-8"
+            transition={{ duration: 0.6 }}
+            className="text-center mb-8 sm:mb-12 md:mb-16"
           >
-            {t('product.featured_products')}
-          </motion.h2>
+            <h2 className="heading-lg mb-4">
+              {t('product.featured_products')}
+            </h2>
+            <p className="text-lg text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
+              Discover our handpicked selection of premium beauty products
+            </p>
+          </motion.div>
 
           {/* Horizontal scrolling carousel for products on mobile */}
           <div className="relative">
@@ -401,16 +412,16 @@ const HomePage = ({ featuredProducts, categories }) => {
               <motion.div
                 key={product.id}
                 variants={item}
-                className="touch-manipulation carousel-item snap-center flex-shrink-0 w-40 sm:w-auto" // Improves touch behavior
+                className="touch-manipulation carousel-item snap-center flex-shrink-0 w-48 sm:w-auto group"
               >
-                <div className="group bg-white dark:bg-cinematic-800 rounded-lg overflow-hidden shadow-sm dark:shadow-soft hover:shadow-md transition-shadow duration-300 border border-transparent dark:border-cinematic-700 h-full flex flex-col">
-                  {/* Product image with link */}
+                <div className="card-product h-full flex flex-col">
+                  {/* Enhanced product image with overlay effects */}
                   <Link
                     href={route("products.show", product.slug)}
-                    className="block relative"
-                    aria-label={`عرض تفاصيل ${product.name}`}
+                    className="block relative overflow-hidden"
+                    aria-label={`View ${product.name} details`}
                   >
-                    <div className="aspect-square w-full overflow-hidden bg-gray-100 dark:bg-gray-800">
+                    <div className="aspect-square w-full overflow-hidden bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-700 relative">
                       <img
                         src={
                           product.image_url
@@ -422,97 +433,104 @@ const HomePage = ({ featuredProducts, categories }) => {
                                 : `/assets/default-product_1.png`
                         }
                         alt={product.name}
-                        className="h-full w-full object-cover object-center group-hover:scale-105 transition-transform duration-300"
+                        className="h-full w-full object-cover object-center group-hover:scale-110 transition-transform duration-700"
                         loading="lazy"
                       />
+
+                      {/* Gradient overlay on hover */}
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+
+                      {/* Quick view button on hover */}
+                      <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300">
+                        <div className="bg-white/90 dark:bg-gray-900/90 backdrop-blur-sm rounded-full p-3 shadow-xl transform scale-75 group-hover:scale-100 transition-transform duration-300">
+                          <svg className="w-5 h-5 text-gray-800 dark:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                          </svg>
+                        </div>
+                      </div>
                     </div>
 
-                    {/* Smaller sale badge if on sale */}
+                    {/* Enhanced sale badge */}
                     {product.sale_price && (
-                      <div className="absolute top-1 left-1 bg-pink-600 text-white text-[10px] font-bold px-1.5 py-0.5 rounded shadow-sm">
-                        خصم
+                      <div className="absolute top-3 left-3 bg-gradient-to-r from-red-500 to-pink-500 text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-lg animate-pulse">
+                        {Math.round((1 - product.sale_price / product.price) * 100)}% OFF
                       </div>
                     )}
                   </Link>
 
-                  {/* Ultra compact product info for mobile */}
-                  <div className="p-1.5 flex-grow flex flex-col">
+                  {/* Enhanced product info */}
+                  <div className="p-4 sm:p-5 flex-grow flex flex-col">
                     <Link
                       href={route("products.show", product.slug)}
                       className="flex-grow"
                     >
-                      <h3 className="text-[9px] text-gray-500 dark:text-cinematic-400 line-clamp-1">
+                      <p className="text-xs text-gray-500 dark:text-gray-400 font-medium uppercase tracking-wider mb-2">
                         {product.category.name}
-                      </h3>
-                      <p className="mt-0.5 text-[11px] font-medium text-gray-900 dark:text-white line-clamp-1">
-                        {product.name}
                       </p>
+                      <h3 className="text-sm sm:text-base font-semibold text-gray-900 dark:text-white line-clamp-2 mb-3 group-hover:text-pink-600 dark:group-hover:text-pink-400 transition-colors duration-300">
+                        {product.name}
+                      </h3>
                     </Link>
 
-                    {/* Price and add to cart - ultra compact layout */}
-                    <div className="mt-1 flex items-center justify-between">
-                      <div>
-                        {product.sale_price ? (
-                          <div className="flex items-center space-x-1 rtl:space-x-reverse">
-                            <span className="text-[11px] font-bold text-primary-600 dark:text-primary-400">
-                              ${product.sale_price}
-                            </span>
-                            <span className="text-[9px] text-cinematic-500 dark:text-cinematic-400 line-through">
+                    {/* Enhanced price and CTA section */}
+                    <div className="mt-auto">
+                      <div className="flex items-center justify-between mb-3">
+                        <div className="flex flex-col">
+                          {product.sale_price ? (
+                            <>
+                              <span className="text-lg font-bold text-gradient">
+                                ${product.sale_price}
+                              </span>
+                              <span className="text-sm text-gray-500 dark:text-gray-400 line-through">
+                                ${product.price}
+                              </span>
+                            </>
+                          ) : (
+                            <span className="text-lg font-bold text-gradient">
                               ${product.price}
                             </span>
-                          </div>
-                        ) : (
-                          <span className="text-[11px] font-bold text-primary-600 dark:text-primary-600">
-                            ${product.price}
-                          </span>
-                        )}
+                          )}
+                        </div>
+
+                        {/* Star rating placeholder */}
+                        <div className="flex items-center">
+                          {[...Array(5)].map((_, i) => (
+                            <svg key={i} className="w-3 h-3 text-yellow-400 fill-current" viewBox="0 0 20 20">
+                              <path d="M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z"/>
+                            </svg>
+                          ))}
+                        </div>
                       </div>
 
-                      {/* Tiny add to cart button */}
+                      {/* Enhanced add to cart button */}
                       <motion.button
-                        whileTap={{ scale: 0.95 }}
+                        whileHover={{ scale: 1.02 }}
+                        whileTap={{ scale: 0.98 }}
                         onClick={(e) => {
                           e.preventDefault();
                           e.stopPropagation();
                           handleAddToCart(product.id);
                         }}
                         disabled={addingToCart === product.id}
-                        aria-label={`إضافة ${product.name} إلى السلة`}
-                        className={`p-1.5 rounded-full ${
-                          addingToCart === product.id
-                            ? 'bg-gradient-to-r from-pink-500 to-purple-600 text-white shadow-sm shadow-pink-500/20 dark:shadow-pink-700/30'
-                            : 'bg-pink-100 dark:bg-pink-900/30 text-pink-600 dark:text-pink-400 hover:bg-pink-200 dark:hover:bg-pink-800/40'
-                        } transition-all duration-300 relative overflow-hidden`}
+                        aria-label={`Add ${product.name} to cart`}
+                        className="btn btn-primary w-full flex items-center justify-center gap-2 text-sm font-semibold"
                       >
                         {addingToCart === product.id ? (
                           <>
-                            {/* Simplified spinner animation */}
-                            <svg className="animate-spin h-3 w-3" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                            <svg className="animate-spin h-4 w-4" fill="none" viewBox="0 0 24 24">
                               <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                               <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                             </svg>
-
-                            {/* Success animation overlay */}
-                            <motion.div
-                              className="absolute inset-0 flex items-center justify-center bg-gradient-to-r from-pink-500 to-purple-600"
-                              initial={{ opacity: 0 }}
-                              animate={{ opacity: 1 }}
-                              transition={{ delay: 0.5, duration: 0.3 }}
-                            >
-                              <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3" viewBox="0 0 20 20" fill="currentColor">
-                                <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                              </svg>
-                            </motion.div>
+                            Adding...
                           </>
                         ) : (
-                          <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            className="h-3 w-3"
-                            viewBox="0 0 20 20"
-                            fill="currentColor"
-                          >
-                            <path d="M3 1a1 1 0 000 2h1.22l.305 1.222a.997.997 0 00.01.042l1.358 5.43-.893.892C3.74 11.846 4.632 14 6.414 14H15a1 1 0 000-2H6.414l1-1H14a1 1 0 00.894-.553l3-6A1 1 0 0017 3H6.28l-.31-1.243A1 1 0 005 1H3zM16 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0zM6.5 18a1.5 1.5 0 100-3 1.5 1.5 0 000 3z" />
-                          </svg>
+                          <>
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 13m0 0l-2.5 5M7 13l2.5 5m0 0h8" />
+                            </svg>
+                            Add to Cart
+                          </>
                         )}
                       </motion.button>
                     </div>
@@ -524,14 +542,17 @@ const HomePage = ({ featuredProducts, categories }) => {
             </div>
           </div>
 
-          {/* Larger, more touch-friendly "View All" button */}
-          <div className="mt-6 sm:mt-8 text-center">
+          {/* Enhanced "View All" button */}
+          <div className="mt-8 sm:mt-12 text-center">
             <Link
               href={route("products.index")}
-              className="inline-flex items-center justify-center w-full sm:w-auto bg-white dark:bg-cinematic-800 border-2 border-pink-600 dark:border-pink-500 text-pink-600 dark:text-pink-400 hover:bg-pink-50 dark:hover:bg-pink-900/20 font-medium py-3 px-6 rounded-lg shadow-sm hover:shadow-md transition duration-300 text-base"
+              className="btn btn-secondary inline-flex items-center gap-3 text-base"
               aria-label="View all products"
             >
-              {t('common.view_all_products')}
+              <span>{t('common.view_all_products')}</span>
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+              </svg>
             </Link>
           </div>
         </div>

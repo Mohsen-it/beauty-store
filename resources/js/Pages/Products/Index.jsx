@@ -345,7 +345,7 @@ const ProductsIndex = ({ products, categories, filters }) => {
           </button>
         </div>
 
-        <div className="lg:grid lg:grid-cols-4 lg:gap-4 xl:gap-8">
+        <div className="lg:grid lg:grid-cols-5 xl:grid-cols-6 lg:gap-6 xl:gap-8">
           {/* Mobile Overlay */}
           {filtersExpanded && (
             <div
@@ -371,7 +371,7 @@ const ProductsIndex = ({ products, categories, filters }) => {
               }}
               transition={{ duration: 0.3, ease: "easeOut" }}
               className={`
-                lg:h-auto lg:w-full lg:max-w-none lg:rounded-xl lg:mb-6 lg:border-2 lg:border-pink-100 lg:dark:border-pink-900/30 lg:shadow-lg lg:dark:shadow-soft
+                lg:h-auto lg:w-full lg:max-w-none lg:rounded-lg lg:mb-0 lg:border lg:border-gray-200 lg:dark:border-gray-700 lg:shadow-md lg:dark:shadow-soft
                 h-[75vh] w-full rounded-t-3xl overflow-hidden bg-white dark:bg-cinematic-800
                 shadow-2xl dark:shadow-2xl border-t-4 border-pink-500
               `}
@@ -385,19 +385,19 @@ const ProductsIndex = ({ products, categories, filters }) => {
               </div>
 
               {/* Scrollable Content */}
-              <div className="h-full overflow-y-auto p-4 sm:p-5 md:p-6 bg-gradient-to-b from-white to-gray-50/50 dark:from-cinematic-800 dark:to-cinematic-900/50">
+              <div className="h-full overflow-y-auto p-4 lg:p-3 xl:p-4 bg-gradient-to-b from-white to-gray-50/50 dark:from-cinematic-800 dark:to-cinematic-900/50">
                 {/* Header with close button for mobile */}
-                <div className="flex justify-between items-center mb-6 pb-4 border-b border-gray-200 dark:border-gray-700">
+                <div className="flex justify-between items-center mb-4 lg:mb-3 pb-3 lg:pb-2 border-b border-gray-200 dark:border-gray-700">
                   <div className="flex items-center">
-                    <div className="p-2 bg-gradient-to-r from-pink-500 to-purple-600 rounded-lg mr-3">
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <div className="p-1.5 lg:p-1 bg-gradient-to-r from-pink-500 to-purple-600 rounded-lg mr-2 lg:mr-1.5">
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 lg:h-3.5 lg:w-3.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
                       </svg>
                     </div>
                     <div className="flex items-center">
                       <div>
-                        <h2 className="text-lg font-bold text-gray-800 dark:text-white">{t('products.filters')}</h2>
-                        <p className="text-sm text-gray-500 dark:text-gray-400">{t('products.refine_your_search')}</p>
+                        <h2 className="text-base lg:text-sm font-bold text-gray-800 dark:text-white">{t('products.filters')}</h2>
+                        <p className="text-xs lg:text-[10px] text-gray-500 dark:text-gray-400 lg:hidden">{t('products.refine_your_search')}</p>
                       </div>
                       {/* Clear filters icon - Mobile only, shows when filters are applied */}
                       {(filters.category || filters.min_price || filters.max_price ||
@@ -455,20 +455,20 @@ const ProductsIndex = ({ products, categories, filters }) => {
                   </button>
                 </div>
               <form onSubmit={handleFilterSubmit}>
-                {/* Categories - Premium Design */}
-                <div className="mb-6 p-4 bg-gradient-to-br from-gray-50 to-white dark:from-gray-800/50 dark:to-gray-900/50 rounded-2xl border border-gray-200 dark:border-gray-700 shadow-sm">
-                  <div className="flex items-center mb-4">
-                    <div className="p-2 bg-gradient-to-r from-pink-500 to-purple-600 rounded-lg mr-3">
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                {/* Categories - Compact Design for Desktop */}
+                <div className="mb-4 lg:mb-3 p-3 lg:p-2 bg-gradient-to-br from-gray-50 to-white dark:from-gray-800/50 dark:to-gray-900/50 rounded-xl lg:rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm">
+                  <div className="flex items-center mb-3 lg:mb-2">
+                    <div className="p-1.5 lg:p-1 bg-gradient-to-r from-pink-500 to-purple-600 rounded-lg mr-2 lg:mr-1.5">
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5 lg:h-3 lg:w-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
                       </svg>
                     </div>
                     <div>
-                      <h3 className="text-base font-bold text-gray-800 dark:text-gray-200">{t('products.categories')}</h3>
-                      <p className="text-xs text-gray-500 dark:text-gray-400">{t('products.choose_category')}</p>
+                      <h3 className="text-sm lg:text-xs font-bold text-gray-800 dark:text-gray-200">{t('products.categories')}</h3>
+                      <p className="text-xs lg:text-[10px] text-gray-500 dark:text-gray-400 lg:hidden">{t('products.choose_category')}</p>
                     </div>
                   </div>
-                  <div className="grid grid-cols-2 gap-3">
+                  <div className="grid grid-cols-2 lg:grid-cols-1 gap-2 lg:gap-1">
                     {categories.map((category) => {
                       const isSelected = parseInt(filters.category) === category.id;
                       return (
@@ -499,10 +499,10 @@ const ProductsIndex = ({ products, categories, filters }) => {
                               only: ['products', 'filters']
                             });
                           }}
-                          className={`relative flex flex-col items-center justify-center p-3 rounded-xl transition-all duration-300 min-h-[70px] ${
+                          className={`relative flex lg:flex-row flex-col items-center justify-center lg:justify-start p-2 lg:p-1.5 rounded-lg lg:rounded-md transition-all duration-300 min-h-[60px] lg:min-h-[32px] ${
                             isSelected
-                              ? 'bg-gradient-to-br from-pink-500 to-purple-600 text-white shadow-lg shadow-pink-500/25 border-2 border-pink-400'
-                              : 'bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-600 hover:border-pink-300 dark:hover:border-pink-700 text-gray-700 dark:text-gray-300 hover:shadow-md'
+                              ? 'bg-gradient-to-br from-pink-500 to-purple-600 text-white shadow-md shadow-pink-500/25 border border-pink-400'
+                              : 'bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 hover:border-pink-300 dark:hover:border-pink-700 text-gray-700 dark:text-gray-300 hover:shadow-sm'
                           }`}
                         >
                           {isSelected && (
@@ -514,14 +514,14 @@ const ProductsIndex = ({ products, categories, filters }) => {
                               </div>
                             </div>
                           )}
-                          <div className={`w-6 h-6 flex items-center justify-center rounded-full mb-1.5 ${
+                          <div className={`w-5 h-5 lg:w-4 lg:h-4 flex items-center justify-center rounded-full mb-1 lg:mb-0 lg:mr-2 ${
                             isSelected
                               ? 'bg-white/20 text-white'
                               : 'bg-gradient-to-br from-pink-100 to-purple-100 dark:from-pink-900/30 dark:to-purple-900/30 text-pink-600 dark:text-pink-400'
                           }`}>
                             {getCategoryIcon(category.name)}
                           </div>
-                          <span className="text-xs font-semibold text-center leading-tight">
+                          <span className="text-xs lg:text-[10px] font-semibold text-center lg:text-left leading-tight">
                             {category.name}
                           </span>
                         </motion.button>
@@ -560,24 +560,24 @@ const ProductsIndex = ({ products, categories, filters }) => {
                       transition={{ duration: 0.3 }}
                       className="overflow-hidden"
                     >
-                      {/* Price Range - Premium Design */}
-                      <div className="mb-6 p-4 bg-gradient-to-br from-gray-50 to-white dark:from-gray-800/50 dark:to-gray-900/50 rounded-2xl border border-gray-200 dark:border-gray-700 shadow-sm">
-                        <div className="flex items-center mb-4">
-                          <div className="p-2 bg-gradient-to-r from-green-500 to-emerald-600 rounded-lg mr-3">
-                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      {/* Price Range - Compact Design for Desktop */}
+                      <div className="mb-4 lg:mb-3 p-3 lg:p-2 bg-gradient-to-br from-gray-50 to-white dark:from-gray-800/50 dark:to-gray-900/50 rounded-xl lg:rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm">
+                        <div className="flex items-center mb-3 lg:mb-2">
+                          <div className="p-1.5 lg:p-1 bg-gradient-to-r from-green-500 to-emerald-600 rounded-lg mr-2 lg:mr-1.5">
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5 lg:h-3 lg:w-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                             </svg>
                           </div>
                           <div>
-                            <h3 className="text-base font-bold text-gray-800 dark:text-gray-200">{t('products.price_range')}</h3>
-                            <p className="text-xs text-gray-500 dark:text-gray-400">{t('products.set_budget')}</p>
+                            <h3 className="text-sm lg:text-xs font-bold text-gray-800 dark:text-gray-200">{t('products.price_range')}</h3>
+                            <p className="text-xs lg:text-[10px] text-gray-500 dark:text-gray-400 lg:hidden">{t('products.set_budget')}</p>
                           </div>
                         </div>
 
                         {/* Custom Price Inputs */}
-                        <div className="flex items-center gap-3 mb-4">
+                        <div className="flex items-center gap-2 lg:gap-1 mb-3 lg:mb-2">
                           <div className="flex-1 relative">
-                            <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-green-600 dark:text-green-400 font-bold">$</div>
+                            <div className="absolute left-2 lg:left-1.5 top-1/2 transform -translate-y-1/2 text-green-600 dark:text-green-400 font-bold text-xs lg:text-[10px]">$</div>
                             <input
                               type="number"
                               placeholder="Min"
@@ -585,16 +585,16 @@ const ProductsIndex = ({ products, categories, filters }) => {
                               step="1"
                               value={priceRange.min}
                               onChange={(e) => setPriceRange({ ...priceRange, min: e.target.value })}
-                              className="w-full pl-8 pr-4 py-3 bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-600 rounded-xl focus:border-green-500 dark:focus:border-green-400 focus:ring-0 focus:outline-none text-gray-800 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 text-sm font-medium transition-all duration-200"
+                              className="w-full pl-6 lg:pl-5 pr-2 lg:pr-1.5 py-2 lg:py-1.5 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-lg lg:rounded-md focus:border-green-500 dark:focus:border-green-400 focus:ring-0 focus:outline-none text-gray-800 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 text-xs lg:text-[10px] font-medium transition-all duration-200"
                             />
                           </div>
-                          <div className="flex items-center justify-center w-8 h-8 bg-gradient-to-r from-green-500 to-emerald-600 rounded-full">
-                            <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <div className="flex items-center justify-center w-6 h-6 lg:w-4 lg:h-4 bg-gradient-to-r from-green-500 to-emerald-600 rounded-full">
+                            <svg className="w-3 h-3 lg:w-2 lg:h-2 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 12H4" />
                             </svg>
                           </div>
                           <div className="flex-1 relative">
-                            <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-green-600 dark:text-green-400 font-bold">$</div>
+                            <div className="absolute left-2 lg:left-1.5 top-1/2 transform -translate-y-1/2 text-green-600 dark:text-green-400 font-bold text-xs lg:text-[10px]">$</div>
                             <input
                               type="number"
                               placeholder="Max"
@@ -602,7 +602,7 @@ const ProductsIndex = ({ products, categories, filters }) => {
                               step="1"
                               value={priceRange.max}
                               onChange={(e) => setPriceRange({ ...priceRange, max: e.target.value })}
-                              className="w-full pl-8 pr-4 py-3 bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-600 rounded-xl focus:border-green-500 dark:focus:border-green-400 focus:ring-0 focus:outline-none text-gray-800 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 text-sm font-medium transition-all duration-200"
+                              className="w-full pl-6 lg:pl-5 pr-2 lg:pr-1.5 py-2 lg:py-1.5 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-lg lg:rounded-md focus:border-green-500 dark:focus:border-green-400 focus:ring-0 focus:outline-none text-gray-800 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 text-xs lg:text-[10px] font-medium transition-all duration-200"
                             />
                           </div>
                         </div>
@@ -764,20 +764,19 @@ const ProductsIndex = ({ products, categories, filters }) => {
           </div>
 
           {/* Product Grid */}
-          <div className="lg:col-span-3">
+          <div className="lg:col-span-4 xl:col-span-5">
             {products.data.length > 0 ? (
               <motion.div
                 variants={container}
                 initial="hidden"
                 animate="show"
-                className="  grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 2xl:grid-cols-6
-    gap-3 p-2 sm:gap-4 sm:p-4"
+                className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-3 sm:gap-4 lg:gap-6 p-2 sm:p-4 lg:p-0"
               >
                 {products.data.map((product) => (
                   <motion.div key={product.id} variants={item}>
-                    <Link href={route('products.show', product.slug)} className="block h-full" aria-label={`View ${product.name} details`}>
-                      <div className="group bg-white dark:bg-cinematic-800 rounded-md overflow-hidden shadow-sm dark:shadow-soft hover:shadow-md dark:hover:shadow-soft-lg transition-shadow duration-300 border border-cinematic-200 dark:border-cinematic-700 h-full flex flex-col">
-                        <div className="aspect-w-1 aspect-h-1 w-full overflow-hidden bg-gray-100 dark:bg-gray-800 relative" style={{ maxHeight: '120px' }}>
+                    <Link href={route('products.show', product.slug)} className="block h-full group" aria-label={`View ${product.name} details`}>
+                      <div className="card-product h-full flex flex-col">
+                        <div className="aspect-square w-full overflow-hidden bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-700 relative">
                             {product.images.length > 0 ? (
                               <img
                                 src={
@@ -788,7 +787,7 @@ const ProductsIndex = ({ products, categories, filters }) => {
                                       : `/assets/default-product.png`
                                 }
                                 alt={product.name}
-                                className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-300"
+                                className="w-full h-full object-cover object-center group-hover:scale-110 transition-transform duration-700"
                                 loading="lazy"
                                 decoding="async"
                                 fetchpriority="low"
@@ -801,12 +800,25 @@ const ProductsIndex = ({ products, categories, filters }) => {
                               <img
                                 src="/assets/default-product.png"
                                 alt={product.name}
-                                className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-300"
+                                className="w-full h-full object-cover object-center group-hover:scale-110 transition-transform duration-700"
                                 loading="lazy"
                                 decoding="async"
                                 fetchpriority="low"
                               />
                             )}
+
+                            {/* Gradient overlay on hover */}
+                            <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+
+                            {/* Quick view button on hover */}
+                            <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300">
+                              <div className="bg-white/90 dark:bg-gray-900/90 backdrop-blur-sm rounded-full p-2 lg:p-3 shadow-xl transform scale-75 group-hover:scale-100 transition-transform duration-300">
+                                <svg className="w-4 h-4 lg:w-5 lg:h-5 text-gray-800 dark:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                </svg>
+                              </div>
+                            </div>
 
                             {/* Sale badge */}
                             {product.sale_price && (
@@ -820,36 +832,36 @@ const ProductsIndex = ({ products, categories, filters }) => {
                               </div>
                             )}
                         </div>
-                        <div className="p-1 xs:p-1.5 sm:p-2 flex-1 flex flex-col">
-                          <div className="flex justify-between items-start mb-0">
-                            <h3 className="text-[8px] xs:text-[9px] sm:text-[10px] text-cinematic-500 dark:text-cinematic-400 truncate max-w-[70%]">{product.category.name}</h3>
+                        <div className="p-1 xs:p-1.5 sm:p-2 lg:p-3 xl:p-4 flex-1 flex flex-col">
+                          <div className="flex justify-between items-start mb-1 lg:mb-2">
+                            <h3 className="text-[8px] xs:text-[9px] sm:text-[10px] lg:text-xs xl:text-sm text-cinematic-500 dark:text-cinematic-400 truncate max-w-[70%]">{product.category.name}</h3>
 
                             {/* Compact rating */}
                             <div className="flex items-center">
                               <svg
-                                className="w-2 h-2 xs:w-2 xs:h-2 sm:w-2.5 sm:h-2.5 text-yellow-400"
+                                className="w-2 h-2 xs:w-2 xs:h-2 sm:w-2.5 sm:h-2.5 lg:w-3 lg:h-3 xl:w-3.5 xl:h-3.5 text-yellow-400"
                                 fill="currentColor"
                                 viewBox="0 0 20 20"
                               >
                                 <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
                               </svg>
-                              <span className="ml-0.5 text-[7px] xs:text-[8px] text-gray-500 dark:text-gray-400">
+                              <span className="ml-0.5 text-[7px] xs:text-[8px] lg:text-xs xl:text-sm text-gray-500 dark:text-gray-400">
                                 {product.rating || 4.0}
                               </span>
                             </div>
                           </div>
 
-                          <p className="mt-0 text-[9px] xs:text-[10px] sm:text-xs font-medium text-cinematic-900 dark:text-white line-clamp-1 min-h-[1rem] xs:min-h-[1.25rem]">{product.name}</p>
+                          <p className="mt-0 text-[9px] xs:text-[10px] sm:text-xs lg:text-sm xl:text-base font-medium text-cinematic-900 dark:text-white line-clamp-2 lg:line-clamp-3 min-h-[1rem] xs:min-h-[1.25rem] lg:min-h-[2.5rem] xl:min-h-[3rem]">{product.name}</p>
 
-                          <div className="mt-auto pt-0.5 xs:pt-1 flex items-center justify-between">
+                          <div className="mt-auto pt-1 lg:pt-2 xl:pt-3 flex items-center justify-between">
                             <div>
                               {product.sale_price ? (
-                                <div className="flex items-center">
-                                  <span className="text-[9px] xs:text-[10px] sm:text-xs font-bold text-pink-600 dark:text-pink-400">${product.sale_price}</span>
-                                  <span className="ml-0.5 text-[7px] xs:text-[8px] text-cinematic-500 dark:text-cinematic-400 line-through">${product.price}</span>
+                                <div className="flex flex-col lg:flex-row lg:items-center">
+                                  <span className="text-[9px] xs:text-[10px] sm:text-xs lg:text-sm xl:text-base font-bold text-pink-600 dark:text-pink-400">${product.sale_price}</span>
+                                  <span className="ml-0 lg:ml-1 text-[7px] xs:text-[8px] lg:text-xs xl:text-sm text-cinematic-500 dark:text-cinematic-400 line-through">${product.price}</span>
                                 </div>
                               ) : (
-                                <span className="text-[9px] xs:text-[10px] sm:text-xs font-bold text-pink-600 dark:text-pink-400">${product.price}</span>
+                                <span className="text-[9px] xs:text-[10px] sm:text-xs lg:text-sm xl:text-base font-bold text-pink-600 dark:text-pink-400">${product.price}</span>
                               )}
                             </div>
                             <motion.button
@@ -861,18 +873,24 @@ const ProductsIndex = ({ products, categories, filters }) => {
                                 handleAddToCart(product.id);
                               }}
                               disabled={addingToCart === product.id}
-                              className={`p-1 rounded-full ${
+                              className={`p-1 lg:p-2 xl:p-2.5 rounded-full ${
                                 addingToCart === product.id
                                   ? 'bg-gradient-to-r from-pink-500 to-purple-600 text-white shadow-lg shadow-pink-500/20 dark:shadow-pink-700/30'
                                   : 'bg-pink-100 dark:bg-pink-900/30 text-pink-600 dark:text-pink-400 hover:bg-pink-200 dark:hover:bg-pink-800/40'
                               } transition-all duration-300 relative overflow-hidden focus:outline-none focus:ring-1 focus:ring-pink-500 focus:ring-offset-1 dark:focus:ring-offset-cinematic-800`}
                               aria-label={t('cart.add_to_cart')}
-                              style={{ minWidth: '24px', minHeight: '24px', width: '24px', height: '24px', touchAction: 'manipulation' }}
+                              style={{
+                                minWidth: window.innerWidth >= 1024 ? '32px' : '24px',
+                                minHeight: window.innerWidth >= 1024 ? '32px' : '24px',
+                                width: window.innerWidth >= 1024 ? '32px' : '24px',
+                                height: window.innerWidth >= 1024 ? '32px' : '24px',
+                                touchAction: 'manipulation'
+                              }}
                             >
                               {addingToCart === product.id ? (
                                 <>
                                   {/* Spinner animation */}
-                                  <svg className="animate-spin h-2.5 w-2.5 xs:h-3 xs:w-3 sm:h-3.5 sm:w-3.5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                  <svg className="animate-spin h-2.5 w-2.5 xs:h-3 xs:w-3 sm:h-3.5 sm:w-3.5 lg:h-4 lg:w-4 xl:h-5 xl:w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                                     <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                                     <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                                   </svg>
@@ -884,14 +902,14 @@ const ProductsIndex = ({ products, categories, filters }) => {
                                     animate={{ opacity: 1 }}
                                     transition={{ delay: 0.5, duration: 0.3 }}
                                   >
-                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-2.5 w-2.5 xs:h-3 xs:w-3 sm:h-3.5 sm:w-3.5" viewBox="0 0 20 20" fill="currentColor">
+                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-2.5 w-2.5 xs:h-3 xs:w-3 sm:h-3.5 sm:w-3.5 lg:h-4 lg:w-4 xl:h-5 xl:w-5" viewBox="0 0 20 20" fill="currentColor">
                                       <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                                     </svg>
                                   </motion.div>
                                 </>
                               ) : (
                                 <>
-                                  <svg xmlns="http://www.w3.org/2000/svg" className="h-2.5 w-2.5 xs:h-3 xs:w-3 sm:h-3.5 sm:w-3.5" viewBox="0 0 20 20" fill="currentColor">
+                                  <svg xmlns="http://www.w3.org/2000/svg" className="h-2.5 w-2.5 xs:h-3 xs:w-3 sm:h-3.5 sm:w-3.5 lg:h-4 lg:w-4 xl:h-5 xl:w-5" viewBox="0 0 20 20" fill="currentColor">
                                     <path d="M3 1a1 1 0 000 2h1.22l.305 1.222a.997.997 0 00.01.042l1.358 5.43-.893.892C3.74 11.846 4.632 14 6.414 14H15a1 1 0 000-2H6.414l1-1H14a1 1 0 00.894-.553l3-6A1 1 0 0017 3H6.28l-.31-1.243A1 1 0 005 1H3zM16 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0zM6.5 18a1.5 1.5 0 100-3 1.5 1.5 0 000 3z" />
                                   </svg>
                                   <span className="absolute inset-0 bg-white dark:bg-white opacity-0 active:opacity-20 rounded-full transition-opacity duration-200"></span>
@@ -906,25 +924,35 @@ const ProductsIndex = ({ products, categories, filters }) => {
                 ))}
               </motion.div>
             ) : (
-              <div className="bg-white dark:bg-cinematic-800 p-4 sm:p-6 md:p-8 rounded-lg shadow-md dark:shadow-soft text-center border border-cinematic-200 dark:border-cinematic-700">
-                <h3 className="text-base sm:text-lg font-medium text-cinematic-900 dark:text-white mb-1 sm:mb-2">{t('products.no_products_found')}</h3>
-                <p className="text-sm text-cinematic-600 dark:text-cinematic-400 mb-3 sm:mb-4">{t('products.try_adjusting_filters')}</p>
-                <Link
-                  href={route('products.index')}
-                  className="inline-block bg-primary-600 hover:bg-primary-700 dark:bg-primary-700 dark:hover:bg-primary-600 text-white py-1.5 sm:py-2 px-3 sm:px-4 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 dark:focus:ring-offset-cinematic-800 transition-colors duration-300 text-xs sm:text-sm"
-                  preserveScroll
-                  preserveState
-                  only={['products', 'filters']}
-                >
-                  {t('products.clear_all_filters')}
-                </Link>
+              <div className="bg-white dark:bg-cinematic-800 p-6 lg:p-8 xl:p-12 rounded-xl lg:rounded-2xl shadow-lg dark:shadow-soft text-center border border-cinematic-200 dark:border-cinematic-700">
+                <div className="max-w-md mx-auto">
+                  <div className="w-16 h-16 lg:w-20 lg:h-20 xl:w-24 xl:h-24 mx-auto mb-4 lg:mb-6 bg-gradient-to-r from-pink-100 to-purple-100 dark:from-pink-900/30 dark:to-purple-900/30 rounded-full flex items-center justify-center">
+                    <svg className="w-8 h-8 lg:w-10 lg:h-10 xl:w-12 xl:h-12 text-pink-500 dark:text-pink-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                    </svg>
+                  </div>
+                  <h3 className="text-lg lg:text-xl xl:text-2xl font-bold text-cinematic-900 dark:text-white mb-2 lg:mb-3">{t('products.no_products_found')}</h3>
+                  <p className="text-sm lg:text-base text-cinematic-600 dark:text-cinematic-400 mb-6 lg:mb-8">{t('products.try_adjusting_filters')}</p>
+                  <Link
+                    href={route('products.index')}
+                    className="inline-flex items-center justify-center bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 text-white py-3 lg:py-4 px-6 lg:px-8 rounded-xl lg:rounded-2xl focus:outline-none focus:ring-4 focus:ring-pink-500/50 focus:ring-offset-2 dark:focus:ring-offset-cinematic-800 transition-all duration-300 text-sm lg:text-base font-semibold shadow-lg hover:shadow-xl"
+                    preserveScroll
+                    preserveState
+                    only={['products', 'filters']}
+                  >
+                    <svg className="w-4 h-4 lg:w-5 lg:h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                    {t('products.clear_all_filters')}
+                  </Link>
+                </div>
               </div>
             )}
 
             {/* Pagination */}
             {products.data.length > 0 && (
-              <div className="mt-4 sm:mt-6 md:mt-8">
-                <div className="flex flex-wrap justify-center gap-1 sm:gap-2">
+              <div className="mt-6 lg:mt-8 xl:mt-10">
+                <div className="flex flex-wrap justify-center gap-2 lg:gap-3">
                   {products.links.map((link, index) => {
                     // For mobile, simplify pagination by only showing prev, current page, and next
                     const isMobileHidden =
@@ -946,13 +974,13 @@ const ProductsIndex = ({ products, categories, filters }) => {
                       <Link
                         key={index}
                         href={link.url}
-                        className={`px-2 sm:px-3 md:px-4 py-1.5 sm:py-2 rounded-md text-xs sm:text-sm ${
+                        className={`px-3 lg:px-4 xl:px-5 py-2 lg:py-2.5 xl:py-3 rounded-lg lg:rounded-xl text-sm lg:text-base ${
                           link.active
-                            ? 'bg-primary-600 dark:bg-primary-700 text-white shadow-md'
+                            ? 'bg-gradient-to-r from-pink-500 to-purple-600 text-white shadow-lg hover:shadow-xl'
                             : link.url
-                              ? 'bg-white dark:bg-cinematic-800 text-cinematic-700 dark:text-cinematic-300 hover:bg-primary-100 dark:hover:bg-primary-900 border border-cinematic-200 dark:border-cinematic-700'
+                              ? 'bg-white dark:bg-cinematic-800 text-cinematic-700 dark:text-cinematic-300 hover:bg-gradient-to-r hover:from-pink-50 hover:to-purple-50 dark:hover:from-pink-900/20 dark:hover:to-purple-900/20 border border-cinematic-200 dark:border-cinematic-700 hover:border-pink-300 dark:hover:border-pink-700'
                               : 'bg-cinematic-100 dark:bg-cinematic-900 text-cinematic-400 dark:text-cinematic-600 cursor-not-allowed border border-cinematic-200 dark:border-cinematic-800'
-                        } ${isMobileHidden ? 'hidden sm:block' : ''} min-w-[32px] sm:min-w-[40px] text-center focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 dark:focus:ring-offset-cinematic-800`}
+                        } ${isMobileHidden ? 'hidden sm:block' : ''} min-w-[40px] lg:min-w-[48px] xl:min-w-[56px] text-center focus:outline-none focus:ring-2 focus:ring-pink-500 focus:ring-offset-2 dark:focus:ring-offset-cinematic-800 transition-all duration-300 font-medium`}
                         aria-label={
                           link.label === "&laquo; Previous"
                             ? "Previous page"
