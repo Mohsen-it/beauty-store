@@ -2,7 +2,8 @@ import React, { useState, useEffect, useRef, useCallback, memo, Suspense } from 
 import { Link, usePage, router } from '@inertiajs/react';
 import { motion, AnimatePresence, useReducedMotion, useScroll, useTransform } from 'framer-motion';
 import { toast } from 'react-hot-toast';
-import ResponsiveNavLink from '@/Components/ResponsiveNavLink';
+import NavigationMenu from '@/Components/NavigationMenu';
+import MobileMenu from '@/Components/MobileMenu';
 import DarkModeToggle from '@/Components/DarkModeToggle';
 import LanguageSwitcher from '@/Components/LanguageSwitcher';
 import Footer from '@/Components/Footer';
@@ -359,17 +360,17 @@ const CinematicLayout = ({ children }) => {
         }}></div>
       </div>
 
-      {/* Enhanced Header */}
+      {/* Enhanced Header with improved mobile responsiveness and sticky behavior */}
       <motion.header
         style={{
           opacity: headerOpacity,
           y: headerY,
           backdropFilter: `blur(${headerBlur}px)`
         }}
-        className="fixed w-full z-50 transition-all duration-500 bg-white/80 dark:bg-gray-900/80 shadow-xl shadow-black/5 dark:shadow-black/20 border-b border-white/20 dark:border-gray-700/30"
+        className="sticky top-0 z-50 transition-all duration-500 bg-white/90 dark:bg-gray-900/90 shadow-lg shadow-black/5 dark:shadow-black/20 border-b border-white/20 dark:border-gray-700/30 backdrop-blur-md"
       >
-        <div className="container max-w-screen-xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8">
-          <div className="flex justify-between h-14 sm:h-16 md:h-20">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl">
+          <div className="flex justify-between items-center h-16 sm:h-18 md:h-20">
             <div className="flex items-center">
               <Link href="/" className="flex-shrink-0 flex items-center group">
                 <motion.div
@@ -410,28 +411,8 @@ const CinematicLayout = ({ children }) => {
                 </motion.div>
               </Link>
 
-              {/* Desktop Navigation */}
-              <nav className="hidden md:ml-4 lg:ml-8 md:flex space-x-1">
-                <NavLink href={route('home')} current={route().current('home')}>
-                  {t('navigation.home')}
-                </NavLink>
-                <NavLink href={route('products.index')} current={route().current('products.index')}>
-                  {t('navigation.products')}
-                </NavLink>
-                <NavLink href={route('categories.skincare')} current={route().current('categories.skincare')}>
-                  Skincare
-                </NavLink>
-                <NavLink href={route('categories.makeup')} current={route().current('categories.makeup')}>
-                  Makeup
-                </NavLink>
-                {auth.user && (
-                  <>
-                    <NavLink href={route('orders.index')} current={route().current('orders.index')}>
-                     {t('navigation.orders')}
-                    </NavLink>
-                  </>
-                )}
-              </nav>
+              {/* Desktop Navigation with improved spacing and responsive breakpoints */}
+              <NavigationMenu auth={auth} className="ml-8" />
             </div>
 
             {/* Right side icons and buttons */}
@@ -633,19 +614,19 @@ const CinematicLayout = ({ children }) => {
                 )}
               </div>
 
-              {/* Mobile menu button */}
-              <div className="md:hidden">
+              {/* Mobile menu button with improved touch target */}
+              <div className="lg:hidden">
                 <motion.button
                   whileTap={{ scale: 0.95 }}
                   onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                  className="p-2 sm:p-3 relative transition-all duration-150 rounded-full bg-white dark:bg-gray-800 shadow-lg hover:shadow-xl border border-gray-200/50 dark:border-gray-700/50 focus:outline-none group active:scale-95"
+                  className="p-3 relative transition-all duration-150 rounded-xl bg-white/90 dark:bg-gray-800/90 shadow-lg hover:shadow-xl border border-gray-200/50 dark:border-gray-700/50 focus:outline-none focus:ring-2 focus:ring-pink-500 focus:ring-offset-2 dark:focus:ring-offset-gray-900 group active:scale-95 min-h-[44px] min-w-[44px] flex items-center justify-center"
                   aria-expanded={mobileMenuOpen}
+                  aria-label={mobileMenuOpen ? "Close menu" : "Open menu"}
                 >
-                  <span className="sr-only">Open main menu</span>
                   <div className="text-gray-700 dark:text-gray-300 group-hover:text-pink-600 dark:group-hover:text-pink-400 transition-colors duration-150">
                     {mobileMenuOpen ? (
                       <svg
-                        className="block h-5 w-5"
+                        className="block h-6 w-6"
                         xmlns="http://www.w3.org/2000/svg"
                         fill="none"
                         viewBox="0 0 24 24"
@@ -661,7 +642,7 @@ const CinematicLayout = ({ children }) => {
                       </svg>
                     ) : (
                       <svg
-                        className="block h-5 w-5"
+                        className="block h-6 w-6"
                         xmlns="http://www.w3.org/2000/svg"
                         fill="none"
                         viewBox="0 0 24 24"
@@ -677,250 +658,27 @@ const CinematicLayout = ({ children }) => {
                       </svg>
                     )}
                   </div>
-
                 </motion.button>
               </div>
             </div>
           </div>
         </div>
 
-        {/* Mobile menu backdrop */}
-        <AnimatePresence>
-          {mobileMenuOpen && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.15, ease: "easeOut" }}
-              className="fixed inset-0 z-40 md:hidden bg-gray-800/50 dark:bg-black/50"
-              onClick={() => setMobileMenuOpen(false)}
-              aria-hidden="true"
-            />
-          )}
-        </AnimatePresence>
-
-        {/* Mobile menu, show/hide based on menu state */}
-        <AnimatePresence>
-          {mobileMenuOpen && (
-            <motion.div
-              ref={mobileMenuRef}
-              initial={{ x: rtl ? '100%' : '-100%' }}
-              animate={{ x: 0 }}
-              exit={{ x: rtl ? '100%' : '-100%' }}
-              transition={{
-                type: 'tween',
-                duration: 0.25,
-                ease: [0.25, 0.46, 0.45, 0.94] // Custom easing for smooth feel
-              }}
-              className={`fixed inset-y-0 ${rtl ? 'right-0' : 'left-0'} z-50 md:hidden w-[85%] max-w-sm`}
-              role="dialog"
-              aria-modal="true"
-              aria-label="Mobile navigation menu"
-              {...menuSwipeHandlers}
-            >
-              <div className="relative h-full w-full bg-white dark:bg-gray-900 shadow-2xl overflow-y-auto custom-scrollbar border-r border-gray-200/50 dark:border-gray-700/50 flex flex-col">
-                {/* Menu header with close button */}
-                <div className="sticky top-0 z-10 flex items-center justify-between p-4 border-b border-gray-200/50 dark:border-gray-700/50 bg-white dark:bg-gray-900">
-                  <Link href="/" className="flex items-center" onClick={() => setMobileMenuOpen(false)}>
-                    <span className="text-transparent bg-clip-text bg-gradient-to-r from-pink-500 to-purple-600 font-bold text-xl tracking-tight">
-                      {t('app.name')}
-                    </span>
-                  </Link>
-
-                  <button
-                    onClick={() => setMobileMenuOpen(false)}
-                    className="p-2 rounded-full bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-pink-500 focus:ring-offset-2 dark:focus:ring-offset-gray-900"
-                    aria-label="Close menu"
-                  >
-                    <svg className="w-5 h-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                    </svg>
-                  </button>
-                </div>
-
-                {/* Menu content */}
-                <div className="flex-1 overflow-y-auto p-4">
-
-                  {/* Navigation Links */}
-                  <nav className="space-y-1.5 sm:space-y-2 md:space-y-3 mb-4 sm:mb-6 md:mb-8">
-                    <div className="text-xs uppercase text-gray-500 dark:text-gray-400 mb-1 sm:mb-2 font-medium tracking-wider">
-                      {t('navigation.main_menu')}
-                    </div>
-                    <ResponsiveNavLink
-                      href={route('home')}
-                      active={route().current('home')}
-                      onClick={() => setMobileMenuOpen(false)}
-                    >
-                      {t('navigation.home')}
-                    </ResponsiveNavLink>
-                    <ResponsiveNavLink
-                      href={route('products.index')}
-                      active={route().current('products.index')}
-                      onClick={() => setMobileMenuOpen(false)}
-                    >
-                      {t('navigation.products')}
-                    </ResponsiveNavLink>
-                    <ResponsiveNavLink
-                      href={route('categories.skincare')}
-                      active={route().current('categories.skincare')}
-                      onClick={() => setMobileMenuOpen(false)}
-                    >
-                      {t('navigation.skincare')}
-                    </ResponsiveNavLink>
-                    <ResponsiveNavLink
-                      href={route('categories.makeup')}
-                      active={route().current('categories.makeup')}
-                      onClick={() => setMobileMenuOpen(false)}
-                    >
-                      {t('navigation.makeup')}
-                    </ResponsiveNavLink>
-                  </nav>
-
-                  {/* User Account Links */}
-                  {auth.user ? (
-                    <div className="mb-6 sm:mb-8">
-                      <div className="text-xs sm:text-sm uppercase text-gray-500 dark:text-gray-400 mb-2 font-medium tracking-wider">
-                        {t('auth.my_account')}
-                      </div>
-
-                      <div className="flex items-center p-2 sm:p-3 mb-2 sm:mb-3 md:mb-4 bg-gradient-to-r from-gray-100/50 to-white/50 dark:from-gray-800/50 dark:to-gray-900/50 rounded-xl border border-gray-200/50 dark:border-gray-700/50">
-                        <div className="w-7 h-7 sm:w-8 sm:h-8 md:w-10 md:h-10 rounded-full bg-gradient-to-br from-pink-500 to-purple-600 flex items-center justify-center text-white font-medium shadow-lg shadow-pink-500/20 dark:shadow-pink-700/30 border border-white/20 dark:border-black/10">
-                          {auth.user.name.charAt(0).toUpperCase()}
-                        </div>
-                        <div className="ml-2 sm:ml-3">
-                          <div className="text-xs sm:text-sm font-medium text-gray-800 dark:text-white">{auth.user.name}</div>
-                          <div className="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400 truncate max-w-[120px] xs:max-w-[150px] sm:max-w-[200px]">{auth.user.email}</div>
-                        </div>
-                      </div>
-
-                      {isAdmin && (
-                        <ResponsiveNavLink
-                          href={route('admin.dashboard')}
-                          active={route().current('admin.dashboard')}
-                          onClick={() => setMobileMenuOpen(false)}
-                        >
-                          {t('navigation.dashboard')}
-                        </ResponsiveNavLink>
-                      )}
-
-                      <ResponsiveNavLink
-                        href={route('profile.edit')}
-                        active={route().current('profile.edit')}
-                        onClick={() => setMobileMenuOpen(false)}
-                      >
-                        {t('navigation.profile')}
-                      </ResponsiveNavLink>
-
-                      <ResponsiveNavLink
-                        href={route('cart.index')}
-                        active={route().current('cart.index')}
-                        onClick={() => setMobileMenuOpen(false)}
-                      >
-                        {t('navigation.cart')}
-                      </ResponsiveNavLink>
-
-                      <ResponsiveNavLink
-                        href={route('favorites.index')}
-                        active={route().current('favorites.index')}
-                        onClick={() => setMobileMenuOpen(false)}
-                      >
-                        {t('navigation.wishlist')}
-                      </ResponsiveNavLink>
-
-                      <ResponsiveNavLink
-                        href={route('orders.index')}
-                        active={route().current('orders.index')}
-                        onClick={() => setMobileMenuOpen(false)}
-                      >
-                        {t('navigation.orders')}
-                      </ResponsiveNavLink>
-
-                      <button
-                        onClick={(e) => {
-                          e.preventDefault();
-                          setMobileMenuOpen(false);
-                          handleLogout(e);
-                        }}
-                        className="w-full flex items-center px-2 sm:px-3 py-1.5 sm:py-2 mt-1 text-xs sm:text-sm md:text-base font-medium text-gray-700 dark:text-gray-300 hover:text-pink-600 dark:hover:text-pink-400 rounded-lg hover:bg-gray-100/70 dark:hover:bg-gray-800/50 transition-all duration-300"
-                      >
-                        {t('navigation.logout')}
-                      </button>
-                    </div>
-                  ) : (
-                    <div className="mb-6 sm:mb-8">
-                      <div className="text-xs sm:text-sm uppercase text-gray-500 dark:text-gray-400 mb-2 font-medium tracking-wider">
-                        {t('auth.account')}
-                      </div>
-                      <ResponsiveNavLink
-                        href={route('login')}
-                        active={route().current('login')}
-                        onClick={() => setMobileMenuOpen(false)}
-                      >
-                        {t('navigation.login')}
-                      </ResponsiveNavLink>
-                      <ResponsiveNavLink
-                        href={route('register')}
-                        active={route().current('register')}
-                        onClick={() => setMobileMenuOpen(false)}
-                      >
-                        {t('navigation.register')}
-                      </ResponsiveNavLink>
-                    </div>
-                  )}
-
-                  {/* Help Links */}
-                  <div className="mb-6 sm:mb-8">
-                    <div className="text-xs sm:text-sm uppercase text-gray-500 dark:text-gray-400 mb-2 font-medium tracking-wider">
-                      {t('navigation.help')}
-                    </div>
-                    <ResponsiveNavLink
-                      href={route('help.about')}
-                      active={route().current('help.about')}
-                      onClick={() => setMobileMenuOpen(false)}
-                    >
-                      {t('common.about_us')}
-                    </ResponsiveNavLink>
-                    <ResponsiveNavLink
-                      href={route('help.contact')}
-                      active={route().current('help.contact')}
-                      onClick={() => setMobileMenuOpen(false)}
-                    >
-                      {t('common.contact_us')}
-                    </ResponsiveNavLink>
-                    <ResponsiveNavLink
-                      href={route('help.faqs')}
-                      active={route().current('help.faqs')}
-                      onClick={() => setMobileMenuOpen(false)}
-                    >
-                      {t('common.faqs')}
-                    </ResponsiveNavLink>
-                  </div>
-
-                  {/* Settings */}
-                  <div className="pt-3 sm:pt-4 md:pt-6 border-t border-gray-200/50 dark:border-gray-700/50">
-                    <div className="flex items-center justify-between mb-2 sm:mb-3 md:mb-4">
-                      <span className="text-xs font-medium text-gray-700 dark:text-gray-300">
-                        {t('common.dark_mode')}
-                      </span>
-                      <DarkModeToggle />
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <span className="text-xs font-medium text-gray-700 dark:text-gray-300">
-                        {t('common.language')}
-                      </span>
-                      <LanguageSwitcher />
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
+        {/* Mobile Menu Component */}
+        <MobileMenu
+          isOpen={mobileMenuOpen}
+          onClose={() => setMobileMenuOpen(false)}
+          auth={auth}
+          isAdmin={isAdmin}
+          handleLogout={handleLogout}
+          rtl={rtl}
+          menuSwipeHandlers={menuSwipeHandlers}
+        />
       </motion.header>
 
-      {/* Main Content */}
-      <main className="pt-16 sm:pt-20 md:pt-24 flex-grow">
-        <div className="container max-w-screen-xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8 relative z-10">
+      {/* Main Content with improved responsive spacing */}
+      <main className="pt-16 sm:pt-18 md:pt-20 flex-grow">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl relative z-10">
           {children}
         </div>
       </main>
