@@ -2,6 +2,7 @@
 import '../css/app.css';
 import '../css/responsive.css';
 import '../css/mobile-first.css';
+import '../css/enhanced-products.css';
 
 // Load page-specific CSS based on current route
 const loadPageSpecificStyles = () => {
@@ -10,6 +11,8 @@ const loadPageSpecificStyles = () => {
   // Load styles immediately for current page
   if (currentPath.includes('/products') || currentPath === '/') {
     import('../css/category-circles.css');
+    import('../css/mobile-products.css');
+    import('../css/enhanced-filters.css');
   }
 
   // Load other styles with slight delay

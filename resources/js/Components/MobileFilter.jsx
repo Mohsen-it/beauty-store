@@ -48,25 +48,34 @@ const MobileFilter = memo(({
 
     return (
         <motion.div
-            className={`bg-white dark:bg-gray-800 rounded-xl shadow-md overflow-hidden ${className}`}
+            className={`bg-gradient-to-br from-white via-pink-50 to-purple-50 dark:from-gray-800 dark:via-gray-800 dark:to-gray-700 rounded-2xl shadow-xl border-2 border-pink-100 dark:border-gray-600 overflow-hidden ${className}`}
             animate={{ height }}
-            transition={{ duration: 0.3, ease: "easeInOut" }}
+            transition={{ duration: 0.4, ease: "easeInOut" }}
+            whileHover={{ scale: 1.02 }}
         >
-            {/* Filter Header - Always visible */}
+            {/* Enhanced Filter Header */}
             <div
-                className="p-4 flex justify-between items-center cursor-pointer md:cursor-default"
+                className="p-5 flex justify-between items-center cursor-pointer md:cursor-default bg-gradient-to-r from-pink-500 via-purple-500 to-blue-500 text-white"
                 onClick={toggleFilter}
             >
-                <h3 className="font-medium text-gray-900 dark:text-white flex items-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
-                    </svg>
+                <h3 className="font-bold text-lg flex items-center">
+                    <motion.div
+                        animate={{ rotate: isOpen ? 360 : 0 }}
+                        transition={{ duration: 0.5 }}
+                        className="mr-3"
+                    >
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
+                        </svg>
+                    </motion.div>
                     {title}
                 </h3>
                 <motion.button
-                    className="md:hidden text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300"
+                    className="md:hidden text-white hover:text-pink-200 bg-white/20 rounded-full p-2 backdrop-blur-sm"
                     animate={{ rotate: isOpen ? 180 : 0 }}
-                    transition={{ duration: 0.3 }}
+                    transition={{ duration: 0.4 }}
+                    whileHover={{ scale: 1.1 }}
+                    whileTap={{ scale: 0.9 }}
                     aria-label={isOpen ? t('common.collapse') : t('common.expand')}
                 >
                     <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -75,17 +84,19 @@ const MobileFilter = memo(({
                 </motion.button>
             </div>
 
-            {/* Filter Content - Visible based on state */}
+            {/* Enhanced Filter Content */}
             <AnimatePresence>
                 <motion.div
                     ref={contentRef}
-                    className="px-4 pb-4"
-                    initial={{ opacity: initiallyOpen ? 1 : 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
-                    transition={{ duration: 0.2 }}
+                    className="px-6 pb-6 bg-white dark:bg-gray-800"
+                    initial={{ opacity: initiallyOpen ? 1 : 0, y: initiallyOpen ? 0 : -20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -20 }}
+                    transition={{ duration: 0.3, ease: "easeOut" }}
                 >
-                    {children}
+                    <div className="space-y-4">
+                        {children}
+                    </div>
                 </motion.div>
             </AnimatePresence>
         </motion.div>
@@ -120,31 +131,37 @@ export const FilterSection = memo(({
     }, [isOpen]);
 
     return (
-        <div className={`mb-4 ${className}`}>
-            <div
-                className="flex justify-between items-center mb-2 cursor-pointer"
+        <div className={`mb-6 ${className}`}>
+            <motion.div
+                className="flex justify-between items-center mb-3 cursor-pointer bg-gradient-to-r from-pink-100 to-purple-100 dark:from-gray-700 dark:to-gray-600 p-3 rounded-xl"
                 onClick={toggleSection}
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
             >
-                <h4 className="font-medium text-gray-700 dark:text-gray-300">{title}</h4>
+                <h4 className="font-bold text-gray-800 dark:text-gray-200 flex items-center">
+                    <div className="w-2 h-2 bg-gradient-to-r from-pink-500 to-purple-500 rounded-full mr-2"></div>
+                    {title}
+                </h4>
                 <motion.button
-                    className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300"
+                    className="text-pink-600 hover:text-purple-600 dark:text-pink-400 dark:hover:text-purple-400 bg-white dark:bg-gray-800 rounded-full p-1 shadow-md"
                     animate={{ rotate: isOpen ? 180 : 0 }}
-                    transition={{ duration: 0.3 }}
+                    transition={{ duration: 0.4 }}
+                    whileHover={{ scale: 1.1 }}
                     aria-label={isOpen ? t('common.collapse') : t('common.expand')}
                 >
                     <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                     </svg>
                 </motion.button>
-            </div>
+            </motion.div>
             <AnimatePresence>
                 {isOpen && (
                     <motion.div
-                        initial={{ height: 0, opacity: 0 }}
-                        animate={{ height: 'auto', opacity: 1 }}
-                        exit={{ height: 0, opacity: 0 }}
-                        transition={{ duration: 0.3 }}
-                        className="overflow-hidden"
+                        initial={{ height: 0, opacity: 0, y: -10 }}
+                        animate={{ height: 'auto', opacity: 1, y: 0 }}
+                        exit={{ height: 0, opacity: 0, y: -10 }}
+                        transition={{ duration: 0.4, ease: "easeOut" }}
+                        className="overflow-hidden bg-white dark:bg-gray-800 rounded-xl p-4 shadow-lg border border-pink-100 dark:border-gray-600"
                     >
                         {children}
                     </motion.div>

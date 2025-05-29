@@ -217,15 +217,35 @@ const ProductsIndex = memo(({ products, categories, filters }) => {
       <CinematicLayout>
         <Head title={`${t('products.title')} - ${t('app.title')}`} />
 
-        {/* Mobile Optimized Container */}
-        <div className="max-w-7xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8 py-3 sm:py-4 md:py-6 lg:py-8">
-          <motion.h1
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="text-xl sm:text-2xl md:text-3xl font-bold text-cinematic-900 dark:text-white mb-3 sm:mb-4 md:mb-6"
-          >
-            {t('products.title')}
-          </motion.h1>
+        {/* Enhanced Mobile Optimized Container */}
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8 lg:px-12 py-6 sm:py-8 md:py-12 lg:py-16">
+          {/* Enhanced Hero Section */}
+          <div className="text-center mb-8 sm:mb-12 md:mb-16">
+            <motion.h1
+              initial={{ opacity: 0, y: -30, scale: 0.9 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              transition={{ duration: 0.6, ease: "easeOut" }}
+              className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black text-transparent bg-clip-text bg-gradient-to-r from-pink-600 via-purple-600 to-blue-600 mb-4 sm:mb-6"
+            >
+              {t('products.title')}
+            </motion.h1>
+
+            <motion.p
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.2 }}
+              className="text-lg sm:text-xl md:text-2xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto leading-relaxed"
+            >
+              Discover our premium collection of beauty products crafted for your unique style
+            </motion.p>
+
+            {/* Decorative Elements */}
+            <div className="flex justify-center items-center space-x-4 mt-6">
+              <div className="w-12 h-1 bg-gradient-to-r from-pink-500 to-purple-500 rounded-full"></div>
+              <div className="w-3 h-3 bg-gradient-to-r from-purple-500 to-blue-500 rounded-full"></div>
+              <div className="w-12 h-1 bg-gradient-to-r from-purple-500 to-blue-500 rounded-full"></div>
+            </div>
+          </div>
 
           {/* Responsive Layout: Desktop Sidebar + Mobile FAB */}
           <div className="flex gap-3 md:gap-6">
@@ -249,36 +269,38 @@ const ProductsIndex = memo(({ products, categories, filters }) => {
                 </div>
               </div>
 
-              {/* Sort Options Bar - Mobile Optimized */}
-              <div className="mb-4 md:mb-6 bg-white dark:bg-gray-800 rounded-lg p-3 md:p-4 shadow-sm">
-                {/* Mobile: Stack vertically */}
-                <div className="flex flex-col space-y-3 md:flex-row md:items-center md:justify-between md:space-y-0">
-                  <div className="flex flex-col space-y-2 md:flex-row md:items-center md:space-y-0 md:space-x-4">
-                    <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+              {/* Enhanced Sort Options Bar */}
+              <div className="mb-6 md:mb-8 bg-gradient-to-r from-white via-pink-50 to-purple-50 dark:from-gray-800 dark:via-gray-800 dark:to-gray-800 rounded-2xl p-4 md:p-6 shadow-xl border-2 border-pink-100 dark:border-gray-700">
+                <div className="flex flex-col space-y-4 md:flex-row md:items-center md:justify-between md:space-y-0">
+                  <div className="flex flex-col space-y-3 md:flex-row md:items-center md:space-y-0 md:space-x-6">
+                    <span className="text-base font-bold text-gray-800 dark:text-gray-200 flex items-center">
+                      <svg className="w-5 h-5 mr-2 text-pink-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4h13M3 8h9m-9 4h6m4 0l4-4m0 0l4 4m-4-4v12" />
+                      </svg>
                       {t('products.sort_by')}:
                     </span>
-                    {/* Mobile: 2x2 Grid, Desktop: Horizontal */}
-                    <div className="grid grid-cols-2 gap-2 md:flex md:space-x-2">
+
+                    {/* Enhanced Sort Buttons */}
+                    <div className="grid grid-cols-2 gap-3 md:flex md:space-x-3">
                       {[
-                        { sort: 'created_at', order: 'desc', label: 'Newest', mobileLabel: 'New' },
-                        { sort: 'price', order: 'asc', label: 'Price ↑', mobileLabel: '$ ↑' },
-                        { sort: 'price', order: 'desc', label: 'Price ↓', mobileLabel: '$ ↓' },
-                        { sort: 'name', order: 'asc', label: 'A-Z', mobileLabel: 'A-Z' }
+                        { sort: 'created_at', order: 'desc', label: '✨ Newest', mobileLabel: '✨ New', icon: '✨' },
+                        { sort: 'price', order: 'asc', label: '💰 Price ↑', mobileLabel: '💰 ↑', icon: '💰' },
+                        { sort: 'price', order: 'desc', label: '💰 Price ↓', mobileLabel: '💰 ↓', icon: '💰' },
+                        { sort: 'name', order: 'asc', label: '🔤 A-Z', mobileLabel: '🔤 A-Z', icon: '🔤' }
                       ].map((option, index) => {
                         const isSelected = sortOption.sort === option.sort && sortOption.order === option.order;
                         return (
                           <motion.button
                             key={index}
-                            whileHover={{ scale: 1.02 }}
-                            whileTap={{ scale: 0.98 }}
+                            whileHover={{ scale: 1.05, y: -2 }}
+                            whileTap={{ scale: 0.95 }}
                             onClick={() => handleSortChange(option.sort, option.order)}
-                            className={`px-3 py-3 md:py-2 text-xs md:text-sm font-medium rounded-lg transition-all duration-200 min-h-[48px] md:min-h-[44px] focus:ring-2 focus:ring-pink-500 ${
+                            className={`px-4 py-3 md:py-3 text-sm md:text-base font-bold rounded-xl transition-all duration-300 min-h-[52px] md:min-h-[48px] focus:ring-2 focus:ring-pink-500 shadow-lg ${
                               isSelected
-                                ? 'bg-gradient-to-r from-pink-500 to-purple-600 text-white shadow-lg transform scale-105'
-                                : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-700 hover:border-pink-300 dark:hover:border-pink-600 hover:bg-pink-50 dark:hover:bg-gray-700'
+                                ? 'bg-gradient-to-r from-pink-500 via-purple-500 to-pink-600 text-white shadow-2xl transform scale-105 border-2 border-pink-300'
+                                : 'bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-200 border-2 border-gray-200 dark:border-gray-600 hover:border-pink-300 dark:hover:border-pink-500 hover:bg-gradient-to-r hover:from-pink-50 hover:to-purple-50 dark:hover:from-gray-600 dark:hover:to-gray-600'
                             }`}
                           >
-                            {/* Show shorter labels on mobile */}
                             <span className="md:hidden">{option.mobileLabel}</span>
                             <span className="hidden md:inline">{option.label}</span>
                           </motion.button>
@@ -286,26 +308,33 @@ const ProductsIndex = memo(({ products, categories, filters }) => {
                       })}
                     </div>
                   </div>
-                  <div className="text-xs md:text-sm text-gray-500 dark:text-gray-400 text-center md:text-right">
-                    {products.total} {t('products.products_found')}
+
+                  {/* Enhanced Results Counter */}
+                  <div className="flex items-center justify-center md:justify-end space-x-2">
+                    <div className="bg-gradient-to-r from-pink-500 to-purple-600 text-white px-4 py-2 rounded-xl shadow-lg">
+                      <span className="text-sm md:text-base font-bold">
+                        {products.total} {t('products.products_found')}
+                      </span>
+                    </div>
                   </div>
                 </div>
               </div>
 
-              {/* Product Grid - Mobile Optimized */}
+              {/* Enhanced Product Grid - Mobile Optimized */}
               {products.data.length > 0 ? (
-                <div className="product-grid-container w-full">
+                <div className="product-grid-container">
                   <motion.div
                     variants={animationVariants.container}
                     initial="hidden"
                     animate="show"
-                    className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-2 sm:gap-3 md:gap-4 w-full"
+                    className="products-grid-unified"
                   >
-                    {memoizedProducts.data.map((product) => (
+                    {memoizedProducts.data.map((product, index) => (
                       <motion.div
                         key={product.id}
                         variants={animationVariants.item}
                         className="product-card-wrapper"
+                        style={{ animationDelay: `${index * 0.1}s` }}
                       >
                         <ProductCard
                           product={product}

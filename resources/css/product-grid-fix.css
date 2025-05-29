@@ -1,0 +1,136 @@
+/* Product Grid Fix - Clean and Simple Layout */
+
+/* Reset any conflicting styles */
+.product-grid-container * {
+  box-sizing: border-box;
+}
+
+/* Ensure proper grid behavior */
+.products-grid-unified {
+  display: grid !important;
+  width: 100% !important;
+  max-width: 100% !important;
+}
+
+/* Product card wrapper fixes */
+.product-card-wrapper {
+  display: flex !important;
+  flex-direction: column !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+}
+
+/* Product card content fixes */
+.product-card-wrapper > div {
+  height: 100% !important;
+  display: flex !important;
+  flex-direction: column !important;
+}
+
+/* Image container fixes */
+.product-card-wrapper .aspect-square {
+  flex-shrink: 0 !important;
+}
+
+/* Content area fixes */
+.product-card-wrapper .flex-1 {
+  flex: 1 !important;
+  display: flex !important;
+  flex-direction: column !important;
+}
+
+/* Ensure consistent spacing */
+.product-grid-container {
+  margin: 0 auto !important;
+  max-width: 1400px !important;
+}
+
+/* Mobile optimizations */
+@media (max-width: 640px) {
+  .product-grid-container {
+    padding: 0.75rem !important;
+  }
+  
+  .products-grid-unified {
+    gap: 0.75rem !important;
+  }
+  
+  .product-card-wrapper {
+    min-height: 350px !important;
+  }
+}
+
+/* Tablet optimizations */
+@media (min-width: 641px) and (max-width: 1023px) {
+  .product-grid-container {
+    padding: 1rem !important;
+  }
+  
+  .products-grid-unified {
+    gap: 1rem !important;
+  }
+  
+  .product-card-wrapper {
+    min-height: 380px !important;
+  }
+}
+
+/* Desktop optimizations */
+@media (min-width: 1024px) {
+  .product-grid-container {
+    padding: 1.5rem !important;
+  }
+  
+  .products-grid-unified {
+    gap: 1.5rem !important;
+  }
+  
+  .product-card-wrapper {
+    min-height: 400px !important;
+  }
+}
+
+/* Large desktop optimizations */
+@media (min-width: 1280px) {
+  .product-grid-container {
+    padding: 2rem !important;
+  }
+  
+  .products-grid-unified {
+    gap: 2rem !important;
+  }
+}
+
+/* Fix any overflow issues */
+.product-card-wrapper img {
+  max-width: 100% !important;
+  height: auto !important;
+}
+
+/* Ensure buttons are properly sized */
+.product-card-wrapper button {
+  flex-shrink: 0 !important;
+}
+
+/* Fix text overflow */
+.product-card-wrapper h3 {
+  overflow-wrap: break-word !important;
+  word-wrap: break-word !important;
+  hyphens: auto !important;
+}
+
+/* Ensure proper aspect ratios */
+.aspect-square {
+  aspect-ratio: 1 / 1 !important;
+}
+
+/* Fix any z-index issues */
+.product-card-wrapper {
+  position: relative !important;
+  z-index: 1 !important;
+}
+
+.product-card-wrapper:hover {
+  z-index: 2 !important;
+}
