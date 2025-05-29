@@ -37,6 +37,12 @@ const MobileMenu = memo(({
 
   // Memoize close handler to prevent unnecessary re-renders
   const handleClose = useCallback(() => {
+    // Add a small flag to prevent immediate reopening
+    document.body.setAttribute('data-menu-closing', 'true');
+    setTimeout(() => {
+      document.body.removeAttribute('data-menu-closing');
+    }, 300);
+
     onClose();
   }, [onClose]);
 
@@ -45,23 +51,68 @@ const MobileMenu = memo(({
     if (!isOpen) return;
 
     const handleClickOutside = (event) => {
+      // Ensure we have a valid target
+      if (!event.target) return;
+
+      // First check if this is a close button click - handle it immediately
+      const isCloseButton = event.target.closest('[data-menu-close="true"]') ||
+                           event.target.closest('[aria-label*="Close menu"]');
+      if (isCloseButton) {
+        handleClose();
+        return;
+      }
+
       // Check if the click is outside the menu panel
       if (menuPanelRef.current && !menuPanelRef.current.contains(event.target)) {
+        // Additional check for mobile: ensure the target is not the menu toggle button
+        // Look for the specific toggle button (hamburger menu button)
+        const menuToggleButton = document.querySelector('[aria-label*="Open menu"], [aria-label*="Close menu"]:not([data-menu-close="true"])');
+        if (menuToggleButton && menuToggleButton.contains(event.target)) {
+          return; // Don't close if clicking the menu toggle button
+        }
+
+        handleClose();
+      }
+    };
+
+    const handleTouchOutside = (event) => {
+      // Ensure we have a valid target
+      if (!event.target) return;
+
+      // First check if this is a close button touch - handle it immediately
+      const isCloseButton = event.target.closest('[data-menu-close="true"]') ||
+                           event.target.closest('[aria-label*="Close menu"]');
+      if (isCloseButton) {
+        handleClose();
+        return;
+      }
+
+      // For touch events, we need to be more careful about event handling
+      // Check if the touch is outside the menu panel
+      if (menuPanelRef.current && !menuPanelRef.current.contains(event.target)) {
+        // Additional check for mobile: ensure the target is not the menu toggle button
+        // Look for the specific toggle button (hamburger menu button)
+        const menuToggleButton = document.querySelector('[aria-label*="Open menu"], [aria-label*="Close menu"]:not([data-menu-close="true"])');
+        if (menuToggleButton && menuToggleButton.contains(event.target)) {
+          return; // Don't close if touching the menu toggle button
+        }
+
         handleClose();
       }
     };
 
     // Add event listener with a slight delay to prevent immediate closing
     // when the menu is just opened by a button click
+    // Increased delay for mobile devices to ensure proper event handling
     const timeoutId = setTimeout(() => {
-      document.addEventListener('mousedown', handleClickOutside);
-      document.addEventListener('touchstart', handleClickOutside, { passive: true });
-    }, 150);
+      document.addEventListener('mousedown', handleClickOutside, { passive: true });
+      document.addEventListener('touchstart', handleTouchOutside, { passive: true });
+    }, 200);
 
     return () => {
       clearTimeout(timeoutId);
       document.removeEventListener('mousedown', handleClickOutside);
-      document.removeEventListener('touchstart', handleClickOutside);
+      document.removeEventListener('touchstart', handleTouchOutside);
     };
   }, [isOpen, handleClose]);
 
@@ -69,6 +120,18 @@ const MobileMenu = memo(({
   const handleBackdropClick = useCallback((event) => {
     // Only close if clicking directly on the backdrop, not on child elements
     if (event.target === event.currentTarget) {
+      // Prevent event bubbling to avoid conflicts
+      event.stopPropagation();
+      handleClose();
+    }
+  }, [handleClose]);
+
+  // Touch handler for backdrop to ensure mobile compatibility
+  const handleBackdropTouch = useCallback((event) => {
+    // Only close if touching directly on the backdrop, not on child elements
+    if (event.target === event.currentTarget) {
+      // Prevent event bubbling to avoid conflicts
+      event.stopPropagation();
       handleClose();
     }
   }, [handleClose]);
@@ -114,6 +177,7 @@ const MobileMenu = memo(({
           <div
             className="fixed inset-0 z-[998] bg-black/60 dark:bg-black/80"
             onClick={handleBackdropClick}
+            onTouchStart={handleBackdropTouch}
             aria-hidden="true"
           />
 
@@ -144,9 +208,13 @@ const MobileMenu = memo(({
                 </div>
               </Link>
               <button
-                onClick={handleClose}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleClose();
+                }}
                 className="p-2 rounded-xl text-gray-500 hover:text-pink-600 hover:bg-white/80 dark:hover:bg-gray-600/50 transition-all duration-200 min-h-[44px] min-w-[44px] flex items-center justify-center shadow-sm hover:shadow-md"
                 aria-label="Close menu"
+                data-menu-close="true"
               >
                 <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />

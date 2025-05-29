@@ -16,11 +16,23 @@ const MobileMenuTest = () => {
 
   const toggleMenu = () => {
     console.log('Toggle menu clicked, current state:', mobileMenuOpen);
+    // Check if menu is currently closing to prevent immediate reopening
+    if (document.body.getAttribute('data-menu-closing') === 'true') {
+      console.log('Menu is closing, ignoring toggle');
+      return;
+    }
     setMobileMenuOpen(!mobileMenuOpen);
   };
 
   const closeMenu = useCallback((testType = 'manual') => {
     console.log('Close menu called via:', testType);
+
+    // Add a small flag to prevent immediate reopening
+    document.body.setAttribute('data-menu-closing', 'true');
+    setTimeout(() => {
+      document.body.removeAttribute('data-menu-closing');
+    }, 300);
+
     setMobileMenuOpen(false);
 
     // Update test results
@@ -37,22 +49,67 @@ const MobileMenuTest = () => {
     if (!mobileMenuOpen) return;
 
     const handleClickOutside = (event) => {
+      // Ensure we have a valid target
+      if (!event.target) return;
+
+      // First check if this is a close button click - handle it immediately
+      const isCloseButton = event.target.closest('[data-menu-close="true"]') ||
+                           event.target.closest('[aria-label*="Close menu"]');
+      if (isCloseButton) {
+        closeMenu('closeButton');
+        return;
+      }
+
       // Check if the click is outside the menu panel
       if (menuPanelRef.current && !menuPanelRef.current.contains(event.target)) {
+        // Additional check for mobile: ensure the target is not the menu toggle button
+        // Look for the specific toggle button (hamburger menu button)
+        const menuToggleButton = document.querySelector('[aria-label*="Open menu"], [aria-label*="Close menu"]:not([data-menu-close="true"])');
+        if (menuToggleButton && menuToggleButton.contains(event.target)) {
+          return; // Don't close if clicking the menu toggle button
+        }
+
+        closeMenu('clickOutside');
+      }
+    };
+
+    const handleTouchOutside = (event) => {
+      // Ensure we have a valid target
+      if (!event.target) return;
+
+      // First check if this is a close button touch - handle it immediately
+      const isCloseButton = event.target.closest('[data-menu-close="true"]') ||
+                           event.target.closest('[aria-label*="Close menu"]');
+      if (isCloseButton) {
+        closeMenu('closeButton');
+        return;
+      }
+
+      // For touch events, we need to be more careful about event handling
+      // Check if the touch is outside the menu panel
+      if (menuPanelRef.current && !menuPanelRef.current.contains(event.target)) {
+        // Additional check for mobile: ensure the target is not the menu toggle button
+        // Look for the specific toggle button (hamburger menu button)
+        const menuToggleButton = document.querySelector('[aria-label*="Open menu"], [aria-label*="Close menu"]:not([data-menu-close="true"])');
+        if (menuToggleButton && menuToggleButton.contains(event.target)) {
+          return; // Don't close if touching the menu toggle button
+        }
+
         closeMenu('clickOutside');
       }
     };
 
     // Add event listener with a slight delay to prevent immediate closing
+    // Increased delay for mobile devices to ensure proper event handling
     const timeoutId = setTimeout(() => {
-      document.addEventListener('mousedown', handleClickOutside);
-      document.addEventListener('touchstart', handleClickOutside, { passive: true });
-    }, 100);
+      document.addEventListener('mousedown', handleClickOutside, { passive: true });
+      document.addEventListener('touchstart', handleTouchOutside, { passive: true });
+    }, 200);
 
     return () => {
       clearTimeout(timeoutId);
       document.removeEventListener('mousedown', handleClickOutside);
-      document.removeEventListener('touchstart', handleClickOutside);
+      document.removeEventListener('touchstart', handleTouchOutside);
     };
   }, [mobileMenuOpen, closeMenu]);
 
@@ -120,7 +177,18 @@ const MobileMenuTest = () => {
                 exit={{ opacity: 0 }}
                 transition={{ duration: 0.2 }}
                 className="fixed inset-0 z-[9998] bg-black/60"
-                onClick={() => closeMenu('backdropClick')}
+                onClick={(event) => {
+                  if (event.target === event.currentTarget) {
+                    event.stopPropagation();
+                    closeMenu('backdropClick');
+                  }
+                }}
+                onTouchStart={(event) => {
+                  if (event.target === event.currentTarget) {
+                    event.stopPropagation();
+                    closeMenu('backdropClick');
+                  }
+                }}
                 aria-hidden="true"
               />
 
@@ -148,9 +216,13 @@ const MobileMenuTest = () => {
                       Test Menu
                     </span>
                     <button
-                      onClick={() => closeMenu('closeButton')}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        closeMenu('closeButton');
+                      }}
                       className="p-2 rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-100 min-h-[44px] min-w-[44px] flex items-center justify-center"
                       aria-label="Close menu"
+                      data-menu-close="true"
                     >
                       <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />

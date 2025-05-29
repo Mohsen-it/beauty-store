@@ -584,7 +584,13 @@ const CinematicLayout = ({ children }) => {
               <div className="lg:hidden">
                 <motion.button
                   whileTap={{ scale: 0.95 }}
-                  onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                  onClick={() => {
+                    // Check if menu is currently closing to prevent immediate reopening
+                    if (document.body.getAttribute('data-menu-closing') === 'true') {
+                      return;
+                    }
+                    setMobileMenuOpen(!mobileMenuOpen);
+                  }}
                   className="p-3 relative transition-all duration-150 rounded-xl bg-white/90 dark:bg-gray-800/90 shadow-lg hover:shadow-xl border border-gray-200/50 dark:border-gray-700/50 focus:outline-none focus:ring-2 focus:ring-pink-500 focus:ring-offset-2 dark:focus:ring-offset-gray-900 group active:scale-95 min-h-[44px] min-w-[44px] flex items-center justify-center"
                   aria-expanded={mobileMenuOpen}
                   aria-label={mobileMenuOpen ? "Close menu" : "Open menu"}
