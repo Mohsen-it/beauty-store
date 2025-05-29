@@ -852,202 +852,57 @@ const ProductShow = memo(({ product, relatedProducts }) => {
           transition={{ duration: 0.5, delay: 0.2 }}
           className="mt-8 lg:mt-12"
         >
+          {/* Product description */}
+          <div className="product-info-section">
+            <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">{t('products.description')}</h2>
+            <div className="product-description">
+              {product.description ? (
+                <p>{product.description}</p>
+              ) : (
+                <p>This premium product is designed to enhance your beauty routine with high-quality ingredients and exceptional results. Experience the difference with our carefully formulated solution.</p>
+              )}
+            </div>
+          </div>
 
-              {/* Product description */}
-              <div className="product-info-section">
-                <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">{t('products.description')}</h2>
-                <div className="product-description">
-                  {product.description ? (
-                    <p>{product.description}</p>
-                  ) : (
-                    <p>This premium product is designed to enhance your beauty routine with high-quality ingredients and exceptional results. Experience the difference with our carefully formulated solution.</p>
-                  )}
-                </div>
-              </div>
-
-              {/* Product Features */}
-              <div className="product-info-section">
-                <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">{t('products.features')}</h2>
-                <ul className="space-y-3 product-description">
-                  {(product.features || ['Dermatologically tested', 'Cruelty-free', 'Paraben-free', 'Suitable for all skin types']).map((feature, index) => (
-                    <li key={index} className="flex items-start">
-                      <svg className="h-5 w-5 text-pink-500 dark:text-pink-400 mr-3 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                      </svg>
-                      <span>{feature}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-
-              {/* Product availability */}
-              <div className="product-info-section">
-                <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">{t('products.availability')}</h2>
-                <div className="flex items-center">
-                  {product.stock > 0 ? (
-                    <>
-                      <div className="w-3 h-3 bg-green-500 rounded-full mr-2"></div>
-                      <p className="text-green-600 dark:text-green-400 font-medium">
-                        {t('products.in_stock', { count: product.stock })}
-                      </p>
-                    </>
-                  ) : (
-                    <>
-                      <div className="w-3 h-3 bg-red-500 rounded-full mr-2"></div>
-                      <p className="text-red-600 dark:text-red-400 font-medium">
-                        {t('products.out_of_stock')}
-                      </p>
-                    </>
-                  )}
-                </div>
-              </div>
-
-            <form onSubmit={handleAddToCart} className="product-info-section">
-              {/* Quantity selector */}
-              <div>
-                <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">{t('products.quantity')}</h2>
-                <div className="quantity-selector">
-                  <button
-                    type="button"
-                    onClick={decrementQuantity}
-                    disabled={quantity <= 1 || product.stock === 0}
-                    className="quantity-btn"
-                    aria-label="Decrease quantity"
-                  >
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 12H4" />
-                    </svg>
-                  </button>
-                  <input
-                    type="number"
-                    min="1"
-                    max={product.stock}
-                    value={quantity}
-                    onChange={(e) => {
-                      const val = parseInt(e.target.value);
-                      if (!isNaN(val) && val >= 1 && val <= product.stock) {
-                        setQuantity(val);
-                      }
-                    }}
-                    className="quantity-input"
-                    readOnly
-                    aria-label="Product quantity"
-                  />
-                  <button
-                    type="button"
-                    onClick={incrementQuantity}
-                    disabled={quantity >= product.stock || product.stock === 0}
-                    className="quantity-btn"
-                    aria-label="Increase quantity"
-                  >
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-                    </svg>
-                  </button>
-                </div>
-                {product.stock > 0 && product.stock <= 5 && (
-                  <p className="text-sm text-amber-600 dark:text-amber-400 mt-2">
-                    Only {product.stock} {product.stock === 1 ? 'item' : 'items'} left in stock!
-                  </p>
-                )}
-              </div>
-
-              {/* Action buttons */}
-              <div className="action-buttons">
-                <motion.button
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                  type="submit"
-                  disabled={addingToCart || product.stock === 0}
-                  className={`add-to-cart-btn ${
-                    product.stock === 0
-                      ? 'opacity-50 cursor-not-allowed'
-                      : ''
-                  }`}
-                  aria-label={t('cart.add_to_cart')}
-                >
-                  {addingToCart ? (
-                    <span className="flex items-center justify-center">
-                      <svg className="animate-spin h-6 w-6 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" aria-hidden="true">
-                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                      </svg>
-                    </span>
-                  ) : (
-                    <span className="flex items-center justify-center">
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
-                      </svg>
-                    </span>
-                  )}
-                </motion.button>
-
-                <motion.button
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  type="button"
-                  onClick={() => {
-                    // Toggle liked state immediately for visual feedback
-                    setIsLiked(!isLiked);
-
-                    // Send request to server
-                    axios.post(route('products.toggle-like', product.id))
-                      .then(response => {
-                        // Update with server response
-                        setIsLiked(response.data.is_liked);
-                      })
-                      .catch(error => {
-                        console.error('Error toggling like:', error);
-                        // Revert on error
-                        setIsLiked(!isLiked);
-
-                        // If unauthorized, redirect to login
-                        if (error.response && error.response.status === 401) {
-                          window.location.href = route('login');
-                        }
-                      });
-                  }}
-                  className={`favorite-btn ${isLiked ? 'active' : ''}`}
-                  aria-label={isLiked ? t('products.remove_from_wishlist') : t('products.add_to_wishlist')}
-                  aria-pressed={isLiked}
-                >
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6"
-                    fill={isLiked ? "currentColor" : "none"}
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                    aria-hidden="true">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+          {/* Product Features */}
+          <div className="product-info-section">
+            <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">{t('products.features')}</h2>
+            <ul className="space-y-3 product-description">
+              {(product.features || ['Dermatologically tested', 'Cruelty-free', 'Paraben-free', 'Suitable for all skin types']).map((feature, index) => (
+                <li key={index} className="flex items-start">
+                  <svg className="h-5 w-5 text-pink-500 dark:text-pink-400 mr-3 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                   </svg>
-                </motion.button>
-              </div>
-            </form>
-
-              {/* Shipping and Returns */}
-              <div className="product-info-section">
-                <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">{t('products.shipping_returns')}</h2>
-                <ul className="space-y-3 product-description">
-                  <li className="flex items-start">
-                    <svg className="h-5 w-5 text-pink-500 dark:text-pink-400 mr-3 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" />
-                    </svg>
-                    <span className="text-sm text-gray-600 dark:text-gray-300">Free shipping on orders over $50. Standard delivery 3-5 business days.</span>
-                  </li>
-                  <li className="flex items-start">
-                    <svg className="h-5 w-5 text-pink-500 dark:text-pink-400 mr-3 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 15v-1a4 4 0 00-4-4H8m0 0l3 3m-3-3l3-3m9 14V5a2 2 0 00-2-2H6a2 2 0 00-2 2v16l4-2 4 2 4-2 4 2z" />
-                    </svg>
-                    <span className="text-sm text-gray-600 dark:text-gray-300">30-day easy returns. Return for any reason within 30 days for a full refund.</span>
-                  </li>
-                  <li className="flex items-start">
-                    <svg className="h-5 w-5 text-pink-500 dark:text-pink-400 mr-3 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-                    </svg>
-                    <span className="text-sm text-gray-600 dark:text-gray-300">Secure payment processing with encryption and fraud protection for your peace of mind.</span>
-                  </li>
-                </ul>
-              </div>
-          </motion.div>
-        </div>
+                  <span>{feature}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+          {/* Shipping and Returns */}
+          <div className="product-info-section">
+            <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">{t('products.shipping_returns')}</h2>
+            <ul className="space-y-3 product-description">
+              <li className="flex items-start">
+                <svg className="h-5 w-5 text-pink-500 dark:text-pink-400 mr-3 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" />
+                </svg>
+                <span className="text-sm text-gray-600 dark:text-gray-300">Free shipping on orders over $50. Standard delivery 3-5 business days.</span>
+              </li>
+              <li className="flex items-start">
+                <svg className="h-5 w-5 text-pink-500 dark:text-pink-400 mr-3 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 15v-1a4 4 0 00-4-4H8m0 0l3 3m-3-3l3-3m9 14V5a2 2 0 00-2-2H6a2 2 0 00-2 2v16l4-2 4 2 4-2 4 2z" />
+                </svg>
+                <span className="text-sm text-gray-600 dark:text-gray-300">30-day easy returns. Return for any reason within 30 days for a full refund.</span>
+              </li>
+              <li className="flex items-start">
+                <svg className="h-5 w-5 text-pink-500 dark:text-pink-400 mr-3 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                </svg>
+                <span className="text-sm text-gray-600 dark:text-gray-300">Secure payment processing with encryption and fraud protection for your peace of mind.</span>
+              </li>
+            </ul>
+          </div>
+        </motion.div>
 
    {/* Related Products */}
 {relatedProducts.length > 0 && (
