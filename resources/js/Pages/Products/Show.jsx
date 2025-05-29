@@ -511,86 +511,14 @@ const ProductShow = memo(({ product, relatedProducts }) => {
           </Link>
         </div>
 
-        {/* Mobile-First Product Layout */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
-          {/* Product Header Section - First on mobile */}
+        {/* Enhanced Mobile-First Product Layout */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8 lg:gap-12">
+          {/* Product Images - First on mobile for better UX */}
           <motion.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
-            className="order-1 lg:order-2"
-          >
-            <div className="product-info-section">
-              <Link
-                href={route('products.index', { category: product.category_id })}
-                className="product-category"
-              >
-                {product.category.name}
-              </Link>
-              <h1 className="product-title">{product.name}</h1>
-
-              {/* Product Rating */}
-              <div className="flex items-center mt-2">
-                <div className="flex text-yellow-400">
-                  {[1, 2, 3, 4, 5].map((star) => (
-                    <svg
-                      key={star}
-                      className={`w-4 h-4 sm:w-5 sm:h-5 ${star <= (product.rating || 4) ? 'text-yellow-400' : 'text-gray-300 dark:text-gray-600'}`}
-                      fill="currentColor"
-                      viewBox="0 0 20 20"
-                      aria-hidden="true"
-                    >
-                      <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                    </svg>
-                  ))}
-                </div>
-                <span className="ml-2 text-xs sm:text-sm text-gray-600 dark:text-gray-400">
-                  {product.review_count || 42} {t('products.reviews')}
-                </span>
-              </div>
-
-              {/* Price section */}
-              <div className="price-section">
-                {product.sale_price ? (
-                  <>
-                    <span className="current-price">${product.sale_price}</span>
-                    <span className="original-price">${product.price}</span>
-                    <span className="discount-badge">
-                      {Math.round((1 - product.sale_price / product.price) * 100)}% OFF
-                    </span>
-                  </>
-                ) : (
-                  <span className="current-price">${product.price}</span>
-                )}
-              </div>
-
-              {/* Product availability - Mobile only */}
-              <div className="sm:hidden mt-2">
-                {product.stock > 0 ? (
-                  <div className="flex items-center">
-                    <div className="w-2.5 h-2.5 bg-green-500 rounded-full mr-2"></div>
-                    <p className="text-sm text-green-600 dark:text-green-400 font-medium">
-                      {t('products.in_stock', { count: product.stock })}
-                    </p>
-                  </div>
-                ) : (
-                  <div className="flex items-center">
-                    <div className="w-2.5 h-2.5 bg-red-500 rounded-full mr-2"></div>
-                    <p className="text-sm text-red-600 dark:text-red-400 font-medium">
-                      {t('products.out_of_stock')}
-                    </p>
-                  </div>
-                )}
-              </div>
-            </div>
-          </motion.div>
-
-          {/* Product Images - Second on mobile */}
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.1 }}
-            className="order-2 lg:order-1"
+            className="order-1 lg:order-1"
           >
             {/* Mobile Gallery */}
             <div className="relative mb-4">
@@ -723,13 +651,207 @@ const ProductShow = memo(({ product, relatedProducts }) => {
             )}
           </motion.div>
 
-          {/* Product Details - Third on mobile */}
+          {/* Product Info - Second on mobile */}
           <motion.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.2 }}
-            className="order-3 lg:order-3 lg:col-span-2"
+            transition={{ duration: 0.5, delay: 0.1 }}
+            className="order-2 lg:order-2"
           >
+            <div className="product-info-section">
+              <Link
+                href={route('products.index', { category: product.category_id })}
+                className="product-category"
+              >
+                {product.category.name}
+              </Link>
+              <h1 className="product-title">{product.name}</h1>
+
+              {/* Product Rating */}
+              <div className="flex items-center mt-2">
+                <div className="flex text-yellow-400">
+                  {[1, 2, 3, 4, 5].map((star) => (
+                    <svg
+                      key={star}
+                      className={`w-4 h-4 sm:w-5 sm:h-5 ${star <= (product.rating || 4) ? 'text-yellow-400' : 'text-gray-300 dark:text-gray-600'}`}
+                      fill="currentColor"
+                      viewBox="0 0 20 20"
+                      aria-hidden="true"
+                    >
+                      <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                    </svg>
+                  ))}
+                </div>
+                <span className="ml-2 text-xs sm:text-sm text-gray-600 dark:text-gray-400">
+                  {product.review_count || 42} {t('products.reviews')}
+                </span>
+              </div>
+
+              {/* Price section */}
+              <div className="price-section">
+                {product.sale_price ? (
+                  <>
+                    <span className="current-price">${product.sale_price}</span>
+                    <span className="original-price">${product.price}</span>
+                    <span className="discount-badge">
+                      {Math.round((1 - product.sale_price / product.price) * 100)}% OFF
+                    </span>
+                  </>
+                ) : (
+                  <span className="current-price">${product.price}</span>
+                )}
+              </div>
+
+              {/* Product availability */}
+              <div className="mt-4">
+                {product.stock > 0 ? (
+                  <div className="flex items-center">
+                    <div className="w-2.5 h-2.5 bg-green-500 rounded-full mr-2"></div>
+                    <p className="text-sm text-green-600 dark:text-green-400 font-medium">
+                      {t('products.in_stock', { count: product.stock })}
+                    </p>
+                  </div>
+                ) : (
+                  <div className="flex items-center">
+                    <div className="w-2.5 h-2.5 bg-red-500 rounded-full mr-2"></div>
+                    <p className="text-sm text-red-600 dark:text-red-400 font-medium">
+                      {t('products.out_of_stock')}
+                    </p>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Quantity and Add to Cart - Mobile optimized */}
+            <form onSubmit={handleAddToCart} className="product-info-section">
+              {/* Quantity selector */}
+              <div>
+                <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">{t('products.quantity')}</h2>
+                <div className="quantity-selector">
+                  <button
+                    type="button"
+                    onClick={decrementQuantity}
+                    disabled={quantity <= 1 || product.stock === 0}
+                    className="quantity-btn"
+                    aria-label="Decrease quantity"
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 12H4" />
+                    </svg>
+                  </button>
+                  <input
+                    type="number"
+                    min="1"
+                    max={product.stock}
+                    value={quantity}
+                    onChange={(e) => {
+                      const val = parseInt(e.target.value);
+                      if (!isNaN(val) && val >= 1 && val <= product.stock) {
+                        setQuantity(val);
+                      }
+                    }}
+                    className="quantity-input"
+                    readOnly
+                    aria-label="Product quantity"
+                  />
+                  <button
+                    type="button"
+                    onClick={incrementQuantity}
+                    disabled={quantity >= product.stock || product.stock === 0}
+                    className="quantity-btn"
+                    aria-label="Increase quantity"
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                    </svg>
+                  </button>
+                </div>
+                {product.stock > 0 && product.stock <= 5 && (
+                  <p className="text-sm text-amber-600 dark:text-amber-400 mt-2">
+                    Only {product.stock} {product.stock === 1 ? 'item' : 'items'} left in stock!
+                  </p>
+                )}
+              </div>
+
+              {/* Action buttons */}
+              <div className="action-buttons">
+                <motion.button
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  type="submit"
+                  disabled={addingToCart || product.stock === 0}
+                  className={`add-to-cart-btn ${
+                    product.stock === 0
+                      ? 'opacity-50 cursor-not-allowed'
+                      : ''
+                  }`}
+                  aria-label={t('cart.add_to_cart')}
+                >
+                  {addingToCart ? (
+                    <span className="flex items-center justify-center">
+                      <svg className="animate-spin h-6 w-6 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" aria-hidden="true">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                      </svg>
+                    </span>
+                  ) : (
+                    <span className="flex items-center justify-center">
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+                      </svg>
+                    </span>
+                  )}
+                </motion.button>
+
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  type="button"
+                  onClick={() => {
+                    // Toggle liked state immediately for visual feedback
+                    setIsLiked(!isLiked);
+
+                    // Send request to server
+                    axios.post(route('products.toggle-like', product.id))
+                      .then(response => {
+                        // Update with server response
+                        setIsLiked(response.data.is_liked);
+                      })
+                      .catch(error => {
+                        console.error('Error toggling like:', error);
+                        // Revert on error
+                        setIsLiked(!isLiked);
+
+                        // If unauthorized, redirect to login
+                        if (error.response && error.response.status === 401) {
+                          window.location.href = route('login');
+                        }
+                      });
+                  }}
+                  className={`favorite-btn ${isLiked ? 'active' : ''}`}
+                  aria-label={isLiked ? t('products.remove_from_wishlist') : t('products.add_to_wishlist')}
+                  aria-pressed={isLiked}
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6"
+                    fill={isLiked ? "currentColor" : "none"}
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                    aria-hidden="true">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                  </svg>
+                </motion.button>
+              </div>
+            </form>
+          </motion.div>
+        </div>
+
+        {/* Product Details - Full width below on mobile */}
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.2 }}
+          className="mt-8 lg:mt-12"
+        >
 
               {/* Product description */}
               <div className="product-info-section">

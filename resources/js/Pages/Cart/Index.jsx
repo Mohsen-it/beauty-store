@@ -276,19 +276,19 @@ const CartIndex = memo(({ cart }) => {
 
         {!isCartEmpty && cart.items && cart.items.length > 0 ? (
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-6 lg:gap-8">
-            {/* Cart Items */}
+            {/* Cart Items - Mobile optimized */}
             <motion.div
               variants={container}
               initial="hidden"
               animate="show"
-              className="lg:col-span-8"
+              className="lg:col-span-8 order-2 lg:order-1"
             >
               <div className="bg-white dark:bg-cinematic-800 rounded-lg shadow-md dark:shadow-soft overflow-hidden border border-cinematic-200 dark:border-cinematic-700">
                 <ul className="divide-y divide-cinematic-200 dark:divide-cinematic-700">
                   {cart.items.map((cartItem) => (
                     <motion.li key={cartItem.id} variants={item} className="p-3 sm:p-4 md:p-6">
-                      <div className="flex flex-col sm:flex-row sm:items-center">
-                        <div className="flex-shrink-0 w-full sm:w-20 md:w-24 h-20 sm:h-20 md:h-24 rounded-md overflow-hidden mb-3 sm:mb-0">
+                      <div className="flex flex-col sm:flex-row sm:items-start gap-3 sm:gap-4">
+                        <div className="flex-shrink-0 w-20 h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 rounded-lg overflow-hidden mx-auto sm:mx-0">
                           <img
                             src={
                               cartItem.product.image_url
@@ -430,14 +430,14 @@ const CartIndex = memo(({ cart }) => {
               </div>
             </motion.div>
 
-            {/* Order Summary */}
+            {/* Order Summary - Mobile first */}
             <motion.div
               initial={{ opacity: 0, y: 20, x: 0 }}
               animate={{ opacity: 1, y: 0, x: 0 }}
               transition={{ duration: 0.5 }}
-              className="lg:col-span-4"
+              className="lg:col-span-4 order-1 lg:order-2"
             >
-              <div className="bg-white dark:bg-cinematic-800 rounded-lg shadow-md dark:shadow-soft p-4 sm:p-5 md:p-6 border border-cinematic-200 dark:border-cinematic-700 sticky top-24">
+              <div className="bg-white dark:bg-cinematic-800 rounded-lg shadow-md dark:shadow-soft p-4 sm:p-5 md:p-6 border border-cinematic-200 dark:border-cinematic-700 lg:sticky lg:top-24">
                 <h2 className="text-base sm:text-lg font-medium text-cinematic-900 dark:text-white mb-3 sm:mb-4 md:mb-6">{t('checkout.order_summary')}</h2>
                 <div className="flow-root">
                   <dl className="text-sm">

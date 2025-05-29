@@ -217,15 +217,15 @@ const ProductsIndex = memo(({ products, categories, filters }) => {
       <CinematicLayout>
         <Head title={`${t('products.title')} - ${t('app.title')}`} />
 
-        {/* Enhanced Mobile Optimized Container */}
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8 lg:px-12 py-6 sm:py-8 md:py-12 lg:py-16">
-          {/* Enhanced Hero Section */}
-          <div className="text-center mb-8 sm:mb-12 md:mb-16">
+        {/* Enhanced Mobile-First Container */}
+        <div className="max-w-7xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8 py-4 sm:py-6 md:py-8 lg:py-12">
+          {/* Enhanced Mobile-First Hero Section */}
+          <div className="text-center mb-6 sm:mb-8 md:mb-12">
             <motion.h1
-              initial={{ opacity: 0, y: -30, scale: 0.9 }}
+              initial={{ opacity: 0, y: -20, scale: 0.95 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
-              transition={{ duration: 0.6, ease: "easeOut" }}
-              className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black text-transparent bg-clip-text bg-gradient-to-r from-pink-600 via-purple-600 to-blue-600 mb-4 sm:mb-6"
+              transition={{ duration: 0.5, ease: "easeOut" }}
+              className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-black text-transparent bg-clip-text bg-gradient-to-r from-pink-600 via-purple-600 to-blue-600 mb-3 sm:mb-4 md:mb-6"
             >
               {t('products.title')}
             </motion.h1>

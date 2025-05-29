@@ -213,8 +213,8 @@ const Checkout = memo(({ cart, order }) => {
         {t('checkout.title')}
       </motion.h1>
 
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 sm:gap-8">
-        {/* Checkout Form */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-6 lg:gap-8">
+        {/* Checkout Form - Mobile optimized */}
         <motion.div
           {...animationVariants.item}
           className="lg:col-span-8 order-2 lg:order-1 performance-card"
