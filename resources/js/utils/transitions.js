@@ -64,5 +64,110 @@ export const animationConfig = {
     backfaceVisibility: "hidden"
   },
   // Reduce animation work for non-visible elements
-  shouldReduceMotion: typeof window !== 'undefined' && window.matchMedia("(prefers-reduced-motion: reduce)").matches
+  shouldReduceMotion: typeof window !== 'undefined' && window.matchMedia("(prefers-reduced-motion: reduce)").matches,
+
+  // Mobile-optimized animation settings
+  mobile: {
+    // Shorter durations for better mobile performance
+    duration: 0.2,
+    // Reduced stagger for better performance
+    staggerChildren: 0.02,
+    // Simpler easing functions
+    ease: [0.25, 0.46, 0.45, 0.94],
+    // Reduced delay
+    delayChildren: 0
+  },
+
+  // Desktop animation settings
+  desktop: {
+    duration: 0.3,
+    staggerChildren: 0.05,
+    ease: [0.25, 0.46, 0.45, 0.94],
+    delayChildren: 0.05
+  },
+
+  // Performance-optimized variants
+  optimizedVariants: {
+    // Container animations with conditional performance
+    container: (isMobile = false, prefersReducedMotion = false) => ({
+      hidden: {
+        opacity: prefersReducedMotion ? 0.9 : 0
+      },
+      show: {
+        opacity: 1,
+        transition: {
+          staggerChildren: prefersReducedMotion ? 0 : (isMobile ? 0.02 : 0.05),
+          delayChildren: prefersReducedMotion ? 0 : (isMobile ? 0 : 0.05),
+          duration: isMobile ? 0.2 : 0.3
+        }
+      }
+    }),
+
+    // Item animations with reduced motion support
+    item: (prefersReducedMotion = false) => ({
+      hidden: {
+        opacity: 0,
+        y: prefersReducedMotion ? 0 : 10
+      },
+      show: {
+        opacity: 1,
+        y: 0,
+        transition: {
+          type: "tween",
+          duration: prefersReducedMotion ? 0.1 : 0.2,
+          ease: "easeOut"
+        }
+      }
+    }),
+
+    // Modal/overlay animations
+    modal: (prefersReducedMotion = false) => ({
+      hidden: {
+        opacity: 0,
+        scale: prefersReducedMotion ? 1 : 0.95
+      },
+      show: {
+        opacity: 1,
+        scale: 1,
+        transition: {
+          duration: prefersReducedMotion ? 0.1 : 0.2,
+          ease: "easeOut"
+        }
+      },
+      exit: {
+        opacity: 0,
+        scale: prefersReducedMotion ? 1 : 0.95,
+        transition: {
+          duration: prefersReducedMotion ? 0.1 : 0.15,
+          ease: "easeIn"
+        }
+      }
+    }),
+
+    // Slide animations for mobile menus
+    slideIn: (direction = 'left', prefersReducedMotion = false) => ({
+      hidden: {
+        x: prefersReducedMotion ? 0 : (direction === 'left' ? '-100%' : '100%'),
+        opacity: prefersReducedMotion ? 0 : 1
+      },
+      show: {
+        x: 0,
+        opacity: 1,
+        transition: {
+          type: 'tween',
+          duration: prefersReducedMotion ? 0.1 : 0.3,
+          ease: [0.25, 0.46, 0.45, 0.94]
+        }
+      },
+      exit: {
+        x: prefersReducedMotion ? 0 : (direction === 'left' ? '-100%' : '100%'),
+        opacity: prefersReducedMotion ? 0 : 1,
+        transition: {
+          type: 'tween',
+          duration: prefersReducedMotion ? 0.1 : 0.25,
+          ease: [0.25, 0.46, 0.45, 0.94]
+        }
+      }
+    })
+  }
 };

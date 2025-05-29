@@ -12,16 +12,21 @@ import debounce from 'lodash/debounce';
 import { t, getCurrentLanguage, isRtl } from '@/utils/translate';
 
 // Enhanced Navigation Link component with modern design
-const NavLink = memo(({ href, current, children, className }) => (
-  <Link
-    href={href}
-    className={`relative px-4 sm:px-5 md:px-6 py-2.5 sm:py-3 rounded-xl text-sm sm:text-base font-semibold transition-all duration-500 backdrop-blur-md overflow-hidden group ${
-      current
-        ? 'text-white bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500 shadow-xl shadow-pink-500/30 dark:shadow-pink-600/40 border border-white/20'
-        : 'text-gray-700 hover:text-white dark:text-gray-300 dark:hover:text-white bg-white/10 hover:bg-gradient-to-r hover:from-pink-500/90 hover:to-purple-600/90 border border-gray-200/30 hover:border-pink-300/50 dark:border-gray-700/30 dark:hover:border-pink-600/50 shadow-lg hover:shadow-xl hover:shadow-pink-500/20'
-    } ${className || ''}`}
-    aria-current={current ? 'page' : undefined}
-  >
+const NavLink = memo(({ href, current, children, className, ...props }) => {
+  // Filter out the current prop to avoid passing it to the DOM
+  const { current: _, ...linkProps } = props;
+
+  return (
+    <Link
+      href={href}
+      {...linkProps}
+      className={`relative px-4 sm:px-5 md:px-6 py-2.5 sm:py-3 rounded-xl text-sm sm:text-base font-semibold transition-all duration-500 backdrop-blur-md overflow-hidden group ${
+        current
+          ? 'text-white bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500 shadow-xl shadow-pink-500/30 dark:shadow-pink-600/40 border border-white/20'
+          : 'text-gray-700 hover:text-white dark:text-gray-300 dark:hover:text-white bg-white/10 hover:bg-gradient-to-r hover:from-pink-500/90 hover:to-purple-600/90 border border-gray-200/30 hover:border-pink-300/50 dark:border-gray-700/30 dark:hover:border-pink-600/50 shadow-lg hover:shadow-xl hover:shadow-pink-500/20'
+      } ${className || ''}`}
+      aria-current={current ? 'page' : undefined}
+    >
     <span className="relative z-20 flex items-center gap-2">{children}</span>
 
     {/* Animated background gradient */}
@@ -45,8 +50,9 @@ const NavLink = memo(({ href, current, children, className }) => (
 
     {/* Shimmer effect on hover */}
     <span className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-1000 bg-gradient-to-r from-transparent via-white/20 to-transparent skew-x-12"></span>
-  </Link>
-));
+    </Link>
+  );
+});
 
 // Memoized Icon Button component
 const IconButton = memo(({ icon, label, onClick, badge, href, className = '' }) => {
@@ -229,10 +235,10 @@ const CinematicLayout = ({ children }) => {
         setProfileDropdownOpen(false);
       }
 
-      // Only check mobile menu if it's open to improve performance
-      if (mobileMenuOpen && mobileMenuRef.current && !mobileMenuRef.current.contains(event.target)) {
-        setMobileMenuOpen(false);
-      }
+      // Remove mobile menu handling from here - it's handled in the MobileMenu component
+      // if (mobileMenuOpen && mobileMenuRef.current && !mobileMenuRef.current.contains(event.target)) {
+      //   setMobileMenuOpen(false);
+      // }
 
       if (searchOpen && searchInputRef.current && !searchInputRef.current.contains(event.target)) {
         setSearchOpen(false);
@@ -246,7 +252,7 @@ const CinematicLayout = ({ children }) => {
     return () => {
       document.removeEventListener('mousedown', handleClickOutside, { passive: true });
     };
-  }, [mobileMenuOpen, searchOpen, profileDropdownOpen]);
+  }, [searchOpen, profileDropdownOpen]); // Remove mobileMenuOpen from dependencies
 
   // Close mobile menu when route changes
   useEffect(() => {

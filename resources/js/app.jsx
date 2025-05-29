@@ -1,33 +1,41 @@
-// Import CSS files with dynamic imports to prevent preload warnings
+// Import critical CSS files immediately
 import '../css/app.css';
-// Import other CSS files only when needed
-const loadAdditionalStyles = () => {
-  import('../css/responsive.css');
-  import('../css/transitions.css');
-  import('../css/rtl.css');
-  import('../css/animations.css');
-  import('../css/category-circles.css');
-  import('../css/product-page.css');
+import '../css/responsive.css';
+import '../css/mobile-first.css';
+
+// Load page-specific CSS based on current route
+const loadPageSpecificStyles = () => {
+  const currentPath = window.location.pathname;
+
+  // Load styles immediately for current page
+  if (currentPath.includes('/products') || currentPath === '/') {
+    import('../css/category-circles.css');
+  }
+
+  // Load other styles with slight delay
+  setTimeout(() => {
+    import('../css/transitions.css');
+    import('../css/animations.css');
+    import('../css/product-page.css');
+    import('../css/rtl.css');
+  }, 100);
 };
 
-// Load additional styles after initial render
+// Load page-specific styles immediately
 if (typeof window !== 'undefined') {
-  window.addEventListener('load', () => {
-    // Use requestIdleCallback to load styles when browser is idle
-    if ('requestIdleCallback' in window) {
-      window.requestIdleCallback(loadAdditionalStyles);
-    } else {
-      // Fallback for browsers that don't support requestIdleCallback
-      setTimeout(loadAdditionalStyles, 1000);
-    }
-  });
+  // Load immediately on DOM ready
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', loadPageSpecificStyles);
+  } else {
+    loadPageSpecificStyles();
+  }
 }
 
 import { createRoot } from 'react-dom/client';
 import { createInertiaApp } from '@inertiajs/react';
 import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
 import { initPerformanceMonitoring } from './utils/performanceMonitoring';
-import React, { Suspense, useEffect, useState } from 'react';
+import React, { Suspense, useEffect, useState, useMemo } from 'react';
 import { Toaster } from 'react-hot-toast';
 
 const appName = import.meta.env.VITE_APP_NAME || 'Cosmetics Store';
@@ -58,12 +66,16 @@ const setupApp = ({ el, App, props }) => {
   }
 
   function MainApp() {
+    // Performance optimization: Memoize locale data to prevent unnecessary re-renders
+    const localeData = useMemo(() => {
+      return props.initialPage?.props?.localeData;
+    }, [props.initialPage?.props?.localeData]);
 
     useEffect(() => {
       // Update shared data when props change
-      if (props.initialPage && props.initialPage.props && props.initialPage.props.localeData) {
+      if (localeData) {
         window._shared = window._shared || {};
-        window._shared.localeData = props.initialPage.props.localeData;
+        window._shared.localeData = localeData;
       }
 
       // Register service worker for offline capabilities

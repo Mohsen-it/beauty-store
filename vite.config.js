@@ -40,6 +40,9 @@ export default defineConfig(({ command, mode }) => {
             cssCodeSplit: true,
             minify: 'terser',
             sourcemap: !isProdMode, // Only generate sourcemaps in development
+            modulePreload: {
+                polyfill: false, // Disable module preload polyfill to reduce preloading
+            },
             terserOptions: {
                 compress: {
                     drop_console: isProdMode,
@@ -68,6 +71,16 @@ export default defineConfig(({ command, mode }) => {
                     entryFileNames: isProdMode ? 'assets/js/[name].[hash].js' : 'assets/js/[name].js',
                     assetFileNames: isProdMode ? 'assets/[ext]/[name].[hash].[ext]' : 'assets/[ext]/[name].[ext]',
                 },
+                // Reduce preloading by being more selective
+                external: (id) => {
+                    // Don't preload certain CSS files
+                    if (id.includes('category-circles.css') ||
+                        id.includes('product-page.css') ||
+                        id.includes('animations.css')) {
+                        return false;
+                    }
+                    return false;
+                }
             },
             chunkSizeWarningLimit: 1000,
         },

@@ -1,12 +1,13 @@
-import React, { useState, useEffect, lazy, Suspense } from 'react';
+import React, { useState, useEffect, lazy, Suspense, memo, useCallback, useMemo } from 'react';
 import { useForm } from '@inertiajs/react';
-import { motion } from 'framer-motion';
+import { motion, useReducedMotion } from 'framer-motion';
 import { loadStripe } from '@stripe/stripe-js';
 import { Elements } from '@stripe/react-stripe-js';
 import toast from 'react-hot-toast';
 import CinematicLayout from '@/Layouts/CinematicLayout';
 import axios from 'axios';
 import { useTranslation } from '@/utils/translate';
+import { usePerformanceOptimization } from '@/utils/usePerformanceOptimization';
 
 // Lazy load the PaymentForm component to improve initial load time
 const PaymentForm = lazy(() => import('@/Components/PaymentForm'));
@@ -18,9 +19,13 @@ const stripePromise = loadStripe(stripeKey);
 
 
 // Main Checkout Component
-const Checkout = ({ cart, order }) => {
+const Checkout = memo(({ cart, order }) => {
   // Use the translation hook
   const { t } = useTranslation();
+
+  // Performance optimization hooks
+  const { animationVariants, performanceSettings } = usePerformanceOptimization();
+  const prefersReducedMotion = useReducedMotion();
 
   const [paymentSuccess, setPaymentSuccess] = useState(false);
   const [completedOrder, setCompletedOrder] = useState(order || null);
@@ -52,7 +57,8 @@ const Checkout = ({ cart, order }) => {
   // Add state for loading indicators
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleSubmit = async (e) => {
+  // Memoize submit handler to prevent unnecessary re-renders
+  const handleSubmit = useCallback(async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
 
@@ -87,21 +93,23 @@ const Checkout = ({ cart, order }) => {
       setIsSubmitting(false);
       toast.error(error.response?.data?.error || t('checkout.error_try_again'));
     }
-  };
+  }, [data, post, t, setIsSubmitting]);
 
-  const handlePaymentSuccess = (order) => {
+  // Memoize payment success handler
+  const handlePaymentSuccess = useCallback((order) => {
     setPaymentSuccess(true);
     setCompletedOrder(order);
     // Redirect to success page
     window.location.href = route('orders.success', order.id);
-  };
+  }, []);
 
-  const handlePaymentError = (errorMessage) => {
+  // Memoize payment error handler
+  const handlePaymentError = useCallback((errorMessage) => {
     toast.error(errorMessage);
-  };
+  }, []);
 
-  // Function to get user's current location
-  const getCurrentLocation = () => {
+  // Memoize location handler to prevent unnecessary re-renders
+  const getCurrentLocation = useCallback(() => {
     if (!navigator.geolocation) {
       setLocationStatus({
         loading: false,
@@ -193,16 +201,14 @@ const Checkout = ({ cart, order }) => {
         maximumAge: 0
       }
     );
-  };
+  }, [data, setData, t]);
 
   return (
     <CinematicLayout>
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10 md:py-12">
       <motion.h1
-        initial={{ opacity: 0, y: -10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.4 }}
-        className="text-2xl sm:text-3xl font-bold text-cinematic-900 dark:text-white mb-6 sm:mb-8"
+        {...animationVariants.item}
+        className="text-2xl sm:text-3xl font-bold text-cinematic-900 dark:text-white mb-6 sm:mb-8 performance-text"
       >
         {t('checkout.title')}
       </motion.h1>
@@ -210,10 +216,8 @@ const Checkout = ({ cart, order }) => {
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 sm:gap-8">
         {/* Checkout Form */}
         <motion.div
-          initial={{ opacity: 0, x: -20 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.5 }}
-          className="lg:col-span-8 order-2 lg:order-1"
+          {...animationVariants.item}
+          className="lg:col-span-8 order-2 lg:order-1 performance-card"
         >
           {!completedOrder ? (
             <form onSubmit={handleSubmit} className="bg-white dark:bg-cinematic-800 rounded-lg shadow-md dark:shadow-soft p-6 border border-cinematic-200 dark:border-cinematic-700">
@@ -506,10 +510,8 @@ const Checkout = ({ cart, order }) => {
 
         {/* Order Summary */}
         <motion.div
-          initial={{ opacity: 0, y: 20, x: 0 }}
-          animate={{ opacity: 1, y: 0, x: 0 }}
-          transition={{ duration: 0.5 }}
-          className="lg:col-span-4 order-1 lg:order-2 mb-6 lg:mb-0"
+          {...animationVariants.item}
+          className="lg:col-span-4 order-1 lg:order-2 mb-6 lg:mb-0 performance-card"
         >
           <div className="bg-white dark:bg-cinematic-800 rounded-lg shadow-md dark:shadow-soft p-5 sm:p-6 sticky top-24 border border-cinematic-200 dark:border-cinematic-700">
             <h2 className="text-lg font-medium text-cinematic-900 dark:text-white mb-4 sm:mb-6">{t('checkout.order_summary')}</h2>
@@ -576,6 +578,8 @@ const Checkout = ({ cart, order }) => {
     </div>
   </CinematicLayout>
   );
-};
+});
+
+Checkout.displayName = 'Checkout';
 
 export default Checkout;

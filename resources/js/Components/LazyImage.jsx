@@ -1,14 +1,14 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback, memo } from 'react';
 
 /**
  * LazyImage component for optimized image loading
- * 
+ *
  * Features:
  * - Lazy loading with IntersectionObserver
  * - WebP support with fallback
  * - Blur-up loading effect
  * - Responsive image sizes
- * 
+ *
  * @param {Object} props
  * @param {string} props.src - Main image source
  * @param {string} props.webpSrc - WebP version of the image (optional)
@@ -17,7 +17,7 @@ import React, { useState, useEffect, useRef } from 'react';
  * @param {string} props.className - Additional CSS classes
  * @param {Object} props.sizes - Responsive sizes configuration (optional)
  */
-const LazyImage = ({
+const LazyImage = memo(({
   src,
   webpSrc,
   placeholderSrc,
@@ -26,14 +26,19 @@ const LazyImage = ({
   sizes = null,
   width,
   height,
+  priority = false,
   ...props
 }) => {
   const [isLoaded, setIsLoaded] = useState(false);
-  const [isInView, setIsInView] = useState(false);
+  const [isInView, setIsInView] = useState(priority);
+  const [hasError, setHasError] = useState(false);
   const imgRef = useRef(null);
+  const observerRef = useRef(null);
 
-  // Set up intersection observer for lazy loading
+  // Optimized intersection observer setup
   useEffect(() => {
+    if (priority || isInView) return; // Skip if already in view or priority
+
     const observer = new IntersectionObserver(
       (entries) => {
         if (entries[0].isIntersecting) {
@@ -41,24 +46,34 @@ const LazyImage = ({
           observer.disconnect();
         }
       },
-      { rootMargin: '200px' } // Start loading when image is 200px from viewport
+      {
+        rootMargin: '50px', // Reduced margin for better performance
+        threshold: 0.1 // Only trigger when 10% visible
+      }
     );
+
+    observerRef.current = observer;
 
     if (imgRef.current) {
       observer.observe(imgRef.current);
     }
 
     return () => {
-      if (imgRef.current) {
-        observer.disconnect();
+      if (observerRef.current) {
+        observerRef.current.disconnect();
       }
     };
+  }, [priority, isInView]);
+
+  // Optimized event handlers with useCallback
+  const handleImageLoaded = useCallback(() => {
+    setIsLoaded(true);
   }, []);
 
-  // Handle image load event
-  const handleImageLoaded = () => {
-    setIsLoaded(true);
-  };
+  const handleImageError = useCallback(() => {
+    setHasError(true);
+    setIsLoaded(true); // Still mark as loaded to hide spinner
+  }, []);
 
   // Determine image source based on loading state
   const imageSrc = isInView ? src : placeholderSrc || src;
@@ -80,11 +95,13 @@ const LazyImage = ({
           <img
             src={src}
             alt={alt}
-            className={`w-full h-full object-cover transition-opacity duration-500 ${
+            className={`w-full h-full object-cover transition-opacity duration-300 ${
               isLoaded ? 'opacity-100' : 'opacity-0'
             }`}
-            loading="lazy"
+            loading={priority ? "eager" : "lazy"}
+            decoding="async"
             onLoad={handleImageLoaded}
+            onError={handleImageError}
             sizes={sizesAttr}
             width={width}
             height={height}
@@ -93,13 +110,15 @@ const LazyImage = ({
         </picture>
       ) : (
         <img
-          src={imageSrc}
+          src={hasError ? '/assets/default-product.png' : imageSrc}
           alt={alt}
-          className={`w-full h-full object-cover transition-opacity duration-500 ${
+          className={`w-full h-full object-cover transition-opacity duration-300 ${
             isLoaded ? 'opacity-100' : 'opacity-0'
           }`}
-          loading="lazy"
+          loading={priority ? "eager" : "lazy"}
+          decoding="async"
           onLoad={handleImageLoaded}
+          onError={handleImageError}
           sizes={sizesAttr}
           width={width}
           height={height}
@@ -125,6 +144,6 @@ const LazyImage = ({
       )}
     </div>
   );
-};
+});
 
 export default LazyImage;

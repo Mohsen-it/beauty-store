@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback, useMemo, memo } from 'react';
 import { Head, Link, useForm } from '@inertiajs/react';
 import { motion, AnimatePresence } from 'framer-motion';
 import axios from 'axios';
@@ -9,10 +9,11 @@ import '../../../css/category-circles.css';
 import '../../../css/product-page.css';
 import '../../../css/mobile-first.css';
 import ImageLightbox from '@/Components/ImageLightbox';
+import LazyImage from '@/Components/LazyImage';
 
 import CinematicLayout from '@/Layouts/CinematicLayout';
 
-const ProductShow = ({ product, relatedProducts }) => {
+const ProductShow = memo(({ product, relatedProducts }) => {
   const [quantity, setQuantity] = useState(1);
   const [activeImage, setActiveImage] = useState(product.image_url);
   const [activeImageIndex, setActiveImageIndex] = useState(0);
@@ -31,6 +32,10 @@ const ProductShow = ({ product, relatedProducts }) => {
 
   // State to track quantity for each related product
   const [relatedProductQuantities, setRelatedProductQuantities] = useState({});
+
+  // Memoize expensive calculations
+  const memoizedRelatedProducts = useMemo(() => relatedProducts, [relatedProducts]);
+  const memoizedProductImages = useMemo(() => productImages, [productImages]);
 
   // Create a form for each related product
   const relatedProductForms = {};
@@ -254,17 +259,17 @@ const ProductShow = ({ product, relatedProducts }) => {
     }
   };
 
-  const incrementQuantity = () => {
+  const incrementQuantity = useCallback(() => {
     if (quantity < product.stock) {
       setQuantity(quantity + 1);
     }
-  };
+  }, [quantity, product.stock]);
 
-  const decrementQuantity = () => {
+  const decrementQuantity = useCallback(() => {
     if (quantity > 1) {
       setQuantity(quantity - 1);
     }
-  };
+  }, [quantity]);
 
   // Functions for related products quantity control
   const incrementRelatedQuantity = (productId) => {
@@ -412,23 +417,32 @@ const ProductShow = ({ product, relatedProducts }) => {
     }
   };
 
-  const container = {
-    hidden: { opacity: 0 },
-    show: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.1
+  // Memoized animation variants for better performance
+  const animationVariants = useMemo(() => ({
+    container: {
+      hidden: { opacity: 0 },
+      show: {
+        opacity: 1,
+        transition: {
+          staggerChildren: 0.05 // Reduced for better performance
+        }
+      }
+    },
+    item: {
+      hidden: { opacity: 0, y: 10 }, // Reduced movement for better performance
+      show: {
+        opacity: 1,
+        y: 0,
+        transition: {
+          type: "tween",
+          duration: 0.2 // Shorter duration for better performance
+        }
       }
     }
-  };
-
-  const item = {
-    hidden: { opacity: 0, y: 20 },
-    show: { opacity: 1, y: 0 }
-  };
+  }), []);
 
   // Function to handle mobile gallery scrolling
-  const handleGalleryScroll = (index) => {
+  const handleGalleryScroll = useCallback((index) => {
     if (galleryRef.current) {
       setGalleryScrolling(true);
       setActiveImageIndex(index);
@@ -441,14 +455,14 @@ const ProductShow = ({ product, relatedProducts }) => {
 
       setTimeout(() => {
         setGalleryScrolling(false);
-      }, 500);
+      }, 300); // Reduced timeout for better performance
     }
-  };
+  }, []);
 
   // Function to toggle accordion sections
-  const toggleAccordion = (section) => {
+  const toggleAccordion = useCallback((section) => {
     setActiveAccordion(activeAccordion === section ? null : section);
-  };
+  }, [activeAccordion]);
 
   return (
     <CinematicLayout>
@@ -597,14 +611,13 @@ const ProductShow = ({ product, relatedProducts }) => {
                   {productImages.length > 0 ? (
                     productImages.map((image, index) => (
                       <div key={index} className="mobile-gallery-slide h-full">
-                        <img
+                        <LazyImage
                           src={image || `/assets/default-product.png`}
                           alt={`${product.name} ${index + 1}`}
-                          loading={index === 0 ? "eager" : "lazy"}
+                          priority={index === 0}
                           className="w-full h-full object-contain"
-                          onError={(e) => {
-                            e.target.src = `/assets/default-product.png`;
-                          }}
+                          width="400"
+                          height="400"
                         />
 
                         {/* Sale discount tag - Only show on first slide */}
@@ -622,11 +635,13 @@ const ProductShow = ({ product, relatedProducts }) => {
                     ))
                   ) : (
                     <div className="mobile-gallery-slide h-full">
-                      <img
+                      <LazyImage
                         src={`/assets/default-product.png`}
                         alt={product.name}
-                        loading="eager"
+                        priority={true}
                         className="w-full h-full object-contain"
+                        width="400"
+                        height="400"
                       />
                     </div>
                   )}
@@ -686,14 +701,12 @@ const ProductShow = ({ product, relatedProducts }) => {
                       }
                     }}
                   >
-                    <img
+                    <LazyImage
                       src={image}
                       alt={`${product.name} ${index + 1}`}
                       className="h-full w-full object-cover object-center"
-                      loading="lazy"
-                      onError={(e) => {
-                        e.target.src = `/assets/default-product.png`;
-                      }}
+                      width="100"
+                      height="100"
                     />
                   </div>
                 ))}
@@ -919,40 +932,35 @@ const ProductShow = ({ product, relatedProducts }) => {
   <section className="mt-16 sm:mt-20 pb-20 md:pb-8">
     <h2 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white mb-8 text-center">{t('products.related_products')}</h2>
     <motion.div
-      variants={container}
+      variants={animationVariants.container}
       initial="hidden"
       whileInView="show"
-      viewport={{ once: true }}
+      viewport={{ once: true, margin: "-50px" }}
       className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4"
     >
-      {relatedProducts.map((relatedProduct) => (
-        <motion.div key={relatedProduct.id} variants={item} className="h-full">
+      {memoizedRelatedProducts.map((relatedProduct) => (
+        <motion.div key={relatedProduct.id} variants={animationVariants.item} className="h-full">
           <Link href={route('products.show', relatedProduct.slug)} className="h-full">
             <div className="bg-white dark:bg-cinematic-800 rounded-xl shadow-md hover:shadow-lg transition-all duration-300 overflow-hidden h-full flex flex-col min-h-[280px] border border-gray-200 dark:border-cinematic-700">
               <div className="relative aspect-[4/3] overflow-hidden bg-gray-100 dark:bg-gray-800">
-                <img
+                <LazyImage
                   src={
-                    relatedProduct.images && relatedProduct.images.length > 0 ? (
-                      relatedProduct.images[0]?.image_url
-                        ? relatedProduct.images[0].image_url
-                        : relatedProduct.images[0]?.url
-                          ? relatedProduct.images[0].url.startsWith('http://') || relatedProduct.images[0].url.startsWith('https://')
-                            ? relatedProduct.images[0].url
-                            : relatedProduct.images[0].url.startsWith('storage/')
-                              ? `/${relatedProduct.images[0].url}?v=${new Date().getTime()}`
-                              : `/storage/${relatedProduct.images[0].url.replace(/^\//, '')}?v=${new Date().getTime()}`
-                          : `/assets/default-product_1.png`
-                    ) : (
-                      relatedProduct.image_url
-                        ? relatedProduct.image_url
-                        : `/assets/default-product_1.png`
-                    )
+                    (relatedProduct.images && relatedProduct.images.length > 0 && relatedProduct.images[0]?.image_url) ||
+                    (relatedProduct.images && relatedProduct.images.length > 0 && relatedProduct.images[0]?.url ?
+                      (relatedProduct.images[0].url.startsWith('http://') || relatedProduct.images[0].url.startsWith('https://') ?
+                        relatedProduct.images[0].url :
+                        relatedProduct.images[0].url.startsWith('storage/') ?
+                          `/${relatedProduct.images[0].url}` :
+                          `/storage/${relatedProduct.images[0].url.replace(/^\//, '')}`
+                      ) : null
+                    ) ||
+                    relatedProduct.image_url ||
+                    `/assets/default-product_1.png`
                   }
                   alt={relatedProduct.name}
                   className="h-full w-full object-cover object-center transition-transform duration-300 hover:scale-105"
-                  onError={(e) => {
-                    e.target.src = `/assets/default-product_1.png`;
-                  }}
+                  width="200"
+                  height="200"
                 />
                 {relatedProduct.sale_price && (
                   <div className="category-circle">
@@ -1077,6 +1085,6 @@ const ProductShow = ({ product, relatedProducts }) => {
       </div>
     </CinematicLayout>
   );
-};
+});
 
 export default ProductShow;

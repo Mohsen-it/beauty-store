@@ -1,10 +1,10 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, memo } from 'react';
 import { CardElement, useStripe, useElements } from '@stripe/react-stripe-js';
 import { motion } from 'framer-motion';
 import toast from 'react-hot-toast';
 import axios from 'axios';
 
-const PaymentForm = ({ order, onSuccess, onError }) => {
+const PaymentForm = memo(({ order, onSuccess, onError }) => {
   const stripe = useStripe();
   const elements = useElements();
   const [loading, setLoading] = useState(false);
@@ -174,6 +174,8 @@ const PaymentForm = ({ order, onSuccess, onError }) => {
       {/* Remove debug information in production */}
     </form>
   );
-};
+});
+
+PaymentForm.displayName = 'PaymentForm';
 
 export default PaymentForm;

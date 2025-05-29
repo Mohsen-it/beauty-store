@@ -1,14 +1,15 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useCallback, useMemo, memo } from "react";
 import { Head, Link } from "@inertiajs/react";
 import { motion, useReducedMotion } from "framer-motion";
 import CinematicLayout from "@/Layouts/CinematicLayout";
+import LazyImage from "@/Components/LazyImage";
 import { t } from "@/utils/translate";
 import { toast } from "react-hot-toast";
 import { getCsrfHeaders } from "@/utils/csrf";
 import "../../../css/category-circles.css";
 import "../../../css/carousel.css";
 
-const HomePage = ({ featuredProducts, categories }) => {
+const HomePage = memo(({ featuredProducts, categories }) => {
   // State to track which product is being added to cart (for animation)
   const [addingToCart, setAddingToCart] = useState(null);
 
@@ -18,6 +19,10 @@ const HomePage = ({ featuredProducts, categories }) => {
   // Refs for scrollable containers
   const categoryScrollRef = useRef(null);
   const productsScrollRef = useRef(null);
+
+  // Memoize expensive calculations
+  const memoizedFeaturedProducts = useMemo(() => featuredProducts, [featuredProducts]);
+  const memoizedCategories = useMemo(() => categories, [categories]);
 
   // Use effect to optimize image loading
   useEffect(() => {
@@ -42,7 +47,7 @@ const HomePage = ({ featuredProducts, categories }) => {
     }
   }, []);
 
-  const handleAddToCart = async (productId) => {
+  const handleAddToCart = useCallback(async (productId) => {
     // Set the product as being added to cart (for animation)
     setAddingToCart(productId);
 
@@ -106,36 +111,36 @@ const HomePage = ({ featuredProducts, categories }) => {
       // إزالة حالة الإضافة في حالة الخطأ
       setAddingToCart(null);
     }
-  };
+  }, []);
 
-  // Optimized animation variants for better mobile performance
-  // Respect user's preference for reduced motion
-  const container = {
-    hidden: { opacity: prefersReducedMotion ? 0.8 : 0 },
-    show: {
-      opacity: 1,
-      transition: {
-        staggerChildren: prefersReducedMotion ? 0.03 : 0.08, // Faster staggering for reduced motion
-        delayChildren: prefersReducedMotion ? 0 : 0.1,       // No delay for reduced motion
+  // Memoized animation variants for better performance
+  const animationVariants = useMemo(() => ({
+    container: {
+      hidden: { opacity: prefersReducedMotion ? 0.9 : 0 },
+      show: {
+        opacity: 1,
+        transition: {
+          staggerChildren: prefersReducedMotion ? 0.02 : 0.05, // Reduced staggering for better performance
+          delayChildren: prefersReducedMotion ? 0 : 0.05,      // Reduced delay
+        },
       },
     },
-  };
-
-  const item = {
-    hidden: {
-      opacity: prefersReducedMotion ? 0.8 : 0,
-      y: prefersReducedMotion ? 5 : 15        // Minimal movement for reduced motion
-    },
-    show: {
-      opacity: 1,
-      y: 0,
-      transition: {
-        type: "tween",                                // Using tween for more predictable performance
-        duration: prefersReducedMotion ? 0.2 : 0.4,   // Shorter duration for reduced motion
-        ease: "easeOut"                               // Smoother easing function
-      }
-    },
-  };
+    item: {
+      hidden: {
+        opacity: prefersReducedMotion ? 0.9 : 0,
+        y: prefersReducedMotion ? 3 : 10        // Reduced movement for better performance
+      },
+      show: {
+        opacity: 1,
+        y: 0,
+        transition: {
+          type: "tween",                                // Using tween for more predictable performance
+          duration: prefersReducedMotion ? 0.15 : 0.25, // Shorter duration for better performance
+          ease: "easeOut"                               // Smoother easing function
+        }
+      },
+    }
+  }), [prefersReducedMotion]);
 
   return (
     <CinematicLayout>
@@ -169,12 +174,11 @@ const HomePage = ({ featuredProducts, categories }) => {
                 }}
                 className="rounded-xl overflow-hidden shadow-lg dark:shadow-soft"
               >
-                <img
-                  src={`/assets/cover.png?v=${new Date().getTime()}`}
+                <LazyImage
+                  src="/assets/cover.png"
                   alt="Cosmetics Collection"
                   className="w-full h-auto object-cover"
-                  loading="eager"
-                  fetchpriority="high"
+                  priority={true}
                   width="600"
                   height="400"
                 />
@@ -298,17 +302,17 @@ const HomePage = ({ featuredProducts, categories }) => {
             {/* Scrollable container */}
             <div ref={categoryScrollRef} className="overflow-x-auto pb-4 hide-scrollbar snap-x">
               <motion.div
-                variants={container}
+                variants={animationVariants.container}
                 initial="hidden"
                 whileInView="show"
-                viewport={{ once: true }}
+                viewport={{ once: true, margin: "-50px" }}
                 className="flex md:grid md:grid-cols-4 gap-3 sm:gap-4 md:gap-6"
                 style={{ minWidth: "min-content" }}
               >
-                {categories.map((category) => (
+                {memoizedCategories.map((category) => (
                   <motion.div
                     key={category.id}
-                    variants={item}
+                    variants={animationVariants.item}
                     className="touch-manipulation w-32 sm:w-40 md:w-full flex-shrink-0 md:flex-shrink snap-center carousel-item"
                   >
                     <Link
@@ -319,15 +323,12 @@ const HomePage = ({ featuredProducts, categories }) => {
                       <div className="relative overflow-hidden rounded-lg shadow-md dark:shadow-soft hover:shadow-lg transition-shadow duration-300 h-full">
                         {/* Aspect ratio container for consistent sizing */}
                         <div className="aspect-square w-full overflow-hidden bg-gray-200 dark:bg-cinematic-700">
-                          <img
-                            src={
-                              category.image_url
-                                ? category.image_url
-                                : `/assets/default-category.png`
-                            }
+                          <LazyImage
+                            src={category.image_url || `/assets/default-category.png`}
                             alt={category.name}
                             className="h-full w-full object-cover object-center transition-opacity duration-300"
-                            loading="lazy"
+                            width="160"
+                            height="160"
                           />
                         </div>
 
@@ -420,17 +421,17 @@ const HomePage = ({ featuredProducts, categories }) => {
             {/* Scrollable container */}
             <div ref={productsScrollRef} className="overflow-x-auto pb-4 hide-scrollbar snap-x">
               <motion.div
-                variants={container}
+                variants={animationVariants.container}
                 initial="hidden"
                 whileInView="show"
-                viewport={{ once: true }}
+                viewport={{ once: true, margin: "-50px" }}
                 className="flex sm:grid sm:grid-cols-3 lg:grid-cols-4 gap-2 sm:gap-3 md:gap-4"
                 style={{ minWidth: "min-content" }}
               >
-            {featuredProducts.map((product) => (
+            {memoizedFeaturedProducts.map((product) => (
               <motion.div
                 key={product.id}
-                variants={item}
+                variants={animationVariants.item}
                 className="touch-manipulation carousel-item snap-center flex-shrink-0 w-48 sm:w-auto group"
               >
                 <div className="card-product h-full flex flex-col">
@@ -441,19 +442,17 @@ const HomePage = ({ featuredProducts, categories }) => {
                     aria-label={`View ${product.name} details`}
                   >
                     <div className="aspect-square w-full overflow-hidden bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-700 relative">
-                      <img
+                      <LazyImage
                         src={
-                          product.image_url
-                            ? product.image_url
-                            : product.images && product.images[0]?.image_url
-                              ? product.images[0].image_url
-                              : product.images && product.images[0]?.url
-                                ? `/storage/${product.images[0].url}`
-                                : `/assets/default-product_1.png`
+                          product.image_url ||
+                          (product.images && product.images[0]?.image_url) ||
+                          (product.images && product.images[0]?.url ? `/storage/${product.images[0].url}` : null) ||
+                          `/assets/default-product_1.png`
                         }
                         alt={product.name}
                         className="h-full w-full object-cover object-center group-hover:scale-110 transition-transform duration-700"
-                        loading="lazy"
+                        width="200"
+                        height="200"
                       />
 
                       {/* Gradient overlay on hover */}
@@ -596,16 +595,16 @@ const HomePage = ({ featuredProducts, categories }) => {
           </div>
           <div className="overflow-x-auto pb-4 hide-scrollbar -mx-4 px-4 sm:mx-0 sm:px-0 sm:overflow-visible snap-x">
             <motion.div
-              variants={container}
+              variants={animationVariants.container}
               initial="hidden"
               whileInView="show"
-              viewport={{ once: true }}
+              viewport={{ once: true, margin: "-100px" }}
               className="flex sm:grid sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-5 md:gap-6"
               style={{ minWidth: "min-content" }}
             >
             {/* Premium Quality */}
             <motion.div
-              variants={item}
+              variants={animationVariants.item}
               className="card-feature p-4 sm:p-6 hover-lift flex flex-row sm:flex-col items-center sm:items-center sm:text-center flex-shrink-0 sm:flex-shrink w-72 sm:w-auto snap-center"
             >
               <div className="flex-shrink-0 flex items-center justify-center w-14 h-14 sm:w-20 sm:h-20 rounded-full bg-gradient-to-br from-pink-500 to-purple-600 text-white shadow-xl mb-0 sm:mb-6 mr-4 sm:mr-0 animate-glow">
@@ -637,7 +636,7 @@ const HomePage = ({ featuredProducts, categories }) => {
 
             {/* Cruelty Free */}
             <motion.div
-              variants={item}
+              variants={animationVariants.item}
               className="card-feature p-4 sm:p-6 hover-lift flex flex-row sm:flex-col items-center sm:items-center sm:text-center flex-shrink-0 sm:flex-shrink w-72 sm:w-auto snap-center"
             >
               <div className="flex-shrink-0 flex items-center justify-center w-14 h-14 sm:w-20 sm:h-20 rounded-full bg-gradient-to-br from-green-500 to-emerald-600 text-white shadow-xl mb-0 sm:mb-6 mr-4 sm:mr-0 animate-glow">
@@ -669,7 +668,7 @@ const HomePage = ({ featuredProducts, categories }) => {
 
             {/* Fast Shipping */}
             <motion.div
-              variants={item}
+              variants={animationVariants.item}
               className="card-feature p-4 sm:p-6 hover-lift flex flex-row sm:flex-col items-center sm:items-center sm:text-center sm:col-span-2 md:col-span-1 flex-shrink-0 sm:flex-shrink w-72 sm:w-auto sm:mx-auto sm:max-w-md md:max-w-none snap-center"
             >
               <div className="flex-shrink-0 flex items-center justify-center w-14 h-14 sm:w-20 sm:h-20 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 text-white shadow-xl mb-0 sm:mb-6 mr-4 sm:mr-0 animate-glow">
@@ -704,6 +703,6 @@ const HomePage = ({ featuredProducts, categories }) => {
       </section>
     </CinematicLayout>
   );
-};
+});
 
 export default HomePage;

@@ -1,11 +1,11 @@
-import React from 'react';
+import React, { memo, useCallback, useEffect, useMemo, useRef } from 'react';
 import { Link } from '@inertiajs/react';
 import ResponsiveNavLink from '@/Components/ResponsiveNavLink';
 import DarkModeToggle from '@/Components/DarkModeToggle';
 import LanguageSwitcher from '@/Components/LanguageSwitcher';
 import { t } from '@/utils/translate';
 
-const MobileMenuSimple = ({
+const MobileMenuSimple = memo(({
   isOpen,
   onClose,
   auth,
@@ -13,8 +13,11 @@ const MobileMenuSimple = ({
   handleLogout,
   rtl
 }) => {
+  // Ref for the menu panel to detect clicks outside
+  const menuPanelRef = useRef(null);
+
   // Handle body scroll lock when mobile menu is open
-  React.useEffect(() => {
+  useEffect(() => {
     if (isOpen) {
       document.body.style.overflow = 'hidden';
     } else {
@@ -26,27 +29,162 @@ const MobileMenuSimple = ({
     };
   }, [isOpen]);
 
+  // Memoize close handler to prevent unnecessary re-renders
+  const handleClose = useCallback(() => {
+    onClose();
+  }, [onClose]);
+
+  // Handle click outside menu panel to close menu
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const handleClickOutside = (event) => {
+      // Check if the click is outside the menu panel
+      if (menuPanelRef.current && !menuPanelRef.current.contains(event.target)) {
+        handleClose();
+      }
+    };
+
+    // Add event listener with a slight delay to prevent immediate closing
+    // when the menu is just opened by a button click
+    const timeoutId = setTimeout(() => {
+      document.addEventListener('mousedown', handleClickOutside);
+      document.addEventListener('touchstart', handleClickOutside, { passive: true });
+    }, 150);
+
+    return () => {
+      clearTimeout(timeoutId);
+      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('touchstart', handleClickOutside);
+    };
+  }, [isOpen, handleClose]);
+
+  // Memoize logout handler
+  const handleLogoutClick = useCallback(() => {
+    handleLogout();
+    onClose();
+  }, [handleLogout, onClose]);
+
+  // Memoize navigation items to prevent unnecessary re-renders
+  const mainNavigationItems = useMemo(() => [
+    {
+      href: route('home'),
+      active: route().current('home'),
+      label: t('navigation.home'),
+      key: 'home'
+    },
+    {
+      href: route('products.index'),
+      active: route().current('products.index'),
+      label: t('navigation.products'),
+      key: 'products'
+    },
+    {
+      href: route('categories.skincare'),
+      active: route().current('categories.skincare'),
+      label: t('navigation.skincare'),
+      key: 'skincare'
+    },
+    {
+      href: route('categories.makeup'),
+      active: route().current('categories.makeup'),
+      label: t('navigation.makeup'),
+      key: 'makeup'
+    },
+    {
+      href: route('categories.haircare'),
+      active: route().current('categories.haircare'),
+      label: t('navigation.haircare'),
+      key: 'haircare'
+    },
+    {
+      href: route('categories.fragrance'),
+      active: route().current('categories.fragrance'),
+      label: t('navigation.fragrance'),
+      key: 'fragrance'
+    }
+  ], []);
+
+  // Memoize user navigation items
+  const userNavigationItems = useMemo(() => {
+    if (!auth.user) return [];
+
+    return [
+      {
+        href: route('profile.edit'),
+        active: route().current('profile.edit'),
+        label: t('navigation.profile'),
+        key: 'profile'
+      },
+      {
+        href: route('orders.index'),
+        active: route().current('orders.index'),
+        label: t('navigation.orders'),
+        key: 'orders'
+      },
+      {
+        href: route('favorites.index'),
+        active: route().current('favorites.index'),
+        label: t('navigation.favorites'),
+        key: 'favorites'
+      },
+      {
+        href: route('cart.index'),
+        active: route().current('cart.index'),
+        label: t('navigation.cart'),
+        key: 'cart'
+      }
+    ];
+  }, [auth.user]);
+
+  // Memoize guest navigation items
+  const guestNavigationItems = useMemo(() => {
+    if (auth.user) return [];
+
+    return [
+      {
+        href: route('login'),
+        active: route().current('login'),
+        label: t('auth.login'),
+        key: 'login'
+      },
+      {
+        href: route('register'),
+        active: route().current('register'),
+        label: t('auth.register'),
+        key: 'register'
+      }
+    ];
+  }, [auth.user]);
+
   if (!isOpen) return null;
 
   return (
-    <div className="lg:hidden">
+    <div className="lg:hidden fixed inset-0 z-[998]">
       {/* Backdrop */}
       <div
         className="fixed inset-0 z-[998] bg-black/60 dark:bg-black/80"
-        onClick={onClose}
+        onClick={(event) => {
+          // Only close if clicking directly on the backdrop, not on child elements
+          if (event.target === event.currentTarget) {
+            handleClose();
+          }
+        }}
         aria-hidden="true"
       />
 
       {/* Menu Panel */}
       <div
+        ref={menuPanelRef}
         className={`fixed inset-y-0 ${rtl ? 'right-0' : 'left-0'} z-[999] w-[85%] max-w-sm bg-white dark:bg-gray-900 shadow-2xl`}
         role="dialog"
         aria-modal="true"
         aria-label="Mobile navigation menu"
-        style={{ 
+        style={{
           minHeight: '100vh',
           maxHeight: '100vh'
         }}
+        onClick={(e) => e.stopPropagation()}
       >
         <div className="h-full flex flex-col">
           {/* Menu header */}
@@ -73,48 +211,17 @@ const MobileMenuSimple = ({
               <div className="text-xs uppercase text-gray-500 dark:text-gray-400 mb-3 font-medium tracking-wider">
                 {t('navigation.main_menu')}
               </div>
-              <ResponsiveNavLink
-                href={route('home')}
-                active={route().current('home')}
-                onClick={onClose}
-              >
-                {t('navigation.home')}
-              </ResponsiveNavLink>
-              <ResponsiveNavLink
-                href={route('products.index')}
-                active={route().current('products.index')}
-                onClick={onClose}
-              >
-                {t('navigation.products')}
-              </ResponsiveNavLink>
-              <ResponsiveNavLink
-                href={route('categories.skincare')}
-                active={route().current('categories.skincare')}
-                onClick={onClose}
-              >
-                {t('navigation.skincare')}
-              </ResponsiveNavLink>
-              <ResponsiveNavLink
-                href={route('categories.makeup')}
-                active={route().current('categories.makeup')}
-                onClick={onClose}
-              >
-                {t('navigation.makeup')}
-              </ResponsiveNavLink>
-              <ResponsiveNavLink
-                href={route('categories.haircare')}
-                active={route().current('categories.haircare')}
-                onClick={onClose}
-              >
-                {t('navigation.haircare')}
-              </ResponsiveNavLink>
-              <ResponsiveNavLink
-                href={route('categories.fragrance')}
-                active={route().current('categories.fragrance')}
-                onClick={onClose}
-              >
-                {t('navigation.fragrance')}
-              </ResponsiveNavLink>
+              {mainNavigationItems.map((item) => (
+                <ResponsiveNavLink
+                  key={item.key}
+                  href={item.href}
+                  active={item.active}
+                  onClick={handleClose}
+                  className="nav-item"
+                >
+                  {item.label}
+                </ResponsiveNavLink>
+              ))}
             </nav>
 
             {/* Auth section */}
@@ -124,40 +231,20 @@ const MobileMenuSimple = ({
                   {t('auth.account')}
                 </div>
                 <div className="space-y-2">
-                  <ResponsiveNavLink
-                    href={route('profile.edit')}
-                    active={route().current('profile.edit')}
-                    onClick={onClose}
-                  >
-                    {t('navigation.profile')}
-                  </ResponsiveNavLink>
-                  <ResponsiveNavLink
-                    href={route('orders.index')}
-                    active={route().current('orders.index')}
-                    onClick={onClose}
-                  >
-                    {t('navigation.orders')}
-                  </ResponsiveNavLink>
-                  <ResponsiveNavLink
-                    href={route('favorites.index')}
-                    active={route().current('favorites.index')}
-                    onClick={onClose}
-                  >
-                    {t('navigation.favorites')}
-                  </ResponsiveNavLink>
-                  <ResponsiveNavLink
-                    href={route('cart.index')}
-                    active={route().current('cart.index')}
-                    onClick={onClose}
-                  >
-                    {t('navigation.cart')}
-                  </ResponsiveNavLink>
+                  {userNavigationItems.map((item) => (
+                    <ResponsiveNavLink
+                      key={item.key}
+                      href={item.href}
+                      active={item.active}
+                      onClick={handleClose}
+                      className="nav-item"
+                    >
+                      {item.label}
+                    </ResponsiveNavLink>
+                  ))}
                   <button
-                    onClick={() => {
-                      handleLogout();
-                      onClose();
-                    }}
-                    className="w-full text-left pl-3 sm:pl-4 pr-4 sm:pr-5 py-3 sm:py-4 border-l-4 border-transparent text-gray-600 hover:text-gray-800 hover:bg-gray-50/90 hover:border-gray-300 focus:text-gray-800 focus:bg-gray-50 focus:border-gray-300 dark:text-gray-400 dark:hover:text-white dark:hover:bg-gray-800/90 dark:hover:border-gray-600 dark:focus:text-white dark:focus:bg-gray-800 dark:focus:border-gray-600 text-sm sm:text-base font-medium focus:outline-none focus:ring-2 focus:ring-pink-500 focus:ring-offset-2 dark:focus:ring-offset-gray-900 transition duration-200 ease-in-out rounded-r-xl min-h-[44px] flex items-center"
+                    onClick={handleLogoutClick}
+                    className="w-full text-left pl-3 sm:pl-4 pr-4 sm:pr-5 py-3 sm:py-4 border-l-4 border-transparent text-gray-600 hover:text-gray-800 hover:bg-gray-50/90 hover:border-gray-300 focus:text-gray-800 focus:bg-gray-50 focus:border-gray-300 dark:text-gray-400 dark:hover:text-white dark:hover:bg-gray-800/90 dark:hover:border-gray-600 dark:focus:text-white dark:focus:bg-gray-800 dark:focus:border-gray-600 text-sm sm:text-base font-medium focus:outline-none focus:ring-2 focus:ring-pink-500 focus:ring-offset-2 dark:focus:ring-offset-gray-900 transition duration-200 ease-in-out rounded-r-xl min-h-[44px] flex items-center btn-optimized"
                   >
                     {t('auth.logout')}
                   </button>
@@ -169,20 +256,17 @@ const MobileMenuSimple = ({
                   {t('auth.account')}
                 </div>
                 <div className="space-y-2">
-                  <ResponsiveNavLink
-                    href={route('login')}
-                    active={route().current('login')}
-                    onClick={onClose}
-                  >
-                    {t('auth.login')}
-                  </ResponsiveNavLink>
-                  <ResponsiveNavLink
-                    href={route('register')}
-                    active={route().current('register')}
-                    onClick={onClose}
-                  >
-                    {t('auth.register')}
-                  </ResponsiveNavLink>
+                  {guestNavigationItems.map((item) => (
+                    <ResponsiveNavLink
+                      key={item.key}
+                      href={item.href}
+                      active={item.active}
+                      onClick={handleClose}
+                      className="nav-item"
+                    >
+                      {item.label}
+                    </ResponsiveNavLink>
+                  ))}
                 </div>
               </div>
             )}
@@ -207,6 +291,8 @@ const MobileMenuSimple = ({
       </div>
     </div>
   );
-};
+});
+
+MobileMenuSimple.displayName = 'MobileMenuSimple';
 
 export default MobileMenuSimple;

@@ -1,10 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback, memo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { t } from '@/utils/translate';
 
 /**
  * Mobile filter component that expands when clicked
- * 
+ *
  * @param {Object} props - Component props
  * @param {React.ReactNode} props.children - Filter content
  * @param {string} props.title - Filter title
@@ -12,48 +12,48 @@ import { t } from '@/utils/translate';
  * @param {string} props.className - Additional classes to apply to the component
  * @returns {JSX.Element} - Mobile filter component
  */
-export default function MobileFilter({ 
-    children, 
-    title = t('products.filters'), 
+const MobileFilter = memo(({
+    children,
+    title = t('products.filters'),
     initiallyOpen = false,
-    className = '' 
-}) {
+    className = ''
+}) => {
     const [isOpen, setIsOpen] = useState(initiallyOpen);
     const [height, setHeight] = useState(initiallyOpen ? 'auto' : '60px');
     const contentRef = React.useRef(null);
 
-    // Handle window resize to adjust filter height
-    useEffect(() => {
-        const handleResize = () => {
-            if (window.innerWidth >= 768) {
-                setHeight('auto');
-            } else if (isOpen) {
-                setHeight('auto');
-            } else {
-                setHeight('60px');
-            }
-        };
-
-        window.addEventListener('resize', handleResize);
-        return () => window.removeEventListener('resize', handleResize);
+    // Handle window resize to adjust filter height - memoized with useCallback
+    const handleResize = useCallback(() => {
+        if (window.innerWidth >= 768) {
+            setHeight('auto');
+        } else if (isOpen) {
+            setHeight('auto');
+        } else {
+            setHeight('60px');
+        }
     }, [isOpen]);
 
-    // Toggle filter open/closed
-    const toggleFilter = () => {
+    useEffect(() => {
+        window.addEventListener('resize', handleResize);
+        return () => window.removeEventListener('resize', handleResize);
+    }, [handleResize]);
+
+    // Toggle filter open/closed - memoized with useCallback
+    const toggleFilter = useCallback(() => {
         if (window.innerWidth < 768) {
             setIsOpen(!isOpen);
             setHeight(!isOpen ? 'auto' : '60px');
         }
-    };
+    }, [isOpen]);
 
     return (
-        <motion.div 
+        <motion.div
             className={`bg-white dark:bg-gray-800 rounded-xl shadow-md overflow-hidden ${className}`}
             animate={{ height }}
             transition={{ duration: 0.3, ease: "easeInOut" }}
         >
             {/* Filter Header - Always visible */}
-            <div 
+            <div
                 className="p-4 flex justify-between items-center cursor-pointer md:cursor-default"
                 onClick={toggleFilter}
             >
@@ -90,11 +90,15 @@ export default function MobileFilter({
             </AnimatePresence>
         </motion.div>
     );
-}
+});
+
+MobileFilter.displayName = 'MobileFilter';
+
+export default MobileFilter;
 
 /**
  * Filter section component for grouping related filters
- * 
+ *
  * @param {Object} props - Component props
  * @param {React.ReactNode} props.children - Filter content
  * @param {string} props.title - Section title
@@ -102,19 +106,24 @@ export default function MobileFilter({
  * @param {string} props.className - Additional classes to apply to the component
  * @returns {JSX.Element} - Filter section component
  */
-export function FilterSection({ 
-    children, 
-    title, 
+export const FilterSection = memo(({
+    children,
+    title,
     initiallyOpen = true,
-    className = '' 
-}) {
+    className = ''
+}) => {
     const [isOpen, setIsOpen] = useState(initiallyOpen);
+
+    // Memoize toggle function
+    const toggleSection = useCallback(() => {
+        setIsOpen(!isOpen);
+    }, [isOpen]);
 
     return (
         <div className={`mb-4 ${className}`}>
-            <div 
+            <div
                 className="flex justify-between items-center mb-2 cursor-pointer"
-                onClick={() => setIsOpen(!isOpen)}
+                onClick={toggleSection}
             >
                 <h4 className="font-medium text-gray-700 dark:text-gray-300">{title}</h4>
                 <motion.button
@@ -143,4 +152,6 @@ export function FilterSection({
             </AnimatePresence>
         </div>
     );
-}
+});
+
+FilterSection.displayName = 'FilterSection';

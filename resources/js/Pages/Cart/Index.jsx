@@ -1,13 +1,14 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useCallback, memo } from 'react';
 import { Head, Link, useForm } from '@inertiajs/react';
 import { motion } from 'framer-motion';
 import { t } from '@/utils/translate';
 import { toast } from 'react-hot-toast';
 import axios from 'axios';
 import CinematicLayout from '@/Layouts/CinematicLayout';
+import LazyImage from '@/Components/LazyImage';
 import { getCsrfHeaders } from '@/utils/csrf';
 
-const CartIndex = ({ cart }) => {
+const CartIndex = memo(({ cart }) => {
   // State for tracking quantities
   const [itemQuantities, setItemQuantities] = useState(() => {
     const initialQuantities = {};
@@ -27,6 +28,9 @@ const CartIndex = ({ cart }) => {
 
   // State to track if cart is empty (used after clearing without reload)
   const [isCartEmpty, setIsCartEmpty] = useState(cart.items.length === 0);
+
+  // Memoize cart items for better performance
+  const memoizedCartItems = useMemo(() => cart.items || [], [cart.items]);
 
   const { delete: destroy, processing } = useForm();
 
@@ -53,7 +57,7 @@ const CartIndex = ({ cart }) => {
     return cartSubtotal + shippingCost + taxAmount;
   }, [cartSubtotal, taxAmount]);
 
-  const handleRemoveItem = (cartItemId) => {
+  const handleRemoveItem = useCallback((cartItemId) => {
     // Set loading state for this item
     setUpdatingItems(prev => ({ ...prev, [cartItemId]: true }));
 
@@ -98,7 +102,7 @@ const CartIndex = ({ cart }) => {
       // Clear loading state
       setUpdatingItems(prev => ({ ...prev, [cartItemId]: false }));
     });
-  };
+  }, [cart.items, itemQuantities, t]);
 
   // Updated increment function using direct axios call like in ProductShow
   const incrementQuantity = (cartItemId) => {
@@ -547,6 +551,8 @@ const CartIndex = ({ cart }) => {
       </div>
     </CinematicLayout>
   );
-};
+});
+
+CartIndex.displayName = 'CartIndex';
 
 export default CartIndex;

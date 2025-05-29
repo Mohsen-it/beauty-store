@@ -193,7 +193,8 @@
     "confirm_your_password": "Confirm your password",
     "new_password_instructions": "Please create a new secure password for your account.",
     "log_out": "Log Out",
-    "to_your_account": "to your account"
+    "to_your_account": "to your account",
+    "login_required": "Please login to continue"
   },
   "product": {
     "description": "Description",
@@ -459,6 +460,11 @@
     "empty_title": "Your wishlist is empty",
     "empty_message": "You haven't added any products to your wishlist yet. Browse our products and click the heart icon to add items to your wishlist."
   },
+  "wishlist": {
+    "added": "Added to wishlist",
+    "removed": "Removed from wishlist",
+    "login_required": "Please login to add items to your wishlist"
+  },
   "newsletter": {
     "invalid_email": "Please provide a valid email address.",
     "subscription_success": "Thank you for subscribing to our newsletter!",
@@ -487,6 +493,8 @@
     "date": "Date",
     "description": "Description",
     "availability": "Availability",
+    "rating": "Rating",
+    "stars": "stars",
     "in_stock": "In Stock ({count} available)",
     "quantity": "Quantity",
     "related_products": "Related Products",
@@ -495,6 +503,16 @@
     "add_to_wishlist": "Add to Wishlist",
     "remove_from_wishlist": "Remove from Wishlist",
     "shipping_returns": "Shipping & Returns",
-    "out_of_stock": "Out of Stock"
+    "out_of_stock": "Out of Stock",
+    "products_found": "products found",
+    "product_found": "product found",
+    "page": "Page",
+    "of": "of",
+    "sort": {
+      "newest": "Newest",
+      "price_low_high": "Price: Low to High",
+      "price_high_low": "Price: High to Low",
+      "name": "Name: A-Z"
+    }
   }
 }

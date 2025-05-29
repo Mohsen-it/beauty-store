@@ -212,7 +212,15 @@ const AdminLayout = ({ children }) => {
 
       {/* Mobile sidebar */}
       <div className={`md:hidden fixed inset-0 flex z-40 ${sidebarOpen ? 'block' : 'hidden'}`}>
-        <div className="fixed inset-0 bg-gray-600 bg-opacity-75" onClick={() => setSidebarOpen(false)}></div>
+        <div
+          className="fixed inset-0 bg-gray-600 bg-opacity-75"
+          onClick={(event) => {
+            // Only close if clicking directly on the backdrop, not on child elements
+            if (event.target === event.currentTarget) {
+              setSidebarOpen(false);
+            }
+          }}
+        ></div>
         <div className="relative flex-1 flex flex-col max-w-xs w-full bg-gray-800">
           <div className="absolute top-0 right-0 -mr-12 pt-2">
             <button

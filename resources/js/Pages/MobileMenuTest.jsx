@@ -1,26 +1,79 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { Head } from '@inertiajs/react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const MobileMenuTest = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [testResults, setTestResults] = useState({
+    backdropClick: null,
+    clickOutside: null,
+    escapeKey: null,
+    closeButton: null
+  });
+
+  // Ref for the menu panel to detect clicks outside
+  const menuPanelRef = useRef(null);
 
   const toggleMenu = () => {
     console.log('Toggle menu clicked, current state:', mobileMenuOpen);
     setMobileMenuOpen(!mobileMenuOpen);
   };
 
-  const closeMenu = () => {
-    console.log('Close menu called');
+  const closeMenu = useCallback((testType = 'manual') => {
+    console.log('Close menu called via:', testType);
     setMobileMenuOpen(false);
-  };
+
+    // Update test results
+    if (testType !== 'manual') {
+      setTestResults(prev => ({
+        ...prev,
+        [testType]: 'PASSED'
+      }));
+    }
+  }, []);
+
+  // Handle click outside menu panel to close menu (same logic as the fixed component)
+  useEffect(() => {
+    if (!mobileMenuOpen) return;
+
+    const handleClickOutside = (event) => {
+      // Check if the click is outside the menu panel
+      if (menuPanelRef.current && !menuPanelRef.current.contains(event.target)) {
+        closeMenu('clickOutside');
+      }
+    };
+
+    // Add event listener with a slight delay to prevent immediate closing
+    const timeoutId = setTimeout(() => {
+      document.addEventListener('mousedown', handleClickOutside);
+      document.addEventListener('touchstart', handleClickOutside, { passive: true });
+    }, 100);
+
+    return () => {
+      clearTimeout(timeoutId);
+      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('touchstart', handleClickOutside);
+    };
+  }, [mobileMenuOpen, closeMenu]);
+
+  // Handle escape key
+  useEffect(() => {
+    const handleEscapeKey = (e) => {
+      if (e.key === 'Escape' && mobileMenuOpen) {
+        closeMenu('escapeKey');
+      }
+    };
+
+    document.addEventListener('keydown', handleEscapeKey);
+    return () => document.removeEventListener('keydown', handleEscapeKey);
+  }, [mobileMenuOpen, closeMenu]);
 
   console.log('MobileMenuTest render - mobileMenuOpen:', mobileMenuOpen);
 
   return (
     <>
       <Head title="Mobile Menu Test" />
-      
+
       <div className="min-h-screen bg-gray-100">
         {/* Header */}
         <header className="bg-white shadow-lg sticky top-0 z-50">
@@ -32,7 +85,7 @@ const MobileMenuTest = () => {
                   Cosmetics Store Test
                 </span>
               </div>
-              
+
               {/* Mobile menu button */}
               <div className="lg:hidden">
                 <button
@@ -67,12 +120,13 @@ const MobileMenuTest = () => {
                 exit={{ opacity: 0 }}
                 transition={{ duration: 0.2 }}
                 className="fixed inset-0 z-[9998] bg-black/60"
-                onClick={closeMenu}
+                onClick={() => closeMenu('backdropClick')}
                 aria-hidden="true"
               />
 
               {/* Menu Panel */}
               <motion.div
+                ref={menuPanelRef}
                 initial={{ x: '-100%' }}
                 animate={{ x: 0 }}
                 exit={{ x: '-100%' }}
@@ -85,6 +139,7 @@ const MobileMenuTest = () => {
                 role="dialog"
                 aria-modal="true"
                 aria-label="Mobile navigation menu"
+                onClick={(e) => e.stopPropagation()}
               >
                 <div className="h-full flex flex-col">
                   {/* Menu header */}
@@ -93,7 +148,7 @@ const MobileMenuTest = () => {
                       Test Menu
                     </span>
                     <button
-                      onClick={closeMenu}
+                      onClick={() => closeMenu('closeButton')}
                       className="p-2 rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-100 min-h-[44px] min-w-[44px] flex items-center justify-center"
                       aria-label="Close menu"
                     >
@@ -157,18 +212,94 @@ const MobileMenuTest = () => {
               <p>Screen Width: <span className="font-mono bg-gray-100 px-2 py-1 rounded">{typeof window !== 'undefined' ? window.innerWidth : 'N/A'}px</span></p>
             </div>
           </div>
-          
-          <div className="space-y-4">
-            <p>هذه صفحة اختبار للقائمة المحمولة.</p>
-            <p>اضغط على زر الهامبرغر في الأعلى لفتح القائمة.</p>
-            <p>تحقق من وحدة التحكم في المتصفح للحصول على معلومات التشخيص.</p>
-            
+
+          <div className="bg-white p-6 rounded-lg shadow mb-6">
+            <h2 className="text-xl font-semibold mb-4">Click-Outside Test Results:</h2>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <p>Backdrop Click:
+                  <span className={`ml-2 px-2 py-1 rounded text-sm font-mono ${
+                    testResults.backdropClick === 'PASSED' ? 'bg-green-100 text-green-800' :
+                    testResults.backdropClick === 'FAILED' ? 'bg-red-100 text-red-800' :
+                    'bg-gray-100 text-gray-600'
+                  }`}>
+                    {testResults.backdropClick || 'NOT TESTED'}
+                  </span>
+                </p>
+                <p>Click Outside:
+                  <span className={`ml-2 px-2 py-1 rounded text-sm font-mono ${
+                    testResults.clickOutside === 'PASSED' ? 'bg-green-100 text-green-800' :
+                    testResults.clickOutside === 'FAILED' ? 'bg-red-100 text-red-800' :
+                    'bg-gray-100 text-gray-600'
+                  }`}>
+                    {testResults.clickOutside || 'NOT TESTED'}
+                  </span>
+                </p>
+              </div>
+              <div className="space-y-2">
+                <p>Escape Key:
+                  <span className={`ml-2 px-2 py-1 rounded text-sm font-mono ${
+                    testResults.escapeKey === 'PASSED' ? 'bg-green-100 text-green-800' :
+                    testResults.escapeKey === 'FAILED' ? 'bg-red-100 text-red-800' :
+                    'bg-gray-100 text-gray-600'
+                  }`}>
+                    {testResults.escapeKey || 'NOT TESTED'}
+                  </span>
+                </p>
+                <p>Close Button:
+                  <span className={`ml-2 px-2 py-1 rounded text-sm font-mono ${
+                    testResults.closeButton === 'PASSED' ? 'bg-green-100 text-green-800' :
+                    testResults.closeButton === 'FAILED' ? 'bg-red-100 text-red-800' :
+                    'bg-gray-100 text-gray-600'
+                  }`}>
+                    {testResults.closeButton || 'NOT TESTED'}
+                  </span>
+                </p>
+              </div>
+            </div>
             <button
-              onClick={toggleMenu}
-              className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition-colors"
+              onClick={() => setTestResults({ backdropClick: null, clickOutside: null, escapeKey: null, closeButton: null })}
+              className="mt-4 bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600 transition-colors text-sm"
             >
-              {mobileMenuOpen ? 'إغلاق القائمة' : 'فتح القائمة'}
+              Reset Test Results
             </button>
+          </div>
+
+          <div className="space-y-4">
+            <h3 className="text-lg font-semibold">Test Instructions:</h3>
+            <ol className="list-decimal list-inside space-y-2 text-sm">
+              <li>Click the hamburger menu button to open the menu</li>
+              <li>Test backdrop click: Click on the dark area outside the menu panel</li>
+              <li>Test click outside: Click anywhere outside the menu panel (not just backdrop)</li>
+              <li>Test escape key: Press the Escape key while menu is open</li>
+              <li>Test close button: Click the X button in the menu header</li>
+              <li>Check that all tests show "PASSED" status above</li>
+            </ol>
+
+            <div className="flex gap-4">
+              <button
+                onClick={toggleMenu}
+                className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition-colors"
+              >
+                {mobileMenuOpen ? 'Close Menu' : 'Open Menu'}
+              </button>
+
+              <button
+                onClick={() => {
+                  setMobileMenuOpen(true);
+                  setTimeout(() => {
+                    // Simulate click outside after menu opens
+                    const outsideElement = document.querySelector('main');
+                    if (outsideElement) {
+                      outsideElement.click();
+                    }
+                  }, 200);
+                }}
+                className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 transition-colors text-sm"
+              >
+                Auto Test Click Outside
+              </button>
+            </div>
           </div>
         </main>
       </div>

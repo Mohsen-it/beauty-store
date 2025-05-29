@@ -1,11 +1,12 @@
-import React from 'react';
+import React, { memo, useCallback, useMemo, useEffect, useRef } from 'react';
 import { Link } from '@inertiajs/react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import DarkModeToggle from '@/Components/DarkModeToggle';
 import LanguageSwitcher from '@/Components/LanguageSwitcher';
 import { t } from '@/utils/translate';
+import { usePerformanceOptimization } from '@/utils/usePerformanceOptimization';
 
-const MobileMenu = ({
+const MobileMenu = memo(({
   isOpen,
   onClose,
   auth,
@@ -14,8 +15,15 @@ const MobileMenu = ({
   rtl,
   menuSwipeHandlers
 }) => {
+  // Performance optimization hooks
+  const { animationVariants, performanceSettings } = usePerformanceOptimization();
+  const prefersReducedMotion = useReducedMotion();
+
+  // Ref for the menu panel to detect clicks outside
+  const menuPanelRef = useRef(null);
+
   // Handle body scroll lock when mobile menu is open
-  React.useEffect(() => {
+  useEffect(() => {
     if (isOpen) {
       document.body.style.overflow = 'hidden';
     } else {
@@ -27,41 +35,103 @@ const MobileMenu = ({
     };
   }, [isOpen]);
 
+  // Memoize close handler to prevent unnecessary re-renders
+  const handleClose = useCallback(() => {
+    onClose();
+  }, [onClose]);
+
+  // Handle click outside menu panel to close menu
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const handleClickOutside = (event) => {
+      // Check if the click is outside the menu panel
+      if (menuPanelRef.current && !menuPanelRef.current.contains(event.target)) {
+        handleClose();
+      }
+    };
+
+    // Add event listener with a slight delay to prevent immediate closing
+    // when the menu is just opened by a button click
+    const timeoutId = setTimeout(() => {
+      document.addEventListener('mousedown', handleClickOutside);
+      document.addEventListener('touchstart', handleClickOutside, { passive: true });
+    }, 150);
+
+    return () => {
+      clearTimeout(timeoutId);
+      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('touchstart', handleClickOutside);
+    };
+  }, [isOpen, handleClose]);
+
+  // Backdrop click handler - ensures clicking outside the menu closes it
+  const handleBackdropClick = useCallback((event) => {
+    // Only close if clicking directly on the backdrop, not on child elements
+    if (event.target === event.currentTarget) {
+      handleClose();
+    }
+  }, [handleClose]);
+
+  // Handle menu panel click to prevent closing
+  const handleMenuClick = useCallback((e) => {
+    e.stopPropagation();
+  }, []);
+
+  // Memoize logout handler
+  const handleLogoutClick = useCallback(() => {
+    handleLogout();
+    handleClose();
+  }, [handleLogout, handleClose]);
+
+  // Memoize optimized animation variants
+  const optimizedAnimations = useMemo(() => ({
+    backdrop: {
+      initial: { opacity: 0 },
+      animate: { opacity: 1 },
+      exit: { opacity: 0 },
+      transition: {
+        duration: prefersReducedMotion ? 0.1 : (performanceSettings.animations.duration * 0.8)
+      }
+    },
+    panel: {
+      initial: { x: rtl ? '100%' : '-100%' },
+      animate: { x: 0 },
+      exit: { x: rtl ? '100%' : '-100%' },
+      transition: {
+        type: 'tween',
+        duration: prefersReducedMotion ? 0.1 : performanceSettings.animations.duration,
+        ease: performanceSettings.animations.easing
+      }
+    }
+  }), [rtl, prefersReducedMotion, performanceSettings]);
+
   return (
     <AnimatePresence>
       {isOpen && (
-        <div className="lg:hidden">
+        <div className="lg:hidden fixed inset-0 z-[998]">
           {/* Backdrop */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.2 }}
+          <div
             className="fixed inset-0 z-[998] bg-black/60 dark:bg-black/80"
-            onClick={onClose}
+            onClick={handleBackdropClick}
             aria-hidden="true"
           />
 
           {/* Menu panel with animation */}
           <motion.div
-            initial={{ x: rtl ? '100%' : '-100%' }}
-            animate={{ x: 0 }}
-            exit={{ x: rtl ? '100%' : '-100%' }}
-            transition={{
-              type: 'tween',
-              duration: 0.3,
-              ease: [0.25, 0.46, 0.45, 0.94]
-            }}
-            className={`fixed top-0 bottom-0 ${rtl ? 'right-0' : 'left-0'} z-[999] w-[75%] sm:w-[70%] max-w-sm h-screen bg-gradient-to-b from-white to-gray-50 dark:from-gray-900 dark:to-gray-800 shadow-2xl border-r border-gray-200/50 dark:border-gray-700/50`}
+            ref={menuPanelRef}
+            {...optimizedAnimations.panel}
+            className={`fixed top-0 bottom-0 ${rtl ? 'right-0' : 'left-0'} z-[999] w-[75%] sm:w-[70%] max-w-sm h-screen bg-gradient-to-b from-white to-gray-50 dark:from-gray-900 dark:to-gray-800 shadow-2xl border-r border-gray-200/50 dark:border-gray-700/50 performance-modal mobile-layout`}
             role="dialog"
             aria-modal="true"
             aria-label="Mobile navigation menu"
             {...menuSwipeHandlers}
+            onClick={handleMenuClick}
           >
           <div className="h-full flex flex-col">
             {/* Menu header */}
             <div className="flex items-center justify-between p-4 sm:p-6 border-b border-gray-200/60 dark:border-gray-700/60 bg-gradient-to-r from-pink-50 to-purple-50 dark:from-gray-800 dark:to-gray-700 min-h-[80px] shadow-sm">
-              <Link href="/" className="flex items-center group" onClick={onClose}>
+              <Link href="/" className="flex items-center group" onClick={handleClose}>
                 <div className="flex items-center space-x-2">
                   <div className="w-8 h-8 rounded-full bg-gradient-to-r from-pink-500 to-purple-600 flex items-center justify-center shadow-lg group-hover:shadow-xl transition-shadow duration-200">
                     <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
@@ -74,7 +144,7 @@ const MobileMenu = ({
                 </div>
               </Link>
               <button
-                onClick={onClose}
+                onClick={handleClose}
                 className="p-2 rounded-xl text-gray-500 hover:text-pink-600 hover:bg-white/80 dark:hover:bg-gray-600/50 transition-all duration-200 min-h-[44px] min-w-[44px] flex items-center justify-center shadow-sm hover:shadow-md"
                 aria-label="Close menu"
               >
@@ -97,7 +167,7 @@ const MobileMenu = ({
                 <div className="bg-gradient-to-r from-pink-50/50 to-purple-50/50 dark:from-gray-800/30 dark:to-gray-700/30 rounded-xl p-3 space-y-1">
                   <Link
                     href={route('home')}
-                    onClick={onClose}
+                    onClick={handleClose}
                     className={`flex items-center space-x-3 px-3 py-3 rounded-lg transition-all duration-200 group min-h-[44px] ${
                       route().current('home')
                         ? 'bg-gradient-to-r from-pink-200 to-purple-200 dark:from-pink-800/40 dark:to-purple-800/40 text-pink-800 dark:text-pink-200 shadow-sm'
@@ -112,7 +182,7 @@ const MobileMenu = ({
 
                   <Link
                     href={route('products.index')}
-                    onClick={onClose}
+                    onClick={handleClose}
                     className={`flex items-center space-x-3 px-3 py-3 rounded-lg transition-all duration-200 group min-h-[44px] ${
                       route().current('products.index')
                         ? 'bg-gradient-to-r from-pink-200 to-purple-200 dark:from-pink-800/40 dark:to-purple-800/40 text-purple-800 dark:text-purple-200 shadow-sm'
@@ -138,7 +208,7 @@ const MobileMenu = ({
                   <div className="bg-gradient-to-br from-indigo-50/50 to-pink-50/50 dark:from-gray-800/30 dark:to-gray-700/30 rounded-xl p-3 space-y-1">
                     <Link
                       href={route('categories.skincare')}
-                      onClick={onClose}
+                      onClick={handleClose}
                       className={`flex items-center space-x-3 px-3 py-2.5 rounded-lg transition-all duration-200 group min-h-[44px] ${
                         route().current('categories.skincare')
                           ? 'bg-gradient-to-r from-green-200 to-teal-200 dark:from-green-800/40 dark:to-teal-800/40 text-green-800 dark:text-green-200 shadow-sm'
@@ -153,7 +223,7 @@ const MobileMenu = ({
 
                     <Link
                       href={route('categories.makeup')}
-                      onClick={onClose}
+                      onClick={handleClose}
                       className={`flex items-center space-x-3 px-3 py-2.5 rounded-lg transition-all duration-200 group min-h-[44px] ${
                         route().current('categories.makeup')
                           ? 'bg-gradient-to-r from-pink-200 to-rose-200 dark:from-pink-800/40 dark:to-rose-800/40 text-pink-800 dark:text-pink-200 shadow-sm'
@@ -168,7 +238,7 @@ const MobileMenu = ({
 
                     <Link
                       href={route('categories.haircare')}
-                      onClick={onClose}
+                      onClick={handleClose}
                       className={`flex items-center space-x-3 px-3 py-2.5 rounded-lg transition-all duration-200 group min-h-[44px] ${
                         route().current('categories.haircare')
                           ? 'bg-gradient-to-r from-amber-200 to-orange-200 dark:from-amber-800/40 dark:to-orange-800/40 text-amber-800 dark:text-amber-200 shadow-sm'
@@ -183,7 +253,7 @@ const MobileMenu = ({
 
                     <Link
                       href={route('categories.fragrance')}
-                      onClick={onClose}
+                      onClick={handleClose}
                       className={`flex items-center space-x-3 px-3 py-2.5 rounded-lg transition-all duration-200 group min-h-[44px] ${
                         route().current('categories.fragrance')
                           ? 'bg-gradient-to-r from-violet-200 to-purple-200 dark:from-violet-800/40 dark:to-purple-800/40 text-violet-800 dark:text-violet-200 shadow-sm'
@@ -212,7 +282,7 @@ const MobileMenu = ({
                   <div className="bg-gradient-to-br from-blue-50/50 to-indigo-50/50 dark:from-gray-800/30 dark:to-gray-700/30 rounded-xl p-3 space-y-1">
                     <Link
                       href={route('profile.edit')}
-                      onClick={onClose}
+                      onClick={handleClose}
                       className={`flex items-center space-x-3 px-3 py-2.5 rounded-lg transition-all duration-200 group min-h-[44px] ${
                         route().current('profile.edit')
                           ? 'bg-gradient-to-r from-blue-200 to-indigo-200 dark:from-blue-800/40 dark:to-indigo-800/40 text-blue-800 dark:text-blue-200 shadow-sm'
@@ -227,7 +297,7 @@ const MobileMenu = ({
 
                     <Link
                       href={route('orders.index')}
-                      onClick={onClose}
+                      onClick={handleClose}
                       className={`flex items-center space-x-3 px-3 py-2.5 rounded-lg transition-all duration-200 group min-h-[44px] ${
                         route().current('orders.index')
                           ? 'bg-gradient-to-r from-emerald-200 to-teal-200 dark:from-emerald-800/40 dark:to-teal-800/40 text-emerald-800 dark:text-emerald-200 shadow-sm'
@@ -243,7 +313,7 @@ const MobileMenu = ({
 
                     <Link
                       href={route('favorites.index')}
-                      onClick={onClose}
+                      onClick={handleClose}
                       className={`flex items-center space-x-3 px-3 py-2.5 rounded-lg transition-all duration-200 group min-h-[44px] ${
                         route().current('favorites.index')
                           ? 'bg-gradient-to-r from-red-200 to-pink-200 dark:from-red-800/40 dark:to-pink-800/40 text-red-800 dark:text-red-200 shadow-sm'
@@ -258,7 +328,7 @@ const MobileMenu = ({
 
                     <Link
                       href={route('cart.index')}
-                      onClick={onClose}
+                      onClick={handleClose}
                       className={`flex items-center space-x-3 px-3 py-2.5 rounded-lg transition-all duration-200 group min-h-[44px] ${
                         route().current('cart.index')
                           ? 'bg-gradient-to-r from-orange-200 to-amber-200 dark:from-orange-800/40 dark:to-amber-800/40 text-orange-800 dark:text-orange-200 shadow-sm'
@@ -274,7 +344,7 @@ const MobileMenu = ({
                     <button
                       onClick={() => {
                         handleLogout();
-                        onClose();
+                        handleClose();
                       }}
                       className="w-full flex items-center space-x-3 px-3 py-2.5 rounded-lg text-gray-700 dark:text-gray-200 hover:bg-gradient-to-r hover:from-gray-100 hover:to-slate-100 dark:hover:from-gray-700/50 dark:hover:to-slate-700/50 transition-all duration-200 group min-h-[44px]"
                     >
@@ -297,7 +367,7 @@ const MobileMenu = ({
                   <div className="bg-gradient-to-br from-cyan-50/50 to-blue-50/50 dark:from-gray-800/30 dark:to-gray-700/30 rounded-xl p-3 space-y-1">
                     <Link
                       href={route('login')}
-                      onClick={onClose}
+                      onClick={handleClose}
                       className={`flex items-center space-x-3 px-3 py-3 rounded-lg transition-all duration-200 group min-h-[44px] ${
                         route().current('login')
                           ? 'bg-gradient-to-r from-cyan-200 to-blue-200 dark:from-cyan-800/40 dark:to-blue-800/40 text-cyan-800 dark:text-cyan-200 shadow-sm'
@@ -312,7 +382,7 @@ const MobileMenu = ({
 
                     <Link
                       href={route('register')}
-                      onClick={onClose}
+                      onClick={handleClose}
                       className={`flex items-center space-x-3 px-3 py-3 rounded-lg transition-all duration-200 group min-h-[44px] ${
                         route().current('register')
                           ? 'bg-gradient-to-r from-emerald-200 to-green-200 dark:from-emerald-800/40 dark:to-green-800/40 text-emerald-800 dark:text-emerald-200 shadow-sm'
@@ -370,6 +440,8 @@ const MobileMenu = ({
       )}
     </AnimatePresence>
   );
-};
+});
+
+MobileMenu.displayName = 'MobileMenu';
 
 export default MobileMenu;

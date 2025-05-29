@@ -1,12 +1,13 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { router, usePage } from '@inertiajs/react';
 import { motion } from 'framer-motion';
 import { getCurrentLanguage } from '@/utils/translate';
 
 const LanguageSwitcher = ({ className = '' }) => {
   const [isOpen, setIsOpen] = useState(false);
+  const dropdownRef = useRef(null);
   const currentLanguage = getCurrentLanguage();
-  
+
   // Define available languages
   const languages = [
     { code: 'en', name: 'English', flag: '🇺🇸' },
@@ -20,12 +21,12 @@ const LanguageSwitcher = ({ className = '' }) => {
   const changeLanguage = (languageCode) => {
     // Close the dropdown
     setIsOpen(false);
-    
+
     // Only make the request if the language is different
     if (languageCode !== currentLanguage) {
       // Make a POST request to change the language
-      router.post(route('language.change'), { 
-        language: languageCode 
+      router.post(route('language.change'), {
+        language: languageCode
       }, {
         preserveScroll: true,
         onSuccess: () => {
@@ -38,16 +39,25 @@ const LanguageSwitcher = ({ className = '' }) => {
 
   // Close the dropdown when clicking outside
   useEffect(() => {
-    const handleClickOutside = () => setIsOpen(false);
-    document.addEventListener('click', handleClickOutside);
-    
-    return () => {
-      document.removeEventListener('click', handleClickOutside);
+    if (!isOpen) return;
+
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setIsOpen(false);
+      }
     };
-  }, []);
+
+    document.addEventListener('mousedown', handleClickOutside);
+    document.addEventListener('touchstart', handleClickOutside, { passive: true });
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('touchstart', handleClickOutside);
+    };
+  }, [isOpen]);
 
   return (
-    <div className={`relative ${className}`} onClick={(e) => e.stopPropagation()}>
+    <div ref={dropdownRef} className={`relative ${className}`} onClick={(e) => e.stopPropagation()}>
       <button
         type="button"
         className="flex items-center space-x-1 text-gray-700 dark:text-gray-300 hover:text-pink-600 dark:hover:text-pink-400 transition-colors duration-200"
@@ -55,11 +65,11 @@ const LanguageSwitcher = ({ className = '' }) => {
       >
         <span className="text-lg">{currentLang.flag}</span>
         <span className="hidden md:inline-block">{currentLang.name}</span>
-        <svg 
-          xmlns="http://www.w3.org/2000/svg" 
-          className={`h-4 w-4 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`} 
-          fill="none" 
-          viewBox="0 0 24 24" 
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          className={`h-4 w-4 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`}
+          fill="none"
+          viewBox="0 0 24 24"
           stroke="currentColor"
         >
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />

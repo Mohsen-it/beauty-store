@@ -1,0 +1,387 @@
+/* Performance Optimizations for Beauty Store Application */
+
+/* GPU Acceleration for smooth animations */
+.gpu-accelerated {
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  perspective: 1000px;
+  will-change: transform;
+}
+
+/* Optimized image containers */
+.image-container {
+  position: relative;
+  overflow: hidden;
+  background-color: #f3f4f6;
+  will-change: transform;
+}
+
+.image-container img {
+  transition: transform 0.3s ease;
+  will-change: transform;
+}
+
+.image-container:hover img {
+  transform: scale(1.05);
+}
+
+/* Smooth scrolling optimizations */
+.smooth-scroll {
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Optimized grid layouts */
+.products-grid {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  contain: layout style paint;
+}
+
+@media (min-width: 640px) {
+  .products-grid {
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  }
+}
+
+@media (min-width: 1024px) {
+  .products-grid {
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  }
+}
+
+/* Optimized card components */
+.card-product {
+  contain: layout style paint;
+  will-change: transform, box-shadow;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card-product:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px -5px rgba(0, 0, 0, 0.1);
+}
+
+/* Optimized carousel performance */
+.carousel-container {
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.carousel-container::-webkit-scrollbar {
+  display: none;
+}
+
+.carousel-item {
+  scroll-snap-align: start;
+  flex-shrink: 0;
+}
+
+/* Optimized mobile gallery */
+.mobile-gallery {
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  contain: layout style paint;
+}
+
+.mobile-gallery::-webkit-scrollbar {
+  display: none;
+}
+
+.mobile-gallery-slide {
+  scroll-snap-align: center;
+  flex-shrink: 0;
+  width: 100%;
+}
+
+/* Performance-optimized buttons */
+.btn-optimized {
+  contain: layout style paint;
+  will-change: transform, background-color;
+  transition: all 0.15s ease;
+}
+
+.btn-optimized:hover {
+  transform: translateY(-1px);
+}
+
+.btn-optimized:active {
+  transform: translateY(0);
+}
+
+/* Optimized loading states */
+.loading-skeleton {
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: skeleton-loading 1.2s ease-in-out infinite;
+  will-change: background-position;
+}
+
+@keyframes skeleton-loading {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+/* Dark mode skeleton */
+.dark .loading-skeleton {
+  background: linear-gradient(90deg, #2a2a2a 25%, #3a3a3a 50%, #2a2a2a 75%);
+  background-size: 200% 100%;
+}
+
+/* Optimized modal and overlay performance */
+.modal-overlay {
+  backdrop-filter: blur(4px);
+  will-change: opacity;
+  transition: opacity 0.2s ease;
+}
+
+.modal-content {
+  will-change: transform, opacity;
+  transition: transform 0.2s ease, opacity 0.2s ease;
+}
+
+/* Optimized navigation performance */
+.nav-item {
+  contain: layout style paint;
+  will-change: background-color, color;
+  transition: all 0.15s ease;
+}
+
+/* Optimized form inputs */
+.form-input {
+  contain: layout style paint;
+  will-change: border-color, box-shadow;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+/* Performance hints for browsers */
+.performance-hint {
+  contain: layout style paint;
+  content-visibility: auto;
+  contain-intrinsic-size: 200px;
+}
+
+/* Optimized text rendering */
+.optimized-text {
+  text-rendering: optimizeSpeed;
+  font-display: swap;
+}
+
+/* Critical performance utilities */
+.will-change-transform {
+  will-change: transform;
+}
+
+.will-change-opacity {
+  will-change: opacity;
+}
+
+.will-change-auto {
+  will-change: auto;
+}
+
+/* Container queries for better performance */
+@container (min-width: 320px) {
+  .container-responsive {
+    padding: 0.5rem;
+  }
+}
+
+@container (min-width: 768px) {
+  .container-responsive {
+    padding: 1rem;
+  }
+}
+
+/* Optimized focus states */
+.focus-optimized:focus {
+  outline: 2px solid #ec4899;
+  outline-offset: 2px;
+  transition: outline-offset 0.1s ease;
+}
+
+/* Performance-optimized animations */
+@media (prefers-reduced-motion: no-preference) {
+  .animate-optimized {
+    animation-duration: 0.2s;
+    animation-timing-function: ease-out;
+    animation-fill-mode: forwards;
+  }
+}
+
+/* Disable animations for reduced motion preference */
+@media (prefers-reduced-motion: reduce) {
+  .animate-optimized {
+    animation: none;
+    transition: none;
+  }
+}
+
+/* Critical rendering optimizations */
+.critical-render {
+  contain: layout style paint;
+  content-visibility: auto;
+}
+
+/* Optimized image lazy loading */
+.lazy-image {
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  will-change: opacity;
+}
+
+.lazy-image.loaded {
+  opacity: 1;
+  will-change: auto;
+}
+
+/* Mobile-first performance optimizations */
+@media (max-width: 768px) {
+  /* Reduce animation complexity on mobile */
+  .mobile-optimized {
+    animation-duration: 0.2s !important;
+    transition-duration: 0.2s !important;
+  }
+
+  /* Optimize touch interactions */
+  .touch-optimized {
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+    user-select: none;
+  }
+
+  /* Reduce reflows on mobile */
+  .mobile-layout {
+    contain: layout style paint;
+    content-visibility: auto;
+  }
+
+  /* Optimize scrolling performance */
+  .mobile-scroll {
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
+  }
+}
+
+/* High-performance grid layouts */
+.performance-grid {
+  display: grid;
+  contain: layout style paint;
+  content-visibility: auto;
+  contain-intrinsic-size: 300px;
+}
+
+/* Optimized card hover effects with hardware acceleration */
+.performance-card {
+  contain: layout style paint;
+  will-change: transform;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  backface-visibility: hidden;
+  transform: translateZ(0);
+}
+
+.performance-card:hover {
+  transform: translateY(-2px) translateZ(0);
+}
+
+/* Optimized button interactions */
+.performance-button {
+  contain: layout style paint;
+  will-change: transform, background-color;
+  transition: all 0.15s ease;
+  transform: translateZ(0);
+}
+
+.performance-button:active {
+  transform: translateY(1px) translateZ(0);
+}
+
+/* Optimized modal and overlay animations */
+.performance-modal {
+  contain: layout style paint;
+  will-change: opacity, transform;
+  backface-visibility: hidden;
+}
+
+.performance-overlay {
+  backdrop-filter: blur(4px);
+  will-change: opacity;
+  contain: layout style paint;
+}
+
+/* Critical rendering path optimizations */
+.above-fold {
+  contain: layout style paint;
+  content-visibility: auto;
+  contain-intrinsic-size: 400px;
+}
+
+.below-fold {
+  content-visibility: auto;
+  contain-intrinsic-size: 200px;
+}
+
+/* Optimized text rendering for performance */
+.performance-text {
+  text-rendering: optimizeSpeed;
+  font-display: swap;
+  contain: layout style paint;
+}
+
+/* Reduce paint complexity for animations */
+.paint-optimized {
+  isolation: isolate;
+  contain: layout style paint;
+}
+
+/* GPU-accelerated transforms */
+.gpu-transform {
+  transform: translateZ(0);
+  will-change: transform;
+  backface-visibility: hidden;
+}
+
+/* Optimized focus states for accessibility and performance */
+.performance-focus:focus {
+  outline: 2px solid #ec4899;
+  outline-offset: 2px;
+  transition: outline-offset 0.1s ease;
+}
+
+/* Container queries for responsive performance */
+@container (min-width: 320px) {
+  .container-optimized {
+    padding: 0.5rem;
+    contain: layout style paint;
+  }
+}
+
+@container (min-width: 768px) {
+  .container-optimized {
+    padding: 1rem;
+  }
+}
+
+@container (min-width: 1024px) {
+  .container-optimized {
+    padding: 1.5rem;
+  }
+}
+
+/* Performance monitoring utilities */
+.perf-monitor {
+  contain: strict;
+  content-visibility: auto;
+  contain-intrinsic-size: 1px 1px;
+}
