@@ -346,23 +346,23 @@ const ProductsIndex = memo(({ products, categories, filters }) => {
                   </motion.div>
                 </div>
               ) : (
-            <div className="bg-white dark:bg-cinematic-800 p-6 lg:p-8 xl:p-12 rounded-xl lg:rounded-2xl shadow-lg dark:shadow-soft text-center border border-cinematic-200 dark:border-cinematic-700">
+            <div className="bg-white dark:bg-gray-800 p-8 rounded-lg shadow-sm text-center border border-gray-200 dark:border-gray-700">
               <div className="max-w-md mx-auto">
-                <div className="w-16 h-16 lg:w-20 lg:h-20 xl:w-24 xl:h-24 mx-auto mb-4 lg:mb-6 bg-gradient-to-r from-pink-100 to-purple-100 dark:from-pink-900/30 dark:to-purple-900/30 rounded-full flex items-center justify-center">
-                  <svg className="w-8 h-8 lg:w-10 lg:h-10 xl:w-12 xl:h-12 text-pink-500 dark:text-pink-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div className="w-16 h-16 mx-auto mb-6 bg-gray-100 dark:bg-gray-700 rounded-full flex items-center justify-center">
+                  <svg className="w-8 h-8 text-gray-400 dark:text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                   </svg>
                 </div>
-                <h3 className="text-lg lg:text-xl xl:text-2xl font-bold text-cinematic-900 dark:text-white mb-2 lg:mb-3">{t('products.no_products_found')}</h3>
-                <p className="text-sm lg:text-base text-cinematic-600 dark:text-cinematic-400 mb-6 lg:mb-8">{t('products.try_adjusting_filters')}</p>
+                <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-3">{t('products.no_products_found')}</h3>
+                <p className="text-gray-600 dark:text-gray-400 mb-6">{t('products.try_adjusting_filters')}</p>
                 <Link
                   href={route('products.index')}
-                  className="inline-flex items-center justify-center bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 text-white py-3 lg:py-4 px-6 lg:px-8 rounded-xl lg:rounded-2xl focus:outline-none focus:ring-4 focus:ring-pink-500/50 focus:ring-offset-2 dark:focus:ring-offset-cinematic-800 transition-all duration-300 text-sm lg:text-base font-semibold shadow-lg hover:shadow-xl"
+                  className="inline-flex items-center justify-center bg-gray-900 dark:bg-white text-white dark:text-gray-900 hover:bg-gray-800 dark:hover:bg-gray-100 py-3 px-6 rounded-lg transition-all duration-200 font-medium shadow-sm hover:shadow-md"
                   preserveScroll
                   preserveState
                   only={['products', 'filters']}
                 >
-                  <svg className="w-4 h-4 lg:w-5 lg:h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                   </svg>
                   {t('products.clear_all_filters')}
